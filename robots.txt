@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://inova01.github.io/Resto_Sevenwonders/sitemap.xml
