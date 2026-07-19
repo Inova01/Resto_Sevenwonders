@@ -859,6 +859,142 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 }
 
 /* =========================================================
+   MENU — SUB-CATEGORY PILLS (2nd level)
+   ========================================================= */
+.subcat-row {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: .6rem; margin: -1.4rem 0 2.4rem;
+}
+.subcat-pill {
+  border: 1px solid var(--line); color: var(--body);
+  padding: .42rem 1.1rem; border-radius: 40px;
+  font-size: .78rem; letter-spacing: .08em; text-transform: uppercase;
+  white-space: nowrap; transition: color .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+}
+.subcat-pill:hover { border-color: var(--apricot); color: var(--apricot-light); }
+.subcat-pill.active { background: var(--apricot); color: #1a1207; border-color: var(--apricot); font-weight: 600; }
+@media (max-width: 620px) {
+  .subcat-row {
+    flex-wrap: nowrap; justify-content: flex-start;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding-bottom: .5rem; scrollbar-width: none;
+  }
+  .subcat-row::-webkit-scrollbar { display: none; }
+  .subcat-pill { flex: 0 0 auto; }
+}
+
+/* Placeholder food thumbnail (apricot) when no photo matches */
+.menu-item__thumb--ph {
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 32% 28%, var(--apricot-light), var(--apricot-deep));
+  color: #1a1207;
+}
+.menu-item__thumb--ph svg { width: 30px; height: 30px; }
+
+.menu-list { animation: fadeIn .4s var(--ease); }
+
+/* =========================================================
+   ORDER SECTION
+   ========================================================= */
+.order-grid {
+  display: grid; grid-template-columns: 1.5fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem); align-items: start;
+}
+.order-group { margin-bottom: 2.2rem; }
+.order-group__title {
+  font-family: var(--serif); color: var(--white); font-size: 1.4rem;
+  margin-bottom: .3rem; letter-spacing: .02em;
+}
+.order-group__sub {
+  color: var(--apricot); font-size: .72rem; text-transform: uppercase;
+  letter-spacing: .14em; margin: 1.2rem 0 .5rem; font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,.07); padding-bottom: .4rem;
+}
+.order-dish {
+  display: flex; align-items: center; gap: .85rem;
+  padding: .6rem 0; border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.order-dish__label { flex: 1; display: flex; align-items: baseline; gap: .5rem 1rem; flex-wrap: wrap; min-width: 0; cursor: pointer; }
+.order-dish__name { color: var(--white); font-weight: 500; }
+.order-dish__desc { color: var(--muted); font-size: .8rem; }
+.order-dish__price { color: var(--apricot); font-weight: 700; white-space: nowrap; }
+.order-dish__vary { color: var(--muted); font-size: .78rem; font-style: italic; white-space: nowrap; }
+
+/* Apricot radio */
+.order-radio {
+  appearance: none; -webkit-appearance: none;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--line); flex: 0 0 auto; position: relative;
+  cursor: pointer; transition: border-color .2s var(--ease); margin: 0;
+}
+.order-radio:checked { border-color: var(--apricot); }
+.order-radio:checked::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--apricot); }
+
+/* Quantity stepper */
+.qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 30px; overflow: hidden; flex: 0 0 auto; }
+.qty[hidden] { display: none; }
+.qty button { width: 30px; height: 30px; color: var(--apricot); font-size: 1.1rem; display: grid; place-items: center; transition: background .2s var(--ease); }
+.qty button:hover { background: rgba(237,158,88,.15); }
+.qty button:disabled { opacity: .3; cursor: default; }
+.qty span { min-width: 26px; text-align: center; font-weight: 600; font-size: .9rem; color: var(--white); }
+
+/* Add-on cards (checkboxes) */
+.addon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: .7rem; }
+.addon-card {
+  display: flex; align-items: center; gap: .6rem;
+  border: 1px solid var(--line); border-radius: 12px; padding: .7rem .9rem;
+  cursor: pointer; transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.addon-card:hover { border-color: var(--apricot); }
+.addon-card.checked { border-color: var(--apricot); background: rgba(237,158,88,.08); }
+.addon-card input { position: absolute; opacity: 0; width: 0; height: 0; }
+.addon-card__box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); flex: 0 0 auto; display: grid; place-items: center; color: #1a1207; transition: background .2s var(--ease), border-color .2s var(--ease); }
+.addon-card.checked .addon-card__box { background: var(--apricot); border-color: var(--apricot); }
+.addon-card.checked .addon-card__box::after { content: "✓"; font-size: .8rem; font-weight: 700; }
+.addon-card__name { flex: 1; font-size: .85rem; color: var(--white); }
+.addon-card__price { color: var(--apricot); font-weight: 700; font-size: .85rem; white-space: nowrap; }
+
+/* Your Order summary */
+.order-summary { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; position: sticky; top: 150px; }
+.order-summary h3 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 1rem; }
+.order-lines { display: flex; flex-direction: column; gap: .7rem; margin-bottom: 1rem; min-height: 40px; }
+.order-line { display: grid; grid-template-columns: auto 1fr auto; gap: .2rem .7rem; align-items: baseline; font-size: .88rem; }
+.order-line__rm { color: var(--muted); font-size: 1rem; line-height: 1; align-self: center; }
+.order-line__rm:hover { color: var(--apricot); }
+.order-line__name { color: var(--body); min-width: 0; }
+.order-line__name b { color: var(--apricot); font-weight: 700; }
+.order-line__tot { color: var(--white); font-weight: 600; white-space: nowrap; }
+.order-line__meta { grid-column: 2 / -1; color: var(--muted); font-size: .74rem; }
+.order-empty { color: var(--muted); font-size: .88rem; font-style: italic; }
+.order-total-row { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line); padding-top: 1rem; margin-top: .3rem; }
+.order-total-row > span:first-child { text-transform: uppercase; letter-spacing: .14em; font-size: .8rem; color: var(--muted); }
+.order-total { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--apricot); }
+.order-clear { color: var(--muted); font-size: .8rem; text-decoration: underline; margin-top: .7rem; }
+.order-clear:hover { color: var(--apricot); }
+.order-note { color: var(--muted); font-size: .74rem; margin-top: .5rem; line-height: 1.4; }
+
+/* Fulfilment radios (pickup/delivery) */
+.pill-radios { display: flex; gap: .6rem; }
+.pill-radio { position: relative; flex: 1; }
+.pill-radio input { position: absolute; opacity: 0; }
+.pill-radio span { display: block; text-align: center; border: 1px solid var(--line); border-radius: 30px; padding: .6rem; font-size: .85rem; cursor: pointer; transition: all .2s var(--ease); }
+.pill-radio input:checked + span { background: var(--apricot); color: #1a1207; border-color: var(--apricot); font-weight: 600; }
+
+/* Field errors (apricot hints) */
+.field__err { color: var(--apricot-light); font-size: .74rem; display: none; }
+.field.invalid .field__err { display: block; }
+.field.invalid input, .field.invalid textarea { border-color: var(--apricot-deep); box-shadow: 0 0 0 3px rgba(237,158,88,0.16); }
+
+/* Success recap */
+.order-recap { margin-top: 1rem; border-radius: 10px; padding: 1rem 1.1rem; background: rgba(237,158,88,0.12); border: 1px solid var(--apricot); color: var(--apricot-light); font-size: .88rem; display: none; white-space: pre-wrap; }
+.order-recap.show { display: block; }
+
+@media (max-width: 992px) {
+  .order-grid { grid-template-columns: 1fr; }
+  .order-summary { position: static; }
+}
+
+/* =========================================================
    REDUCED MOTION
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {

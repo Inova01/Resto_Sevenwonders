@@ -90,157 +90,7 @@
 
     <!-- ============ MENU VIEW ============ -->
     <section class="subview" id="view-menu" role="tabpanel" aria-label="Food menu">
-    <section class="section" style="padding-top:1rem">
-      <div class="container">
-        <!-- Tabs -->
-        <div class="menu-tabs" role="tablist" aria-label="Menu categories">
-          <button class="menu-tab" role="tab" data-tab="starter"  aria-selected="false" aria-controls="panel-starter">Starter</button>
-          <button class="menu-tab" role="tab" data-tab="mains"    aria-selected="true"  aria-controls="panel-mains">Main Dishes</button>
-          <button class="menu-tab" role="tab" data-tab="desserts" aria-selected="false" aria-controls="panel-desserts">Desserts</button>
-          <button class="menu-tab" role="tab" data-tab="drinks"   aria-selected="false" aria-controls="panel-drinks">Drinks</button>
-        </div>
-
-        <!-- STARTERS -->
-        <div class="menu-panel" id="panel-starter" role="tabpanel">
-          <div class="menu-list">
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=200&q=80" alt="Heirloom tomato salad" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Heirloom Salad</span><span class="badge-new">New</span><span class="menu-item__leader"></span><span class="menu-item__price">$16</span></div>
-                <p class="menu-item__desc">Local heirloom tomatoes, burrata, basil oil, aged balsamic pearls.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=200&q=80" alt="Oysters on ice" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Gulf Oysters</span><span class="menu-item__leader"></span><span class="menu-item__price">$22</span></div>
-                <p class="menu-item__desc">Half dozen day-boat oysters, apricot mignonette, sea salt.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=200&q=80" alt="Tuna tartare" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Tuna Tartare</span><span class="menu-item__leader"></span><span class="menu-item__price">$19</span></div>
-                <p class="menu-item__desc">Yellowfin tuna, avocado, yuzu, crisp taro, chili oil.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1511690078903-71dc5a49f5e3?auto=format&fit=crop&w=200&q=80" alt="Roasted soup" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Squash Velouté</span><span class="menu-item__leader"></span><span class="menu-item__price">$14</span></div>
-                <p class="menu-item__desc">Roasted butternut, brown butter, toasted pepitas, sage.</p>
-              </div>
-            </div>
-          </div>
-          <div class="menu-photo"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" alt="Beautifully plated starter salad" /></div>
-        </div>
-
-        <!-- MAINS -->
-        <div class="menu-panel active" id="panel-mains" role="tabpanel">
-          <div class="menu-list">
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=200&q=80" alt="Wagyu steak" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Wagyu Reserve</span><span class="badge-new">New</span><span class="menu-item__leader"></span><span class="menu-item__price">$68</span></div>
-                <p class="menu-item__desc">Grade A5 wagyu, charred leek, bordelaise, smoked bone marrow.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=200&q=80" alt="Scallops" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Coastal Scallops</span><span class="menu-item__leader"></span><span class="menu-item__price">$42</span></div>
-                <p class="menu-item__desc">Day-boat scallops, saffron beurre blanc, citrus pearls.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=200&q=80" alt="Roasted chicken" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Herb Poulet</span><span class="menu-item__leader"></span><span class="menu-item__price">$34</span></div>
-                <p class="menu-item__desc">Free-range chicken, truffle jus, pommes purée, wild mushroom.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=200&q=80" alt="Pasta dish" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Lobster Tagliatelle</span><span class="menu-item__leader"></span><span class="menu-item__price">$46</span></div>
-                <p class="menu-item__desc">Hand-cut pasta, Maine lobster, tomato-cognac cream, chives.</p>
-              </div>
-            </div>
-          </div>
-          <div class="menu-photo"><img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=800&q=80" alt="Perfectly seared main course" /></div>
-        </div>
-
-        <!-- DESSERTS -->
-        <div class="menu-panel" id="panel-desserts" role="tabpanel">
-          <div class="menu-list">
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=200&q=80" alt="Soufflé" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Golden Soufflé</span><span class="badge-new">New</span><span class="menu-item__leader"></span><span class="menu-item__price">$24</span></div>
-                <p class="menu-item__desc">Vanilla-bean soufflé, warm salted caramel, gold leaf.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=200&q=80" alt="Chocolate tart" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Dark Chocolate Tart</span><span class="menu-item__leader"></span><span class="menu-item__price">$18</span></div>
-                <p class="menu-item__desc">70% Valrhona ganache, hazelnut praline, sea salt.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=200&q=80" alt="Cheesecake" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Citrus Cheesecake</span><span class="menu-item__leader"></span><span class="menu-item__price">$16</span></div>
-                <p class="menu-item__desc">Florida key lime, torched meringue, graham crumble.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1505250463387-e2be1c1e9052?auto=format&fit=crop&w=200&q=80" alt="Gelato" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">House Gelato</span><span class="menu-item__leader"></span><span class="menu-item__price">$12</span></div>
-                <p class="menu-item__desc">Three scoops, rotating flavours, candied almonds.</p>
-              </div>
-            </div>
-          </div>
-          <div class="menu-photo"><img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=800&q=80" alt="Decadent plated dessert" /></div>
-        </div>
-
-        <!-- DRINKS -->
-        <div class="menu-panel" id="panel-drinks" role="tabpanel">
-          <div class="menu-list">
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=200&q=80" alt="Cocktail" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Ember Old Fashioned</span><span class="badge-new">New</span><span class="menu-item__leader"></span><span class="menu-item__price">$18</span></div>
-                <p class="menu-item__desc">Smoked bourbon, apricot bitters, charred orange peel.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=200&q=80" alt="Red wine" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Reserve Red Flight</span><span class="menu-item__leader"></span><span class="menu-item__price">$28</span></div>
-                <p class="menu-item__desc">Three old-world pours selected by our sommelier.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=200&q=80" alt="Champagne" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Grand Champagne</span><span class="menu-item__leader"></span><span class="menu-item__price">$24</span></div>
-                <p class="menu-item__desc">Brut by the glass, delicate mousse, brioche notes.</p>
-              </div>
-            </div>
-            <div class="menu-item">
-              <img class="menu-item__thumb" src="https://images.unsplash.com/photo-1497534547324-0ebb3f052e88?auto=format&fit=crop&w=200&q=80" alt="Espresso" />
-              <div>
-                <div class="menu-item__head"><span class="menu-item__name">Single-Origin Espresso</span><span class="menu-item__leader"></span><span class="menu-item__price">$6</span></div>
-                <p class="menu-item__desc">Locally roasted, velvet crema, served with dark chocolate.</p>
-              </div>
-            </div>
-          </div>
-          <div class="menu-photo"><img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=800&q=80" alt="Signature cocktail on the bar" /></div>
-        </div>
-      </div>
-    </section>
+      <div id="menu-root"></div>
     </section><!-- /view-menu -->
 
     <!-- ============ RESERVATION VIEW ============ -->
@@ -309,6 +159,8 @@
 
   <script src="js/reservation.js"></script>
   <script src="js/gallery.js"></script>
+  <script src="js/menu-data.js"></script>
+  <script src="js/menu-render.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
