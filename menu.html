@@ -53,14 +53,43 @@
   <div class="drawer-backdrop"></div>
 
   <main id="main">
-    <section class="page-hero">
+    <!-- ============ SUB-NAV: Gallery / Menu / Reservation ============ -->
+    <div class="subnav-bar">
       <div class="container">
-        <p class="eyebrow">Our Kitchen</p>
-        <h1>The Menu</h1>
-        <p class="breadcrumb"><a href="index.html">Home</a> <span class="sep">✦</span> Menu</p>
+        <div class="subnav" role="tablist" aria-label="Menu page sections">
+          <button class="subnav-tab active" type="button" role="tab" data-view="gallery" aria-selected="true" aria-controls="view-gallery">Gallery</button>
+          <span class="subnav-sep" aria-hidden="true">✦</span>
+          <button class="subnav-tab" type="button" role="tab" data-view="menu" aria-selected="false" aria-controls="view-menu">Menu</button>
+          <span class="subnav-sep" aria-hidden="true">✦</span>
+          <button class="subnav-tab" type="button" role="tab" data-view="reservation" aria-selected="false" aria-controls="view-reservation">Reservation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ GALLERY VIEW ============ -->
+    <section class="subview active" id="view-gallery" role="tabpanel" aria-label="Gallery">
+      <div class="section" style="padding-block:clamp(2.2rem,6vw,4rem)">
+        <div class="container">
+          <div class="center" style="margin-bottom:2.5rem">
+            <p class="eyebrow">Moments</p>
+            <h2 class="section-title">The Gallery</h2>
+            <p class="section-lead">A glimpse of the plates, the room and the evenings that define Seven Wonders.</p>
+          </div>
+
+          <div class="mgal" id="mgal">
+            <div class="mgal-stage">
+              <button class="mgal-arrow prev" type="button" aria-label="Previous page">‹</button>
+              <div class="mgal-grid" aria-label="Photo gallery"></div>
+              <button class="mgal-arrow next" type="button" aria-label="Next page">›</button>
+            </div>
+            <div class="mgal-dots" role="tablist" aria-label="Gallery pages"></div>
+          </div>
+        </div>
       </div>
     </section>
 
+    <!-- ============ MENU VIEW ============ -->
+    <section class="subview" id="view-menu" role="tabpanel" aria-label="Food menu">
     <section class="section" style="padding-top:1rem">
       <div class="container">
         <!-- Tabs -->
@@ -212,7 +241,24 @@
         </div>
       </div>
     </section>
+    </section><!-- /view-menu -->
+
+    <!-- ============ RESERVATION VIEW ============ -->
+    <section class="subview" id="view-reservation" role="tabpanel" aria-label="Reservation">
+      <div data-reservation-widget></div>
+    </section>
   </main>
+
+  <!-- ============ MOSAIC GALLERY LIGHTBOX ============ -->
+  <div class="mgal-lb" id="mgal-lightbox" role="dialog" aria-modal="true" aria-label="Gallery image viewer">
+    <button class="mgal-lb__close" type="button" aria-label="Close">✕</button>
+    <button class="mgal-lb__nav prev" type="button" aria-label="Previous photo">‹</button>
+    <figure class="mgal-lb__figure">
+      <img class="mgal-lb__img" src="" alt="" />
+      <figcaption class="mgal-lb__count">1 / 1</figcaption>
+    </figure>
+    <button class="mgal-lb__nav next" type="button" aria-label="Next photo">›</button>
+  </div>
 
   <!-- ================= FOOTER ================= -->
   <footer class="site-footer">
@@ -261,6 +307,8 @@
     </div>
   </footer>
 
+  <script src="js/reservation.js"></script>
+  <script src="js/gallery.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

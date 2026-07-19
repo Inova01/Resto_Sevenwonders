@@ -485,6 +485,36 @@
   }
 
   /* -----------------------------------------------------
+     12. SUB-NAV (Gallery / Menu / Reservation) — fade/slide
+  ----------------------------------------------------- */
+  function initSubnav() {
+    const tabs = $$(".subnav-tab");
+    const views = $$(".subview");
+    if (!tabs.length || !views.length) return;
+
+    function select(view) {
+      tabs.forEach((t) => {
+        const on = t.dataset.view === view;
+        t.classList.toggle("active", on);
+        t.setAttribute("aria-selected", String(on));
+      });
+      views.forEach((v) => v.classList.toggle("active", v.id === "view-" + view));
+
+      const shown = $("#view-" + view);
+      if (shown) {
+        // Reveal any scroll-reveal items that were hidden while the view was closed.
+        $$(".reveal", shown).forEach((el) => el.classList.add("in"));
+      }
+      // The mosaic needs a re-measure when it becomes visible again.
+      if (view === "gallery" && window.SWGallery) window.SWGallery.relayout();
+    }
+
+    tabs.forEach((tab) =>
+      tab.addEventListener("click", () => select(tab.dataset.view))
+    );
+  }
+
+  /* -----------------------------------------------------
      INIT ALL
   ----------------------------------------------------- */
   document.addEventListener("DOMContentLoaded", function () {
@@ -492,6 +522,7 @@
     initCart();
     initEmbers();
     initMenuTabs();
+    initSubnav();
     initReveal();
     initCalendar();
     initForms();
