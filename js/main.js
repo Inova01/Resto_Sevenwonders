@@ -345,56 +345,123 @@
   }
 
   /* -----------------------------------------------------
-     9. MENU OF THE DAY (rotates by weekday, animated)
+     9. MENU OF THE DAY — deterministic daily special
+     Picks ONE real dish from the printed menu (js/menu-data.js): every
+     LUNCH / DINNER main dish plus everything on Special Menu Night, minus
+     sides, drinks and any "price varies" item. The pick is seeded from
+     today's date, so it is the SAME for every visitor on a given day and
+     survives page refreshes (pure date math, no storage) yet rotates on
+     its own at midnight. A one-day guard stops the same dish showing two
+     days in a row.
   ----------------------------------------------------- */
   function initMenuOfDay() {
     const root = $("#mod");
     if (!root) return;
 
-    const specials = [
-      { day: "Sunday",    name: "Roast Sunday Prime", price: "$54", old: "$66", desc: "Slow-roasted prime rib, rosemary jus, duck-fat potatoes, charred baby carrots.", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=800&q=80" },
-      { day: "Monday",    name: "Chef's Rest Day",    price: "—",   old: "",    desc: "We are closed on Mondays. Join us Tuesday through Sunday for the full experience.", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" },
-      { day: "Tuesday",   name: "Truffle Tagliatelle",price: "$38", old: "$46", desc: "Hand-cut pasta, black truffle, aged parmesan, brown-butter sage.", img: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=800&q=80" },
-      { day: "Wednesday", name: "Coastal Scallops",   price: "$36", old: "$42", desc: "Day-boat scallops, saffron beurre blanc, citrus pearls, crisp leek.", img: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80" },
-      { day: "Thursday",  name: "Herb Poulet",        price: "$29", old: "$34", desc: "Free-range chicken, truffle jus, pommes purée, wild mushroom.", img: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=800&q=80" },
-      { day: "Friday",    name: "Wagyu Reserve",      price: "$58", old: "$68", desc: "Grade A5 wagyu, charred leek, bordelaise, smoked bone marrow.", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=800&q=80" },
-      { day: "Saturday",  name: "Lobster Tagliatelle",price: "$40", old: "$46", desc: "Maine lobster, tomato-cognac cream, hand-cut pasta, chives.", img: "https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=800&q=80" },
-    ];
+    const menu = window.SW_MENU;
+    if (!menu || !Array.isArray(menu.categories)) return;
 
-    const img   = $("#mod-img", root);
-    const dayEl = $("#mod-day", root);
-    const nameEl= $("#mod-name", root);
-    const descEl= $("#mod-desc", root);
+    // --- Build the eligible pool from the real menu data ---
+    const isSide = (name) => /^side\b/i.test(name || "");
+    const pool = [];
+    menu.categories.forEach((cat) => {
+      let subcats = null;
+      if (cat.id === "lunch" || cat.id === "dinner") {
+        // only the "Main Dishes" sub-category of lunch & dinner
+        subcats = (cat.subcats || []).filter((sc) => /main dish/i.test(sc.label || ""));
+      } else if (cat.id === "special") {
+        subcats = cat.subcats || []; // everything on Special Menu Night
+      }
+      if (!subcats) return;
+      subcats.forEach((sc) => {
+        (sc.items || []).forEach((it) => {
+          if (typeof it.price !== "number") return; // skip "price varies" / TBD
+          if (isSide(it.name)) return;              // skip side portions
+          pool.push({ item: it, catPhoto: cat.photo });
+        });
+      });
+    });
+    if (!pool.length) return;
+
+    // --- Deterministic date-seeded index (identical for all visitors) ---
+    const seedOf = (d) =>
+      d.getFullYear() +
+      "-" + String(d.getMonth() + 1).padStart(2, "0") +
+      "-" + String(d.getDate()).padStart(2, "0");
+    // Small integer hash (FNV-1a + an avalanche mix) so that dates one day
+    // apart scatter across the pool instead of stepping through it in order.
+    const hash = (str) => {
+      let h = 2166136261 >>> 0;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
+      return h >>> 0;
+    };
+    const today = new Date();
+
+    // Walk day-by-day from a fixed epoch applying the guard "hash % len, and
+    // if it equals YESTERDAY'S (already-guarded) pick, shift by 1". Because
+    // each day is compared against the prior day's real displayed pick, the
+    // same dish can never land on two consecutive days. It's still pure date
+    // math: no storage, identical for every visitor, stable across refreshes.
+    const seededIndex = (target) => {
+      const d = new Date(2020, 0, 1); // fixed anchor (local midnight)
+      const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+      let idx = 0, prev = -1;
+      while (d <= end) {
+        idx = hash(seedOf(d)) % pool.length;
+        if (pool.length > 1 && idx === prev) idx = (idx + 1) % pool.length;
+        prev = idx;
+        d.setDate(d.getDate() + 1); // calendar-safe step (DST-proof)
+      }
+      return idx;
+    };
+
+    const idx = seededIndex(today);
+    const dish = pool[idx].item;
+
+    // --- Pricing: 15% off the real price, rounded to the nearest .50 ---
+    const money = (n) => "$" + n.toFixed(2);
+    const promo = Math.round(dish.price * 0.85 * 2) / 2;
+
+    // --- Photo: a matching restaurant photo, else the category photo ---
+    const PHOTO = {
+      "chicken-wings-7": "assets/gallery/gallery-16.jpeg",
+      "griot-pork-platter": "assets/gallery/gallery-11.jpeg",
+      "legume-platter": "assets/gallery/gallery-12.jpeg",
+      "tasso-beef": "assets/gallery/gallery-02.jpeg",
+      "fish-platter-sm": "assets/gallery/gallery-19.jpeg",
+      "fish-platter-md": "assets/gallery/gallery-19.jpeg",
+      "fish-platter-lg": "assets/gallery/gallery-19.jpeg",
+      "fish-platter-xl": "assets/gallery/gallery-19.jpeg",
+      "kabrit-platter": "assets/gallery/gallery-15.jpeg",
+    };
+    const photo = PHOTO[dish.id] || pool[idx].catPhoto || "assets/gallery/gallery-07.jpeg";
+
+    // --- Current weekday, straight from the visitor's device ---
+    const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    // --- Paint the card ---
+    const dayEl   = $("#mod-day", root);
+    const nameEl  = $("#mod-name", root);
+    const descEl  = $("#mod-desc", root);
     const priceEl = $("#mod-price", root);
-    const body  = $(".mod-body", root);
-    const dots  = $$(".mod-dots button", root);
+    const img     = $("#mod-img", root);
 
-    const todayIdx = new Date().getDay(); // 0=Sun
-    let current = todayIdx;
-
-    function show(i, animate) {
-      const s = specials[i];
-      const paint = () => {
-        dayEl.textContent = (i === todayIdx ? "Today · " : "") + s.day;
-        nameEl.textContent = s.name;
-        descEl.textContent = s.desc;
-        priceEl.innerHTML = s.price + (s.old ? ` <small>${s.old}</small>` : "");
-        img.src = s.img;
-        img.alt = s.name + " — special of the day";
-        dots.forEach((d, di) => d.classList.toggle("active", di === i));
-        if (animate && !reduceMotion) {
-          img.classList.remove("swap"); body.classList.remove("swap");
-          void body.offsetWidth;
-          img.classList.add("swap"); body.classList.add("swap");
-          setTimeout(() => img.classList.remove("swap"), 60);
-        }
-      };
-      paint();
-      current = i;
+    if (dayEl)  dayEl.textContent = DAYS[today.getDay()];
+    if (nameEl) nameEl.textContent = dish.name;
+    if (descEl) {
+      const d = (dish.desc || "").trim();
+      descEl.textContent = d;
+      descEl.hidden = !d; // no real description on the menu → omit the line
     }
-
-    dots.forEach((d, i) => d.addEventListener("click", () => show(i, true)));
-    show(todayIdx, false);
+    if (priceEl) priceEl.innerHTML = money(promo) + ' <small>' + money(dish.price) + "</small>";
+    if (img) {
+      img.src = photo;
+      img.alt = dish.name + " — special of the day";
+    }
   }
 
   /* -----------------------------------------------------
