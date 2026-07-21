@@ -345,7 +345,7 @@
   }
 
   /* -----------------------------------------------------
-     9. MENU OF THE DAY (real menu, date-seeded daily pick)
+     9. MENU OF THE DAY (old rotation style, real Haitian dishes)
   ----------------------------------------------------- */
   function initMenuOfDay() {
     const root = $("#mod");
@@ -357,39 +357,64 @@
     const descEl = $("#mod-desc", root);
     const priceEl = $("#mod-price", root);
     const body = $(".mod-body", root);
+    const dots = $$(".mod-dots button", root);
 
     const pool = buildDailySpecialPool();
     if (!pool.length) return;
 
     const today = new Date();
-    const special = pickDailySpecial(today, pool);
+    const todayIdx = today.getDay(); // 0=Sunday
+    const weekDates = Array.from({ length: 7 }, (_, dayIndex) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() + dayIndex - todayIdx);
+      return date;
+    });
+    const specials = weekDates.map((date) => ({
+      date,
+      day: date.toLocaleDateString("en-US", { weekday: "long" }),
+      dish: pickDailySpecial(date, pool),
+    }));
 
-    dayEl.textContent = today.toLocaleDateString("en-US", { weekday: "long" });
-    nameEl.textContent = special.name;
+    function show(dayIndex, animate) {
+      const special = specials[dayIndex];
+      const dish = special.dish;
 
-    if (special.desc) {
-      descEl.textContent = special.desc;
-      descEl.hidden = false;
-    } else {
-      descEl.textContent = "";
-      descEl.hidden = true;
+      dayEl.textContent = (dayIndex === todayIdx ? "Today \u00b7 " : "") + special.day;
+      nameEl.textContent = dish.name;
+
+      if (dish.desc) {
+        descEl.textContent = dish.desc;
+        descEl.hidden = false;
+      } else {
+        descEl.textContent = "";
+        descEl.hidden = true;
+      }
+
+      priceEl.innerHTML = `${formatPrice(discountPrice(dish.price))} <small>${formatPrice(dish.price)}</small>`;
+
+      if (img) {
+        img.src = dish.photo;
+        img.alt = `${dish.name} - menu of the day`;
+      }
+
+      dots.forEach((dot, index) => {
+        dot.classList.toggle("active", index === dayIndex);
+        dot.setAttribute("aria-selected", String(index === dayIndex));
+        dot.setAttribute("aria-label", specials[index].day);
+      });
+
+      if (animate && !reduceMotion) {
+        img.classList.remove("swap");
+        body.classList.remove("swap");
+        void body.offsetWidth;
+        img.classList.add("swap");
+        body.classList.add("swap");
+        setTimeout(() => img.classList.remove("swap"), 60);
+      }
     }
 
-    priceEl.innerHTML = `<span>${formatPrice(discountPrice(special.price))}</span> <small>${formatPrice(special.price)}</small>`;
-
-    if (img) {
-      img.src = special.photo;
-      img.alt = `${special.name} - today's special`;
-    }
-
-    if (body && !reduceMotion) {
-      body.classList.remove("swap");
-      void body.offsetWidth;
-      body.classList.add("swap");
-    }
-
-    // Debug rotation check used during development:
-    // console.table(getSpecialsForNextDates(new Date(), 7, pool));
+    dots.forEach((dot, dayIndex) => dot.addEventListener("click", () => show(dayIndex, true)));
+    show(todayIdx, false);
   }
 
   function buildDailySpecialPool() {
@@ -463,19 +488,6 @@
     return `$${price.toFixed(2)}`;
   }
 
-  function getSpecialsForNextDates(startDate, count, pool) {
-    return Array.from({ length: count }, (_, offset) => {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + offset);
-      const dish = pickDailySpecial(date, pool);
-      return {
-        date: localDateKey(date),
-        day: date.toLocaleDateString("en-US", { weekday: "long" }),
-        dish: dish.name,
-        source: dish.source,
-      };
-    });
-  }
   /* -----------------------------------------------------
      10. TESTIMONIAL SLIDER (autoplay, arrows, dots, swipe)
   ----------------------------------------------------- */
