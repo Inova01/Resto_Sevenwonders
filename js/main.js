@@ -345,58 +345,137 @@
   }
 
   /* -----------------------------------------------------
-     9. MENU OF THE DAY (rotates by weekday, animated)
+     9. MENU OF THE DAY (real menu, date-seeded daily pick)
   ----------------------------------------------------- */
   function initMenuOfDay() {
     const root = $("#mod");
     if (!root) return;
 
-    const specials = [
-      { day: "Sunday",    name: "Roast Sunday Prime", price: "$54", old: "$66", desc: "Slow-roasted prime rib, rosemary jus, duck-fat potatoes, charred baby carrots.", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=800&q=80" },
-      { day: "Monday",    name: "Chef's Rest Day",    price: "—",   old: "",    desc: "We are closed on Mondays. Join us Tuesday through Sunday for the full experience.", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" },
-      { day: "Tuesday",   name: "Truffle Tagliatelle",price: "$38", old: "$46", desc: "Hand-cut pasta, black truffle, aged parmesan, brown-butter sage.", img: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=800&q=80" },
-      { day: "Wednesday", name: "Coastal Scallops",   price: "$36", old: "$42", desc: "Day-boat scallops, saffron beurre blanc, citrus pearls, crisp leek.", img: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80" },
-      { day: "Thursday",  name: "Herb Poulet",        price: "$29", old: "$34", desc: "Free-range chicken, truffle jus, pommes purée, wild mushroom.", img: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&w=800&q=80" },
-      { day: "Friday",    name: "Wagyu Reserve",      price: "$58", old: "$68", desc: "Grade A5 wagyu, charred leek, bordelaise, smoked bone marrow.", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=800&q=80" },
-      { day: "Saturday",  name: "Lobster Tagliatelle",price: "$40", old: "$46", desc: "Maine lobster, tomato-cognac cream, hand-cut pasta, chives.", img: "https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=800&q=80" },
-    ];
-
-    const img   = $("#mod-img", root);
+    const img = $("#mod-img", root);
     const dayEl = $("#mod-day", root);
-    const nameEl= $("#mod-name", root);
-    const descEl= $("#mod-desc", root);
+    const nameEl = $("#mod-name", root);
+    const descEl = $("#mod-desc", root);
     const priceEl = $("#mod-price", root);
-    const body  = $(".mod-body", root);
-    const dots  = $$(".mod-dots button", root);
+    const body = $(".mod-body", root);
 
-    const todayIdx = new Date().getDay(); // 0=Sun
-    let current = todayIdx;
+    const pool = buildDailySpecialPool();
+    if (!pool.length) return;
 
-    function show(i, animate) {
-      const s = specials[i];
-      const paint = () => {
-        dayEl.textContent = (i === todayIdx ? "Today · " : "") + s.day;
-        nameEl.textContent = s.name;
-        descEl.textContent = s.desc;
-        priceEl.innerHTML = s.price + (s.old ? ` <small>${s.old}</small>` : "");
-        img.src = s.img;
-        img.alt = s.name + " — special of the day";
-        dots.forEach((d, di) => d.classList.toggle("active", di === i));
-        if (animate && !reduceMotion) {
-          img.classList.remove("swap"); body.classList.remove("swap");
-          void body.offsetWidth;
-          img.classList.add("swap"); body.classList.add("swap");
-          setTimeout(() => img.classList.remove("swap"), 60);
-        }
-      };
-      paint();
-      current = i;
+    const today = new Date();
+    const special = pickDailySpecial(today, pool);
+
+    dayEl.textContent = today.toLocaleDateString("en-US", { weekday: "long" });
+    nameEl.textContent = special.name;
+
+    if (special.desc) {
+      descEl.textContent = special.desc;
+      descEl.hidden = false;
+    } else {
+      descEl.textContent = "";
+      descEl.hidden = true;
     }
 
-    dots.forEach((d, i) => d.addEventListener("click", () => show(i, true)));
-    show(todayIdx, false);
+    priceEl.innerHTML = `<span>${formatPrice(discountPrice(special.price))}</span> <small>${formatPrice(special.price)}</small>`;
+
+    if (img) {
+      img.src = special.photo;
+      img.alt = `${special.name} - today's special`;
+    }
+
+    if (body && !reduceMotion) {
+      body.classList.remove("swap");
+      void body.offsetWidth;
+      body.classList.add("swap");
+    }
+
+    // Debug rotation check used during development:
+    // console.table(getSpecialsForNextDates(new Date(), 7, pool));
   }
 
+  function buildDailySpecialPool() {
+    const data = window.SW_MENU;
+    if (!data || !Array.isArray(data.categories)) return [];
+
+    return data.categories.flatMap((category) => {
+      const isMealMainCategory = category.id === "lunch" || category.id === "dinner";
+      const isSpecialNight = category.id === "special";
+      if (!isMealMainCategory && !isSpecialNight) return [];
+
+      return (category.subcats || []).flatMap((subcat) => {
+        const isMainSubcat = /main dishes/i.test(subcat.label || "");
+        if (isMealMainCategory && !isMainSubcat) return [];
+
+        return (subcat.items || [])
+          .filter((item) => isEligibleDailySpecial(item))
+          .map((item) => ({
+            id: item.id,
+            name: item.name,
+            desc: (item.desc || "").trim(),
+            price: item.price,
+            photo: item.photo || category.photo || "assets/gallery/gallery-07.jpeg",
+            source: `${category.label} / ${subcat.label}`,
+          }));
+      });
+    });
+  }
+
+  function isEligibleDailySpecial(item) {
+    if (!item || typeof item.price !== "number" || !Number.isFinite(item.price)) return false;
+    if (/tbd|variable/i.test(String(item.priceLabel || ""))) return false;
+    if (/^side\b/i.test(item.name || "")) return false;
+    return true;
+  }
+
+  function localDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function hashDateKey(key) {
+    let hash = 2166136261;
+    for (let i = 0; i < key.length; i++) {
+      hash ^= key.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function rawSpecialIndex(date, poolLength) {
+    return hashDateKey(localDateKey(date)) % poolLength;
+  }
+
+  function pickDailySpecial(date, pool) {
+    const todayIndex = rawSpecialIndex(date, pool.length);
+    const yesterday = new Date(date);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayIndex = rawSpecialIndex(yesterday, pool.length);
+    const guardedIndex = todayIndex === yesterdayIndex ? (todayIndex + 1) % pool.length : todayIndex;
+    return pool[guardedIndex];
+  }
+
+  function discountPrice(price) {
+    return Math.round((price * 0.85) * 2) / 2;
+  }
+
+  function formatPrice(price) {
+    return `$${price.toFixed(2)}`;
+  }
+
+  function getSpecialsForNextDates(startDate, count, pool) {
+    return Array.from({ length: count }, (_, offset) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + offset);
+      const dish = pickDailySpecial(date, pool);
+      return {
+        date: localDateKey(date),
+        day: date.toLocaleDateString("en-US", { weekday: "long" }),
+        dish: dish.name,
+        source: dish.source,
+      };
+    });
+  }
   /* -----------------------------------------------------
      10. TESTIMONIAL SLIDER (autoplay, arrows, dots, swipe)
   ----------------------------------------------------- */

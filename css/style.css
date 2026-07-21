@@ -225,25 +225,28 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 
 @media (max-width: 900px) {
   .nav-links {
-    position: fixed; top: 0; right: 0; z-index: 950;
+    position: fixed; top: 0; right: calc((100vw - 100%) + 1px); z-index: 950;
     height: 100dvh; width: min(82vw, 340px);
     background: var(--near-black);
     border-left: 1px solid var(--line);
     flex-direction: column; align-items: stretch;
     gap: 0;
     padding: 90px 0 2rem;
-    transform: translateX(105%);
-    transition: transform .35s var(--ease);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(16px);
+    transition: opacity .25s var(--ease), visibility .25s var(--ease), transform .35s var(--ease);
     overflow-y: auto;
     margin-left: 0;
   }
-  .nav-links.open { transform: translateX(0); }
+  .nav-links.open { opacity: 1; visibility: visible; transform: translateX(0); }
   .nav-links a {
     padding: 1.05rem var(--gutter);
     border-bottom: 1px solid rgba(255,255,255,0.06);
     font-size: .95rem;
   }
   .nav-links a::after { display: none; }
+  .nav-actions .btn { display: none; }
   .hamburger { display: flex; }
 }
 
@@ -555,7 +558,29 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 /* =========================================================
    MENU OF THE DAY
    ========================================================= */
-.mod-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(2rem,5vw,4rem); align-items: center; }
+.mod-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(2rem,5vw,4rem);
+  align-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid rgba(237, 158, 88, 0.34);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 8% 8%, rgba(237, 158, 88, 0.16), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+  box-shadow: 0 0 0 1px rgba(247,192,138,0.04), 0 0 44px rgba(217,126,51,0.12);
+  overflow: hidden;
+}
+.mod-grid::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  border-radius: inherit;
+  box-shadow: inset 0 0 34px rgba(237, 158, 88, 0.12);
+}
 .mod-media { position: relative; border-radius: 200px 200px var(--radius) var(--radius); overflow: hidden; aspect-ratio: 4/4.4; }
 .mod-media img { width: 100%; height: 100%; object-fit: cover; transition: opacity .5s var(--ease), transform .8s var(--ease); }
 .mod-media img.swap { opacity: 0; transform: scale(1.05); }
@@ -564,6 +589,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
   background: var(--apricot); color: #1a1207;
   font-weight: 700; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
   padding: .4rem .9rem; border-radius: 30px;
+  box-shadow: 0 0 24px rgba(237, 158, 88, 0.38);
 }
 .mod-body { animation: fadeIn .5s var(--ease); }
 .mod-body.swap { animation: modFlip .55s var(--ease); }
@@ -574,7 +600,8 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 .mod-day { color: var(--apricot); font-family: var(--sans); letter-spacing: .2em; text-transform: uppercase; font-size: .78rem; font-weight: 600; }
 .mod-name { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: .5rem 0 .8rem; }
 .mod-desc { color: var(--body); max-width: 46ch; margin-bottom: 1.2rem; }
-.mod-price { color: var(--apricot); font-family: var(--serif); font-size: 2rem; font-weight: 700; }
+.mod-price { display: flex; align-items: baseline; gap: .65rem; color: var(--white); font-family: var(--serif); font-size: 2rem; font-weight: 700; }
+.mod-price span { color: var(--apricot-light); text-shadow: 0 0 18px rgba(237, 158, 88, 0.22); }
 .mod-price small { color: var(--muted); font-family: var(--sans); font-size: .8rem; font-weight: 400; text-decoration: line-through; margin-left: .6rem; }
 .mod-dots { display: flex; gap: .5rem; margin-top: 1.6rem; }
 .mod-dots button { width: 30px; height: 5px; border-radius: 4px; background: rgba(255,255,255,0.18); transition: background .25s var(--ease); }
