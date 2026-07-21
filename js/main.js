@@ -364,37 +364,28 @@
 
     const today = new Date();
     const todayIdx = today.getDay(); // 0=Sunday
-    const weekDates = Array.from({ length: 7 }, (_, dayIndex) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() + dayIndex - todayIdx);
-      return date;
-    });
-    const specials = weekDates.map((date) => ({
-      date,
-      day: date.toLocaleDateString("en-US", { weekday: "long" }),
-      dish: pickDailySpecial(date, pool),
-    }));
+    const specials = getWeeklyMenuSpecials(pool);
+    if (specials.length !== 7) return;
 
     function show(dayIndex, animate) {
       const special = specials[dayIndex];
-      const dish = special.dish;
 
       dayEl.textContent = (dayIndex === todayIdx ? "Today \u00b7 " : "") + special.day;
-      nameEl.textContent = dish.name;
+      nameEl.textContent = special.name;
 
-      if (dish.desc) {
-        descEl.textContent = dish.desc;
+      if (special.desc) {
+        descEl.textContent = special.desc;
         descEl.hidden = false;
       } else {
         descEl.textContent = "";
         descEl.hidden = true;
       }
 
-      priceEl.innerHTML = `${formatPrice(discountPrice(dish.price))} <small>${formatPrice(dish.price)}</small>`;
+      priceEl.innerHTML = `${formatPrice(discountPrice(special.price))} <small>${formatPrice(special.price)}</small>`;
 
       if (img) {
-        img.src = dish.photo;
-        img.alt = `${dish.name} - menu of the day`;
+        img.src = special.photo;
+        img.alt = `${special.name} - menu of the day`;
       }
 
       dots.forEach((dot, index) => {
@@ -415,6 +406,30 @@
 
     dots.forEach((dot, dayIndex) => dot.addEventListener("click", () => show(dayIndex, true)));
     show(todayIdx, false);
+  }
+
+  function getWeeklyMenuSpecials(pool) {
+    const weeklyPicks = [
+      { day: "Sunday", id: "legume-platter", photo: "assets/gallery/gallery-12.jpeg" },
+      { day: "Monday", id: "turkey-platter", photo: "assets/gallery/gallery-16.jpeg" },
+      { day: "Tuesday", id: "fish-platter-lg", name: "Fish Platter (Pwason)", photo: "assets/gallery/gallery-53.jpeg" },
+      { day: "Wednesday", id: "kabrit-platter", photo: "assets/gallery/gallery-52.jpeg" },
+      { day: "Thursday", id: "chicken-wings-7", photo: "assets/gallery/gallery-17.jpeg" },
+      { day: "Friday", id: "tasso-beef", photo: "assets/gallery/gallery-11.jpeg" },
+      { day: "Saturday", id: "griot-pork-platter", photo: "assets/gallery/gallery-36.jpeg" },
+    ];
+
+    return weeklyPicks.map((pick) => {
+      const dish = pool.find((item) => item.id === pick.id);
+      if (!dish) return null;
+      return {
+        day: pick.day,
+        name: pick.name || dish.name,
+        desc: dish.desc,
+        price: dish.price,
+        photo: pick.photo,
+      };
+    }).filter(Boolean);
   }
 
   function buildDailySpecialPool() {
@@ -449,35 +464,6 @@
     if (/tbd|variable/i.test(String(item.priceLabel || ""))) return false;
     if (/^side\b/i.test(item.name || "")) return false;
     return true;
-  }
-
-  function localDateKey(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
-  function hashDateKey(key) {
-    let hash = 2166136261;
-    for (let i = 0; i < key.length; i++) {
-      hash ^= key.charCodeAt(i);
-      hash = Math.imul(hash, 16777619);
-    }
-    return hash >>> 0;
-  }
-
-  function rawSpecialIndex(date, poolLength) {
-    return hashDateKey(localDateKey(date)) % poolLength;
-  }
-
-  function pickDailySpecial(date, pool) {
-    const todayIndex = rawSpecialIndex(date, pool.length);
-    const yesterday = new Date(date);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayIndex = rawSpecialIndex(yesterday, pool.length);
-    const guardedIndex = todayIndex === yesterdayIndex ? (todayIndex + 1) % pool.length : todayIndex;
-    return pool[guardedIndex];
   }
 
   function discountPrice(price) {
