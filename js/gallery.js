@@ -1,5 +1,5 @@
 /* =========================================================
-   SEVEN WONDERS — gallery.js  (mosaic gallery + lightbox)
+   SEVEN WONDERS - gallery.js  (mosaic gallery + lightbox)
    Vanilla, no dependencies.
 
    HOW TO ADD PHOTOS:
@@ -11,9 +11,14 @@
   "use strict";
 
   /* -----------------------------------------------------
-     IMAGE MANIFEST  — add new photos here (one line each)
+     IMAGE MANIFEST  - add new photos here (one line each)
   ----------------------------------------------------- */
   const GALLERY_IMAGES = [
+    "assets/restaurant/seven-wonders-exterior.jpeg",
+    "assets/restaurant/seven-wonders-dining-room-front.jpeg",
+    "assets/restaurant/seven-wonders-dining-room-art.jpeg",
+    "assets/restaurant/oswald-gaboyau.jpeg",
+    "assets/restaurant/marjorie-gaboyau.jpeg",
     "assets/gallery/gallery-01.jpeg",
     "assets/gallery/gallery-02.jpeg",
     "assets/gallery/gallery-03.jpeg",
