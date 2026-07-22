@@ -554,7 +554,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 .about-intro-grid,
 .about-detail-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(260px, .65fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
   gap: clamp(2rem, 5vw, 4rem);
   align-items: start;
 }
@@ -566,8 +566,8 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 .founder-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .75rem;
-  max-width: 340px;
+  gap: 1rem;
+  max-width: 520px;
   justify-self: center;
   width: 100%;
 }
@@ -579,14 +579,14 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 }
 .founder-card img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1.12;
   object-fit: cover;
 }
-.founder-card div { padding: .7rem; }
-.founder-card h3 { font-size: clamp(.88rem, 2.4vw, 1rem); margin-bottom: .15rem; }
+.founder-card div { padding: .9rem; }
+.founder-card h3 { font-size: clamp(1.05rem, 2.8vw, 1.25rem); margin-bottom: .2rem; }
 .founder-card p {
   color: var(--apricot);
-  font-size: .68rem;
+  font-size: .78rem;
   text-transform: uppercase;
   letter-spacing: .12em;
 }
@@ -631,10 +631,10 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
   .dish-grid, .blog-grid, .product-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
-  .founder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; max-width: 300px; }
-  .founder-card div { padding: .6rem; }
-  .founder-card h3 { font-size: .82rem; }
-  .founder-card p { font-size: .62rem; }
+  .founder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; max-width: 380px; }
+  .founder-card div { padding: .7rem; }
+  .founder-card h3 { font-size: .95rem; }
+  .founder-card p { font-size: .68rem; }
   .stat-row { gap: 1.5rem; }
   .menu-item { grid-template-columns: 54px 1fr; }
   .menu-item__thumb { width: 54px; height: 54px; }
