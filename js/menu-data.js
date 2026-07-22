@@ -1,34 +1,18 @@
 /* =========================================================
-   SEVEN WONDERS BAKERY & GRILL — menu-data.js
-   Single source of truth for the whole menu + order section.
-   Transcribed from the printed menu photos (assets/menu/menu-1.jpeg,
-   assets/menu/menu-2.jpeg). Edit prices/names/items HERE — the menu
-   UI, the order builder and the add-ons all render from this object.
-
-   PRICE RULES:
-   - price: a number in USD, OR null when the printed menu says the
-     price is "variable". When price is null, set priceLabel and the
-     order builder shows it as "price varies" (excluded from the total,
-     staff confirm on order).
-
-   NOTES ON THE SOURCE MENU (see report):
-   - The printed menu has one combined "LUNCH & DINNER" section; it has
-     been split across the Lunch / Dinner / Special Menu Night tabs by
-     dish type (see each category below).
-   - There are NO desserts on the printed menu, so the "Add a Dessert"
-     add-on has no items and is hidden until desserts are added here.
+   SEVEN WONDERS RESTAURANT & BAKERY - menu-data.js
+   Single source of truth for the menu tabs and order section.
+   Transcribed from the updated printed menu photos in assets/menu/.
    ========================================================= */
 (function () {
   "use strict";
 
   window.SW_MENU = {
     info: {
-      name: "Seven Wonders Bakery & Grill",
+      name: "Seven Wonders Restaurant & Bakery",
       address: "2145 University Blvd N, Jacksonville FL 32211",
       phone: "904 402 9212",
     },
 
-    /* ---- Four top-level categories (the MENU tab's first row) ---- */
     categories: [
       {
         id: "breakfast",
@@ -39,18 +23,18 @@
             id: "bk-plates",
             label: "Plates",
             items: [
-              { id: "spaghetti", name: "Spaghetti", desc: "Meat or Aransò", price: null, priceLabel: "Variable" },
-              { id: "sandwich", name: "Sandwich", desc: "Egg or Chicken", price: 6 },
+              { id: "spaghetti", name: "Spaghetti", desc: "Meat or Aranso", price: 12.99 },
+              { id: "sandwich", name: "Sandwich", desc: "Egg or Chicken", price: 6.99 },
             ],
           },
           {
             id: "bk-patties",
             label: "Patties",
             items: [
-              { id: "patte-kode-meat", name: "Patte Kòde", desc: "Meat", price: 6.21 },
-              { id: "patte-kode-aranso", name: "Patté Kòde", desc: "Aransò", price: 7.25 },
-              { id: "pate-fete-1", name: "Pate Fete (1)", desc: "Meat or Aransò", price: 1.24 },
-              { id: "pate-fete-12", name: "Pate Fête (Bwat) 12", desc: "Meat or Aransò", price: 12.42 },
+              { id: "patte-kode-meat", name: "Patte Kode", desc: "Meat", price: 7.99 },
+              { id: "patte-kode-aranso", name: "Patte Kode", desc: "Aranso", price: 8.99 },
+              { id: "pate-fete-1", name: "Pate Fete (1)", desc: "Meat or Aranso", price: 1.25 },
+              { id: "pate-fete-12", name: "Pate Fete (Bwat) 12", desc: "Meat or Aranso", price: 14.00 },
             ],
           },
         ],
@@ -65,24 +49,25 @@
             id: "ln-mains",
             label: "Main Dishes",
             items: [
-              { id: "chicken-wings-7", name: "7 Chicken Wings", desc: "", price: 13.46 },
-              { id: "side-chicken", name: "Side Chicken", desc: "", price: 10.43 },
-              { id: "griot-pork-platter", name: "Griot Pork Platter", desc: "", price: 17.60 },
-              { id: "side-griot", name: "Side Griot", desc: "", price: 12.42 },
-              { id: "fritay", name: "Fritay", desc: "Variable", price: null, priceLabel: "Variable" },
+              { id: "chicken-wings-7", name: "7 Chicken Wings Platter", desc: "", price: 12.99 },
+              { id: "griot-pork-platter", name: "Griot Pork Platter", desc: "", price: 16.99 },
+              { id: "chicken-plate", name: "Chicken Plate", desc: "", price: 16.99 },
+              { id: "lunch-special", name: "Lunch Special", desc: "11:30 AM - 4:00 PM", price: 9.99 },
             ],
           },
           {
             id: "ln-sides",
-            label: "Sides",
+            label: "Sides & Others",
             items: [
               { id: "salad", name: "Salad", desc: "", price: 5.00 },
               { id: "fries", name: "Fries", desc: "Pomme de Terre", price: 3.00 },
               { id: "rice-beans", name: "Rice & Beans", desc: "Diri Kole", price: 6.00 },
-              { id: "side-diri", name: "Side Diri", desc: "Rice", price: 6.21 },
-              { id: "side-banana-3", name: "Side Banana 3 Pics", desc: "", price: 4.14 },
-              { id: "side-banana-7", name: "Side Banana 7 Pics", desc: "", price: 9.40 },
-              { id: "side-acra", name: "Side Acra", desc: "", price: 6.21 },
+              { id: "side-legume", name: "Legume", desc: "Side", price: 11.00 },
+              { id: "side-turkey", name: "Turkey", desc: "Side", price: 12.00 },
+              { id: "side-griot", name: "Griot", desc: "Side", price: 10.00 },
+              { id: "side-chicken", name: "Chicken", desc: "Side", price: 10.00 },
+              { id: "plantain-3", name: "Plantain", desc: "3 for $2", price: 2.00 },
+              { id: "akra-9", name: "Akra", desc: "9 for $6", price: 6.00 },
             ],
           },
         ],
@@ -97,18 +82,18 @@
             id: "dn-mains",
             label: "Main Dishes",
             items: [
-              { id: "turkey-platter", name: "Turkey Platter", desc: "Kodenn", price: 19.67 },
-              { id: "side-turkey", name: "Side Turkey", desc: "Kodenn", price: 13.46 },
-              { id: "legume-platter", name: "Legume Platter", desc: "", price: 20.70 },
-              { id: "kalalou-platter", name: "Kalalou Platter", desc: "Okra", price: 21.83 },
-              { id: "tasso-beef", name: "Tasso Beef", desc: "Oxtail Platter", price: 25.88 },
+              { id: "legume-platter", name: "Legume Platter", desc: "", price: 17.99 },
+              { id: "turkey-platter", name: "Turkey Platter", desc: "Kodenn", price: 19.99 },
+              { id: "fish-platter-lg", name: "Fish Platter (Pwason)", desc: "Pwason - $28 and up", price: 28.00 },
+              { id: "kabrit-platter", name: "Kabrit Platter", desc: "Goat", price: 24.99 },
+              { id: "kalalou-platter", name: "Kalalou Platter", desc: "Okra", price: 24.99 },
             ],
           },
           {
             id: "dn-soups",
             label: "Soups",
             items: [
-              { id: "bouillon-kabrit", name: "Bouillon Kabrit", desc: "Goat Soup", price: 20.70 },
+              { id: "bouillon-kabrit", name: "Bouillon Kabrit", desc: "Goat Soup - Saturday only", price: 19.99 },
             ],
           },
         ],
@@ -120,38 +105,26 @@
         photo: "assets/gallery/gallery-09.jpeg",
         subcats: [
           {
-            id: "sp-seafood",
-            label: "Seafood (Pwason)",
+            id: "sp-night",
+            label: "Special",
             items: [
-              { id: "fish-platter-sm", name: "Fish Platter", desc: "Pwason · Small", price: 31.05 },
-              { id: "fish-platter-md", name: "Fish Platter", desc: "Pwason · Medium", price: 33.12 },
-              { id: "fish-platter-lg", name: "Fish Platter", desc: "Pwason · Large", price: 36.23 },
-              { id: "fish-platter-xl", name: "Fish Platter", desc: "Pwason · XL", price: 41.40, badge: "New" },
-            ],
-          },
-          {
-            id: "sp-goat",
-            label: "Goat (Kabrit)",
-            items: [
-              { id: "kabrit-platter", name: "Kabrit Platter", desc: "Goat", price: 25.88, badge: "New" },
-              { id: "side-kabrit", name: "Side Kabrit", desc: "Goat", price: 18.63 },
+              { id: "lanbi-conch", name: "Lanbi", desc: "Conch", price: 35.00 },
+              { id: "lalo", name: "Lalo", desc: "", price: 25.00 },
+              { id: "tonmtonm", name: "Tonmtonm", desc: "", price: 25.00 },
             ],
           },
         ],
       },
     ],
 
-    /* ---- Add-on pools (rendered in the Order section) ---- */
-    /* Drinks: every beverage from the printed menu (menu-1 BEVERAGE +
-       all of menu-2). Shown as multi-select checkbox cards. */
     drinks: [
       { id: "water", name: "Water", price: 1.04 },
       { id: "malta", name: "Malta", price: 3.00 },
       { id: "coconut-water", name: "Coconut Water", price: 3.00 },
       { id: "mystic", name: "Mystic", price: 2.00 },
       { id: "corossol-juice", name: "Corossol Juice", price: 6.00 },
-      { id: "papaya-smoothie", name: "Papaya Smoothie", price: 6.00 },
-      { id: "pineapple-smoothie", name: "Pineapple Smoothie", price: 2.07 },
+      { id: "papaya-smoothie", name: "Papaya Smoothies", price: 6.00 },
+      { id: "pineapple-smoothie", name: "Pineapple Smoothies", price: 2.07 },
       { id: "lemon-juice", name: "Lemon Juice", price: 6.00 },
       { id: "red-bull", name: "Red Bull", price: 2.50 },
       { id: "pina-juice", name: "Pina Juice", price: 6.00 },
@@ -170,8 +143,6 @@
       { id: "shot-wine", name: "Shot Wine", price: 10.00 },
     ],
 
-    /* Desserts: none on the printed menu. Add dessert items here
-       (same shape as drinks) to enable the "Add a Dessert" group. */
     desserts: [],
   };
 })();

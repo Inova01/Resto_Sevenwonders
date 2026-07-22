@@ -987,6 +987,32 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 
 .menu-list { animation: fadeIn .4s var(--ease); }
 
+.menu-board-section { padding-top: clamp(2rem, 5vw, 4rem); }
+.menu-board-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 1.6rem);
+}
+.menu-board-card {
+  display: block;
+  border: 1px solid rgba(237,158,88,.28);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: rgba(255,255,255,.04);
+  box-shadow: 0 18px 48px rgba(0,0,0,.32);
+  transition: transform .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease);
+}
+.menu-board-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--apricot);
+  box-shadow: 0 24px 60px rgba(237,158,88,.16);
+}
+.menu-board-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* =========================================================
    ORDER SECTION
    ========================================================= */
@@ -1086,6 +1112,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 @media (max-width: 992px) {
   .order-grid { grid-template-columns: 1fr; }
   .order-summary { position: static; }
+  .menu-board-grid { grid-template-columns: 1fr; }
 }
 
 /* =========================================================

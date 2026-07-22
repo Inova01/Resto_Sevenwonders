@@ -512,6 +512,23 @@
           "</div>" +
         "</div>" +
       "</div>" +
+      '<div class="section section--near menu-board-section">' +
+        '<div class="container">' +
+          '<div class="center" style="margin-bottom:2.4rem">' +
+            '<p class="eyebrow">Printed Menu</p>' +
+            '<h2 class="section-title">Current Menu Board</h2>' +
+            '<p class="section-lead">Browse the latest Seven Wonders breakfast, lunch, dinner, beverage, beer and wine menu.</p>' +
+          "</div>" +
+          '<div class="menu-board-grid">' +
+            '<a class="menu-board-card" href="assets/menu/menu-1.jpeg" target="_blank" rel="noopener">' +
+              '<img src="assets/menu/menu-1.jpeg" alt="Seven Wonders updated food menu board" loading="lazy" />' +
+            "</a>" +
+            '<a class="menu-board-card" href="assets/menu/menu-2.jpeg" target="_blank" rel="noopener">' +
+              '<img src="assets/menu/menu-2.jpeg" alt="Seven Wonders updated beverage, beer and wine menu board" loading="lazy" />' +
+            "</a>" +
+          "</div>" +
+        "</div>" +
+      "</div>" +
       '<div class="section section--near" id="order">' +
         '<div class="container">' +
           '<div class="center" style="margin-bottom:2.6rem">' +

@@ -415,7 +415,7 @@
       { day: "Tuesday", id: "fish-platter-lg", name: "Fish Platter (Pwason)", photo: "assets/gallery/gallery-53.jpeg" },
       { day: "Wednesday", id: "kabrit-platter", photo: "assets/gallery/gallery-52.jpeg" },
       { day: "Thursday", id: "chicken-wings-7", photo: "assets/gallery/gallery-17.jpeg" },
-      { day: "Friday", id: "tasso-beef", photo: "assets/gallery/gallery-11.jpeg" },
+      { day: "Friday", id: "chicken-plate", photo: "assets/gallery/gallery-17.jpeg" },
       { day: "Saturday", id: "griot-pork-platter", photo: "assets/gallery/gallery-36.jpeg" },
     ];
 
