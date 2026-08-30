@@ -451,6 +451,24 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
   check("non-Stripe payment links are ignored",
     !invalid.doc.querySelector("[data-payment-link]") &&
     !!invalid.doc.querySelector("[data-add-to-cart]"));
+
+  /* The two spoofs that defeat a naive host check: a lookalike suffix
+     domain, and a host smuggled into the userinfo position. Both must
+     fall back to the local cart rather than send a guest off-site. */
+  [
+    ["suffix-domain spoof", "https://buy.stripe.com.evil.example/x"],
+    ["userinfo spoof",      "https://buy.stripe.com@evil.example/x"],
+    ["protocol-relative",   "//buy.stripe.com/x"],
+    ["plain http",          "http://buy.stripe.com/x"]
+  ].forEach(([label, url]) => {
+    const spoof = loadPage("shop.html", {
+      query: "?preview=1",
+      draft: { shop: { products: [{ id: "bad", name: "Bad Link", note: "", price: 1, sale: null, inStock: true, img: "", paymentLink: url }] } }
+    });
+    check("payment link rejected: " + label,
+      !spoof.doc.querySelector("[data-payment-link]") &&
+      !!spoof.doc.querySelector("[data-add-to-cart]"), url);
+  });
 }
 
 /* ============ admin.html ============ */
