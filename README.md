@@ -49,16 +49,42 @@ Script order matters: `content/*.js` → `js/content.js` → page scripts →
 `js/site-render.js` → `js/main.js`.
 
 ## Design system
-- **Apricot** `#ED9E58` (light `#F7C08A`, deep `#D97E33`) on pure black `#000`
-  alternating with warm charcoal `#1A1613`; cards lift to `#241D18`.
-  The charcoals are deliberately warm and deliberately *not* `#0A0A0A` —
-  that sat 1.06:1 against black, so the alternating bands were invisible
-  and every page read as one unbroken slab.
-- Exactly **one** apricot-filled section on the site: the closing reservation
-  banner, with `--gold-ink` `#1A1208` text (6.2:1 at the worst gradient stop).
-  Keeping it to one is what lets apricot go on meaning "act on this" elsewhere.
+
+**Light where you read, dark where you look.** The site is light by default
+and goes dark only where a dark ground earns something: the hero, the photo
+gallery band, the footer and the lightboxes.
+
+```
+--ground      #FBF7F1   warm cream, the default page ground
+--ground-2    #F3EADD   deeper cream for alternating bands
+--surface     #FFFFFF   cards, lifted with --shadow-card
+--ink-strong  #140E09   headings
+--ink         #2A1E15   body text
+--ink-muted   #6B5B4E   secondary text
+--accent      #9A5112   apricot, darkened enough to carry text on light
+```
+
+Every rule uses these semantic tokens rather than literal colours. The tokens
+are redefined inside one selector list (`.on-dark, .hero, .site-footer,
+.section--dark, …`), so a component needs no knowledge of which ground it is
+sitting on. There are three grounds in total: light, dark, and the gold band.
+
+**Why `--accent` is not `--apricot`:** apricot `#ED9E58` measures **2.18:1**
+on a light ground, so it cannot legally carry text there. `--accent` is
+apricot darkened until it clears 4.5:1 against `--ground-2`, the tightest
+case on the site (it lands at 4.95:1). Apricot itself is still used at full
+strength wherever it is a *fill* behind dark text — which is where gold
+actually reads as gold rather than as beige.
+
+- **Apricot** `#ED9E58` (light `#F7C08A`, deep `#D97E33`); `--gold-ink`
+  `#1A1208` for text on gold
+- Exactly **one** apricot-filled section: the closing reservation banner
 - Typography: Playfair Display + DM Sans (Google Fonts)
-- Ember/fire canvas animation on the hero; respects `prefers-reduced-motion`
+- Ember/fire canvas animation on the dark hero; respects `prefers-reduced-motion`
+- Every text/ground pair on the site is AA or better; the tightest is 4.77:1
+
+The dashboard (`css/admin.css`) keeps its own dark token block on purpose —
+it is a back-office tool, not part of the guest-facing site.
 
 ## Run locally
 ```bash
