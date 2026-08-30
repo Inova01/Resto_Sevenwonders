@@ -31,7 +31,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=perf-cart-a11y" />
+  <link rel="stylesheet" href="css/style.css?v=stripe-checkout" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -93,6 +93,28 @@
         <!-- Filled from content/shop.js. The count line above is calculated
              from these products, so it can never disagree again. -->
         <div class="product-grid"></div>
+
+        <section class="cart-panel" id="cart-panel" aria-live="polite">
+          <div class="cart-panel__head">
+            <div>
+              <p class="eyebrow">Secure Checkout</p>
+              <h2>Your order</h2>
+            </div>
+            <button class="btn btn--ghost btn--sm" type="button" data-cart-clear>Clear cart</button>
+          </div>
+          <div class="cart-items" id="cart-items"></div>
+          <div class="cart-total">
+            <span>Total before tax</span>
+            <strong id="cart-total">$0.00</strong>
+          </div>
+          <p class="cart-note">
+            Checkout opens on Stripe. Final tax, pickup details and card information are handled securely there.
+          </p>
+          <button class="btn btn--primary btn--block" type="button" id="stripe-checkout" disabled>
+            Pay securely with Stripe
+          </button>
+          <p class="form-status" id="checkout-status"></p>
+        </section>
       </div>
     </section>
   </main>

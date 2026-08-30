@@ -294,53 +294,28 @@ this work. Keep `--ground-2` at `#1A1613` (1.17:1 against black, which
 
 ---
 
-## 6. Task B — Stripe payments
+## 6. Stripe payments
 
-### READ THIS FIRST. It changes the whole approach.
+Stripe Checkout Sessions are now implemented for the Shop page.
 
-**This site is static and has no server.** Stripe's secret key
-(`sk_live_...` / `sk_test_...`) can **never** appear in client-side JS, in
-`content/*.js`, or anywhere in this repo — the repo is public, and a
-committed live secret key is a real incident requiring immediate key
-rotation. Only the **publishable** key (`pk_...`) is safe in the browser.
+- `shop.html` has a combined cart and checkout button.
+- `js/main.js` stores product ids and quantities only.
+- `functions/api/checkout.js` creates the Stripe Checkout Session using the
+  secret key from `context.env.STRIPE_SECRET_KEY`.
+- `functions/_shared/shop-catalog.js` is the authoritative server-side price
+  catalog used by checkout.
+- `js/admin/store.js` publishes that server catalog whenever Shop content
+  changes, alongside `content/shop.js`.
+- `functions/api/stripe-webhook.js` verifies the raw Stripe payload with
+  `STRIPE_WEBHOOK_SECRET` before accepting events.
 
-Stripe's old client-only Checkout is deprecated. Do not use it.
+Important: GitHub Pages cannot run the `functions/` directory. The payment
+architecture goes live when the same repo is deployed to Cloudflare Pages and
+the Stripe secrets are set there. Until then, the checkout button falls back
+to the restaurant phone number.
 
-That leaves two viable routes:
-
-**Route 1 — Stripe Payment Links (no backend at all).**
-Create a Payment Link per product in the Stripe dashboard, store the URL on
-the product in `content/shop.js`, and have the button navigate to it. Adds
-a `paymentLink` field the manager can paste into the dashboard.
-- Pros: works today on GitHub Pages, no server, no secret key anywhere, no
-  hosting change, and the manager can manage it themselves.
-- Cons: no combined cart total across items, less control over the flow.
-- **This is the right first step** and fits the project's constraints.
-
-**Route 2 — Stripe Checkout Sessions (needs a server endpoint).**
-A serverless function creates the Checkout Session with the secret key held
-as an environment variable, and the browser redirects to the returned URL.
-- GitHub Pages **cannot** run this. It requires Cloudflare Pages Functions
-  / Workers, Netlify Functions, or Vercel.
-- Note: commit `7795219` already made every link domain-relative
-  specifically to prepare for "the future Cloudflare domain", so
-  **Cloudflare Pages + a Worker is the natural fit.**
-- Handles the existing multi-item localStorage cart properly.
-- Also needs a webhook endpoint to confirm payment, and prices must be
-  validated **server-side** against `content/menu.js` — never trust a total
-  posted from the browser.
-
-### Existing integration points
-- `shop.html` already has a localStorage cart (`[data-add-to-cart]`).
-- `js/menu-render.js` has the online order builder with live totals.
-- Both currently submit by email through Web3Forms.
-
-### Do first, before any payment work
-**The Web3Forms key is still not set.** Reservations, contact messages and
-online orders currently reach nobody. Taking payments while order
-notifications go nowhere would be worse than not taking payments. Get a
-free key at web3forms.com and paste it into the dashboard under
-*Info & hours -> Online forms*.
+Never commit Stripe secrets. Use `.dev.vars.example` only as the empty local
+template.
 
 ---
 

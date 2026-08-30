@@ -7,6 +7,11 @@ Thumbs.db
 
 # Local server / dependency artifacts
 node_modules/
+.env
+.env.*
+!.env.example
+.dev.vars*
+!.dev.vars.example
 # jsdom is only needed to run tests/check-pages.js. Installed ad-hoc
 # (see README) so the site itself stays dependency-free.
 package.json

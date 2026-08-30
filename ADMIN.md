@@ -61,15 +61,17 @@ empty.
 For Shop items the equivalent is untickng **In stock** — the card stays but
 shows "Sold out" and cannot be added to a cart.
 
-### Take payment for a shop item
-Create a Stripe **Payment Link** in Stripe, then open **Shop** → paste it into
-**Stripe Payment Link** for that item → **Publish**.
+### Take payment for online shop orders
+The Shop page now has a real combined cart. Guests add one or more items,
+review the total, then press **Pay securely with Stripe**. Stripe handles the
+card screen.
 
-Guests will see **Pay with Stripe** instead of **Add to cart** for that item.
-Leave the box blank to keep the normal cart button.
+The checkout button only works on a host that can run the `/api/checkout`
+server function, such as Cloudflare Pages. GitHub Pages can still show the
+website, but it cannot run Stripe checkout.
 
-Only paste links that start with `https://buy.stripe.com/`. Never paste a
-Stripe secret key into the dashboard or into any website file.
+Never paste a Stripe secret key into the dashboard or into any website file.
+Secret keys belong only in Cloudflare **Variables and Secrets**.
 
 ### Set today's special
 **Menu & prices** → *Menu of the Day*.
@@ -240,26 +242,40 @@ stops working immediately.
 
 ## Payments with Stripe
 
-The safe option for this GitHub Pages site is **Stripe Payment Links**. They are
-public checkout URLs, so they can live in `content/shop.js` and be edited in the
-dashboard.
+The site now includes a Stripe Checkout architecture for the Shop page:
+
+- Guests add products to the cart in `shop.html`.
+- The cart sends only product ids and quantities to `/api/checkout`.
+- `/api/checkout` loads prices from `functions/_shared/shop-catalog.js`, creates
+  a Stripe Checkout Session, and returns Stripe's hosted checkout URL.
+- `/api/stripe-webhook` verifies Stripe's signature before accepting payment
+  events.
+- When Shop is changed in the dashboard, publishing writes both
+  `content/shop.js` and the server catalog, so visible prices and checkout
+  prices stay together.
+
+To switch it on in Cloudflare Pages:
+
+1. Deploy the site to Cloudflare Pages from this GitHub repo.
+2. In Cloudflare, open **Workers & Pages → your Pages project → Settings →
+   Variables and Secrets**.
+3. Add an encrypted secret named `STRIPE_SECRET_KEY` with the restaurant's
+   Stripe secret key.
+4. In Stripe, add a webhook endpoint:
+   `https://YOUR-DOMAIN/api/stripe-webhook`
+5. Subscribe it to `checkout.session.completed`.
+6. Copy the webhook signing secret from Stripe and add it in Cloudflare as
+   `STRIPE_WEBHOOK_SECRET`.
+7. Optional: add `STRIPE_TAX_RATE_ID`, `STRIPE_SUCCESS_URL`,
+   `STRIPE_CANCEL_URL`, or `STRIPE_CURRENCY`.
 
 Do **not** put Stripe API secret keys in this project. Anything committed here
-is public. That means values beginning with `sk_live_` or `sk_test_` never
+is public. Values beginning with `sk_live_`, `sk_test_`, or `whsec_` never
 belong in `content/`, `js/`, HTML, tests, screenshots, or docs.
 
-If the restaurant later wants a full cart checkout, move the site to a host that
-can run serverless code, such as Cloudflare Pages + Workers. The backend should:
-
-- receive the cart from the browser and ignore any browser-provided prices
-- load the authoritative prices from `content/menu.js` or an equivalent private
-  product table
-- create the Stripe Checkout Session with the secret key on the server only
-- verify payment events with a Stripe webhook signing secret
-- record the order after the webhook confirms payment
-
-GitHub Pages cannot run that backend, so Payment Links are the production-ready
-payment path while the website remains fully static.
+Stripe Payment Links are still supported as optional single-item express links
+when a product has a public `https://buy.stripe.com/...` URL, but the main path
+is the combined cart checkout above.
 
 ---
 

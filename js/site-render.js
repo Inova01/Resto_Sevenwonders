@@ -299,7 +299,7 @@
       var actions = [];
       var cartButton = p.inStock === false
         ? h("button", { class: "btn btn--ghost btn--block", type: "button", disabled: true, text: "Sold out" })
-        : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": "" },
+        : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": p.id },
             [h("span", { svg: CART_SVG }), document.createTextNode(" Add to cart")]);
       actions.push(cartButton);
       if (paymentLink && p.inStock !== false) {

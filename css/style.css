@@ -553,6 +553,89 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
   font-size: .88rem;
   margin: -1.1rem 0 1.8rem;
 }
+.cart-panel {
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+  background:
+    linear-gradient(135deg, rgba(237,158,88,.12), transparent 42%),
+    var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+.cart-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.cart-panel__head h2 { font-size: clamp(1.8rem, 3.6vw, 2.5rem); }
+.cart-items { display: grid; gap: .8rem; }
+.cart-empty {
+  color: var(--ink-muted);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+}
+.cart-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.cart-line h3 { font-size: 1rem; margin: 0 0 .2rem; }
+.cart-line p { color: var(--ink-muted); font-size: .86rem; margin: 0; }
+.cart-line__price {
+  color: var(--ink-strong);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cart-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .25rem;
+}
+.cart-qty button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(237,158,88,.12);
+  color: var(--accent);
+  font-weight: 700;
+}
+.cart-qty span {
+  min-width: 1.8rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--ink-strong);
+}
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.1rem 0 .8rem;
+  color: var(--ink-muted);
+}
+.cart-total strong {
+  color: var(--accent);
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+.cart-note {
+  color: var(--ink-muted);
+  font-size: .9rem;
+  margin: 0 0 1rem;
+}
+.checkout-success {
+  margin-bottom: 1.2rem;
+}
 
 /* =========================================================
    RESERVATION PAGE
@@ -761,6 +844,17 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
 }
 @media (max-width: 620px) {
   .dish-grid, .blog-grid, .product-grid { grid-template-columns: 1fr; }
+  .shop-bar { align-items: stretch; }
+  .sort-select { width: 100%; }
+  .cart-panel__head,
+  .cart-line,
+  .cart-total {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+  .cart-line { gap: .7rem; }
+  .cart-qty { width: max-content; }
   .form-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .founder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; max-width: 380px; }

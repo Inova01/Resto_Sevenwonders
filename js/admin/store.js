@@ -116,6 +116,8 @@
   var Serializer = {
     path: function (section) { return "content/" + section + ".js"; },
 
+    shopCatalogPath: function () { return "functions/_shared/shop-catalog.js"; },
+
     render: function (section, data) {
       var header =
         "/* =========================================================\n" +
@@ -134,15 +136,53 @@
         JSON.stringify(data, null, 2) + ";\n";
     },
 
+    renderShopCatalog: function (shop) {
+      var products = (shop.products || []).map(function (p) {
+        return {
+          id: p.id,
+          name: p.name,
+          note: p.note || "",
+          price: p.price,
+          sale: p.sale == null ? null : p.sale,
+          inStock: p.inStock !== false,
+          img: p.img || ""
+        };
+      });
+      return "/* =========================================================\n" +
+        "   SEVEN WONDERS — functions/_shared/shop-catalog.js\n" +
+        "   ---------------------------------------------------------\n" +
+        "   Server-side catalog for Stripe Checkout. Managed from\n" +
+        "   admin.html whenever Shop is published.\n" +
+        "\n" +
+        "   Never trust prices sent from the browser. The checkout\n" +
+        "   function imports this file and prices orders from here.\n" +
+        "   ========================================================= */\n\n" +
+        "export const SHOP_CATALOG = " + JSON.stringify(products, null, 2) + ";\n\n" +
+        "export function effectivePrice(product) {\n" +
+        "  return typeof product.sale === \"number\" && product.sale > 0 && product.sale < product.price\n" +
+        "    ? product.sale\n" +
+        "    : product.price;\n" +
+        "}\n";
+    },
+
     /* Every changed section as { path, text } */
     filesFor: function (draft, published) {
-      return Draft.changedSections(draft, published).map(function (section) {
-        return {
+      var files = [];
+      Draft.changedSections(draft, published).forEach(function (section) {
+        files.push({
           section: section,
           path: Serializer.path(section),
           text: Serializer.render(section, draft[section])
-        };
+        });
+        if (section === "shop") {
+          files.push({
+            section: section,
+            path: Serializer.shopCatalogPath(),
+            text: Serializer.renderShopCatalog(draft[section])
+          });
+        }
       });
+      return files;
     }
   };
 

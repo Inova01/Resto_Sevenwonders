@@ -59,6 +59,10 @@ function run(rel) {
   vm.runInContext(fs.readFileSync(file, "utf8"), ctx, { filename: rel });
 }
 
+function read(rel) {
+  return fs.readFileSync(path.join(ROOT, rel), "utf8");
+}
+
 console.log("\n=== 1. Content files load ===");
 try {
   ["settings", "menu", "shop", "gallery", "blog", "home", "about"].forEach(s => run("content/" + s + ".js"));
@@ -86,6 +90,28 @@ console.log("\n=== 1b. Public repo safety ===");
     if (/sk_(live|test)_[A-Za-z0-9]/.test(body)) offenders.push(path.relative(ROOT, file));
   });
   check("no Stripe secret keys are committed", offenders.length === 0, offenders.join(", "));
+}
+
+console.log("\n=== 1d. Stripe payment architecture ===");
+{
+  const checkout = read("functions/api/checkout.js");
+  const webhook = read("functions/api/stripe-webhook.js");
+  const catalogText = read("functions/_shared/shop-catalog.js");
+  const match = /export const SHOP_CATALOG = ([\s\S]*?);\s*\n\nexport function/.exec(catalogText);
+  const catalog = match ? JSON.parse(match[1]) : [];
+  check("Stripe checkout function exists and uses a server secret",
+    /STRIPE_SECRET_KEY/.test(checkout) && /api\.stripe\.com\/v1\/checkout\/sessions/.test(checkout));
+  check("Stripe checkout re-prices from the server catalog",
+    /SHOP_CATALOG/.test(checkout) && !/payload\.[a-zA-Z0-9_]*price/.test(checkout));
+  check("Stripe webhook verifies signed raw payloads",
+    /STRIPE_WEBHOOK_SECRET/.test(webhook) &&
+    /stripe-signature/i.test(webhook) &&
+    /crypto\.subtle/.test(webhook));
+  check("server Stripe catalog matches the public shop ids",
+    JSON.stringify(catalog.map(p => p.id)) === JSON.stringify(SW.shop.products.map(p => p.id)),
+    JSON.stringify(catalog.map(p => p.id)));
+  check("server Stripe catalog keeps prices but not Payment Links",
+    catalog.every(p => typeof p.price === "number" && p.paymentLink === undefined));
 }
 
 console.log("\n=== 1c. Image performance budget ===");
@@ -248,6 +274,11 @@ const Store = sandbox.window.SWStore;
 });
 check("Serializer path is content/<section>.js",
   Store.Serializer.path("menu") === "content/menu.js");
+check("Serializer writes the server Stripe catalog beside shop.js",
+  Store.Serializer.shopCatalogPath() === "functions/_shared/shop-catalog.js" &&
+  /export const SHOP_CATALOG/.test(Store.Serializer.renderShopCatalog(SW.shop)));
+check("checked-in server Stripe catalog matches dashboard serialization",
+  Store.Serializer.renderShopCatalog(SW.shop) === read("functions/_shared/shop-catalog.js"));
 
 console.log("\n=== 7. Change detection ===");
 const base = Store.clone(SW.published);
@@ -261,6 +292,12 @@ const files = Store.Serializer.filesFor(base, SW.published);
 check("only the changed file is queued for publishing",
   files.length === 1 && files[0].path === "content/menu.js",
   JSON.stringify(files.map(f => f.path)));
+const shopDraft = Store.clone(SW.published);
+shopDraft.shop.products[0].price = 15;
+const shopFiles = Store.Serializer.filesFor(shopDraft, SW.published);
+check("editing shop publishes both public content and server catalog",
+  JSON.stringify(shopFiles.map(f => f.path)) === JSON.stringify(["content/shop.js", "functions/_shared/shop-catalog.js"]),
+  JSON.stringify(shopFiles.map(f => f.path)));
 check("UTF-8 survives serialization (Patte Kòde / Pate Fête)",
   /K.{0,2}de/.test(files[0].text) === false || files[0].text.includes("Kòde"),
   "accented characters look mangled");

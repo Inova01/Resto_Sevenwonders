@@ -1,7 +1,8 @@
 # Seven Wonders Restaurant & Bakery — Jacksonville FL
 
 A Haitian kitchen and bakery at 2145 University Blvd N. Pure HTML / CSS /
-vanilla JavaScript — no frameworks, no build step, no server.
+vanilla JavaScript for the public site, plus Cloudflare Pages Functions for
+Stripe checkout. No frontend framework and no build step are required.
 
 **The manager edits the site themselves at [`admin.html`](admin.html).**
 See **[ADMIN.md](ADMIN.md)** — written for them, not for a developer.
@@ -10,7 +11,7 @@ See **[ADMIN.md](ADMIN.md)** — written for them, not for a developer.
 - `index.html` — Home: hero, our story, menu of the day, featured dishes, events, gallery, guest reviews, blog preview
 - `about.html` — The founding story, the founders, photos of the restaurant
 - `menu.html` — Gallery / Menu / Reservation in one page, plus the online order builder
-- `shop.html` — Product grid with a localStorage cart
+- `shop.html` — Product grid with a combined cart and Stripe checkout
 - `reservation.html` — Booking form + availability calendar
 - `blog.html` — Posts with in-page detail views
 - `contact.html` — Info, map, contact form
@@ -26,6 +27,8 @@ price, an address or an opening time.
 content/settings.js   identity, address, phone, hours, socials, form key
 content/menu.js       categories → dishes → prices, drinks, daily special
 content/shop.js       shop products
+functions/api/*       Stripe checkout + signed webhook endpoints
+functions/_shared/*   server-side product catalog for Stripe prices
 content/gallery.js    all 53 photos + the 7 on the homepage
 content/blog.js       posts
 content/home.js       homepage copy, events, guest reviews
@@ -96,13 +99,19 @@ python -m http.server 8000
 
 ## Configuration
 
-One setting is required for the site to function properly:
+Two settings are required for the site to function properly:
 
 **Web3Forms key** — until it is set, the reservation form, contact form and
-online ordering **cannot send anything**. They tell guests so and give them the
+reservation requests **cannot send anything**. They tell guests so and give them the
 phone number, rather than showing a fake confirmation. Get a free key at
 [web3forms.com](https://web3forms.com) and paste it into the dashboard under
 *Info & hours → Online forms*.
+
+**Stripe secrets** — the Shop page can collect combined-cart payments when the
+site is deployed on Cloudflare Pages. Add `STRIPE_SECRET_KEY` and
+`STRIPE_WEBHOOK_SECRET` as encrypted Cloudflare Variables and Secrets. Do not
+commit Stripe secret keys. `.dev.vars.example` lists the supported variable
+names for local testing.
 
 Publishing from the dashboard needs a fine-grained GitHub token with
 `Contents: Read and write` on this repository — see [ADMIN.md](ADMIN.md).
@@ -120,3 +129,6 @@ anything in `content/`.
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which publishes to
 GitHub Pages. The dashboard's Publish button makes exactly that push — one
 commit containing every changed content file, so one deploy.
+
+GitHub Pages serves only the static site. The Stripe functions in `functions/`
+run when this same repo is deployed on Cloudflare Pages.

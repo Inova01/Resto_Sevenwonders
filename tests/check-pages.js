@@ -152,7 +152,7 @@ console.log("\n=== theme and portable links ===");
   allPages.forEach(file => {
     const html = fs.readFileSync(path.join(ROOT, file), "utf8");
     check(file + " uses the bumped stylesheet",
-      /css\/style\.css\?v=perf-cart-a11y/.test(html));
+      /css\/style\.css\?v=stripe-checkout/.test(html));
     check(file + " sets the theme before CSS loads",
       html.indexOf("sw_theme") !== -1 && html.indexOf("sw_theme") < html.indexOf("css/style.css"));
     check(file + " has no github.io absolute links",
@@ -316,8 +316,34 @@ console.log("\n=== shop.html ===");
   check("prices are the real menu prices", /\$16\.99/.test(visible(doc)));
   check("invented products are gone", !/Wagyu|Soufflé|Scallops/i.test(visible(doc)));
   check("add-to-cart buttons are wired", cards.every(c => c.querySelector("[data-add-to-cart]")));
+  check("add-to-cart buttons carry product ids",
+    Array.from(doc.querySelectorAll("[data-add-to-cart]")).every(b => !!b.getAttribute("data-add-to-cart")));
+  check("combined Stripe cart panel is present",
+    !!doc.querySelector("#cart-panel") &&
+    !!doc.querySelector("#stripe-checkout") &&
+    text(doc.querySelector("#cart-total")) === "$0.00");
   check("blank payment links keep the regular cart flow",
     doc.querySelectorAll("[data-payment-link]").length === 0);
+  const firstAdd = doc.querySelector("[data-add-to-cart]");
+  firstAdd.dispatchEvent(new doc.defaultView.Event("click", { bubbles: true }));
+  check("adding a product creates a real cart line",
+    /Pate F/.test(text(doc.querySelector("#cart-items"))) &&
+    text(doc.querySelector("#cart-badge")) === "1" &&
+    text(doc.querySelector("#cart-total")) === "$14.00",
+    text(doc.querySelector("#cart-items")));
+  let postedCart = null;
+  doc.defaultView.fetch = (url, opts) => {
+    postedCart = { url, body: JSON.parse(opts.body) };
+    return Promise.resolve({ ok: false, json: () => Promise.resolve({ error: "Stripe is not connected yet." }) });
+  };
+  doc.querySelector("#stripe-checkout").dispatchEvent(new doc.defaultView.Event("click", { bubbles: true }));
+  check("checkout posts product ids and quantities to the server endpoint",
+    postedCart &&
+    postedCart.url === "/api/checkout" &&
+    postedCart.body.items.length === 1 &&
+    postedCart.body.items[0].id === "pate-fete-box" &&
+    postedCart.body.items[0].qty === 1,
+    JSON.stringify(postedCart));
   const sortOpts = Array.from(doc.querySelectorAll("#sort option")).map(o => o.textContent);
   check("sort dropdown only offers implemented options",
     !sortOpts.some(o => /popularity|latest/i.test(o)), sortOpts.join(", "));
@@ -495,6 +521,8 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
     doc.querySelector("[data-payment-link]").getAttribute("href") === "https://buy.stripe.com/test_123");
   check("Stripe products still keep the regular cart button",
     !!doc.querySelector(".product-card [data-add-to-cart]"));
+  check("draft add-to-cart button carries the draft product id",
+    doc.querySelector(".product-card [data-add-to-cart]").getAttribute("data-add-to-cart") === "d1");
   check("Stripe checkout is presented as a separate single-item path",
     /combine items/i.test(text(doc.querySelector(".shop-pay-note"))));
 
@@ -758,10 +786,16 @@ console.log("\n=== dashboard: a Stripe Payment Link becomes a publishable file =
     changed.length === 1 && changed[0] === "shop", JSON.stringify(changed));
 
   const files = win.SWStore.Serializer.filesFor(draft, win.SW.published);
-  check("one file queued: content/shop.js",
-    files.length === 1 && files[0].path === "content/shop.js");
+  check("two shop files queued: content/shop.js and the server Stripe catalog",
+    files.length === 2 &&
+    files[0].path === "content/shop.js" &&
+    files[1].path === "functions/_shared/shop-catalog.js",
+    JSON.stringify(files.map(f => f.path)));
   check("the Stripe Payment Link is in the generated file",
     /https:\/\/buy\.stripe\.com\/test_abc123/.test(files[0].text));
+  check("the generated server catalog omits Payment Links",
+    /griot-platter-shop/.test(files[1].text) &&
+    !/buy\.stripe\.com/.test(files[1].text));
   check("the generated shop file is valid JavaScript", (() => {
     try { new win.Function(files[0].text); return true; } catch (e) { return false; }
   })());

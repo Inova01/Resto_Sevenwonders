@@ -78,12 +78,61 @@
   }
 
   /* -----------------------------------------------------
-     2. CART (localStorage + badge pop)
+     2. CART + STRIPE CHECKOUT
+     The browser stores only product ids and quantities. Prices are
+     shown here for convenience, but the Stripe endpoint always
+     re-prices from functions/_shared/shop-catalog.js.
   ----------------------------------------------------- */
-  const CART_KEY = "sw_cart_count";
+  const CART_COUNT_KEY = "sw_cart_count";
+  const CART_ITEMS_KEY = "sw_cart_items_v1";
 
+  function shopProducts() {
+    return ((window.SW && SW.shop && SW.shop.products) || []).filter((p) => p && p.id);
+  }
+  function productById(id) {
+    return shopProducts().filter((p) => p.id === id)[0] || null;
+  }
+  function effectivePrice(product) {
+    return typeof product.sale === "number" && product.sale > 0 && product.sale < product.price
+      ? product.sale
+      : product.price;
+  }
+  function readCart() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(CART_ITEMS_KEY) || "[]");
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .map((row) => ({
+          id: String(row && row.id || ""),
+          qty: Math.max(0, Math.min(20, Math.floor(Number(row && row.qty) || 0)))
+        }))
+        .filter((row) => row.id && row.qty && productById(row.id));
+    } catch (err) {
+      return [];
+    }
+  }
+  function writeCart(items) {
+    const clean = (items || []).filter((row) => row.id && row.qty > 0);
+    localStorage.setItem(CART_ITEMS_KEY, JSON.stringify(clean));
+    localStorage.setItem(CART_COUNT_KEY, String(clean.reduce((sum, row) => sum + row.qty, 0)));
+  }
   function getCartCount() {
-    return parseInt(localStorage.getItem(CART_KEY) || "0", 10) || 0;
+    return readCart().reduce((sum, row) => sum + row.qty, 0);
+  }
+  function setCheckoutStatus(type, msg) {
+    const status = $("#checkout-status");
+    if (!status) return;
+    status.className = "form-status show " + type;
+    status.textContent = msg;
+  }
+  function clearCheckoutStatus() {
+    const status = $("#checkout-status");
+    if (!status) return;
+    status.className = "form-status";
+    status.textContent = "";
+  }
+  function money(n) {
+    return window.SW && SW.money ? SW.money(n) : "$" + Number(n || 0).toFixed(2);
   }
   function renderBadge(pop) {
     const badge = $("#cart-badge");
@@ -97,18 +146,125 @@
       badge.classList.add("pop");
     }
   }
+  function renderCartPanel() {
+    const wrap = $("#cart-items");
+    const totalEl = $("#cart-total");
+    const checkout = $("#stripe-checkout");
+    const clear = $("[data-cart-clear]");
+    if (!wrap || !totalEl || !checkout) return;
+
+    const cart = readCart();
+    const rows = cart
+      .map((row) => ({ cart: row, product: productById(row.id) }))
+      .filter((row) => row.product && row.product.inStock !== false);
+    if (rows.length !== cart.length) writeCart(rows.map((row) => row.cart));
+
+    wrap.innerHTML = "";
+    if (!rows.length) {
+      wrap.appendChild(Object.assign(document.createElement("p"), {
+        className: "cart-empty",
+        textContent: "Your cart is empty. Add a dish above to start a secure Stripe checkout."
+      }));
+    } else {
+      rows.forEach(({ cart: row, product }) => {
+        const line = document.createElement("article");
+        line.className = "cart-line";
+        line.innerHTML =
+          "<div><h3></h3><p></p></div>" +
+          "<div class=\"cart-qty\">" +
+          "<button type=\"button\" data-cart-dec=\"\">−</button>" +
+          "<span></span>" +
+          "<button type=\"button\" data-cart-inc=\"\">+</button>" +
+          "</div>" +
+          "<div class=\"cart-line__price\"></div>";
+        line.querySelector("h3").textContent = product.name;
+        line.querySelector("p").textContent = product.note || "Seven Wonders favorite";
+        line.querySelector(".cart-qty span").textContent = row.qty;
+        line.querySelector(".cart-line__price").textContent = money(effectivePrice(product) * row.qty);
+        line.querySelector("[data-cart-dec]").setAttribute("aria-label", "Remove one " + product.name);
+        line.querySelector("[data-cart-inc]").setAttribute("aria-label", "Add one more " + product.name);
+        line.querySelector("[data-cart-dec]").addEventListener("click", () => changeQty(product.id, -1));
+        line.querySelector("[data-cart-inc]").addEventListener("click", () => changeQty(product.id, 1));
+        wrap.appendChild(line);
+      });
+    }
+
+    const total = rows.reduce((sum, row) => sum + effectivePrice(row.product) * row.cart.qty, 0);
+    totalEl.textContent = money(total);
+    checkout.disabled = rows.length === 0;
+    if (clear) clear.disabled = rows.length === 0;
+    renderBadge(false);
+  }
+  function changeQty(id, delta) {
+    const cart = readCart();
+    const found = cart.filter((row) => row.id === id)[0];
+    if (!found && delta > 0) cart.push({ id, qty: 1 });
+    else if (found) found.qty = Math.max(0, Math.min(20, found.qty + delta));
+    writeCart(cart.filter((row) => row.qty > 0));
+    clearCheckoutStatus();
+    renderCartPanel();
+  }
+  function addToCart(id) {
+    if (!productById(id)) return;
+    changeQty(id, 1);
+  }
+  async function startStripeCheckout() {
+    const btn = $("#stripe-checkout");
+    if (!btn) return;
+    const cart = readCart();
+    if (!cart.length) return;
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Opening Stripe...";
+    clearCheckoutStatus();
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart, orderType: "pickup" })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.url) {
+        throw new Error(data.detail || data.error || "Stripe checkout is not connected yet.");
+      }
+      window.location.assign(data.url);
+    } catch (err) {
+      const phone = ((window.SW && SW.settings && SW.settings.contact) || {}).phone || "904 402 9212";
+      setCheckoutStatus("warn", (err && err.message ? err.message : "Stripe checkout is not connected yet.") +
+        " Please call " + phone + " to place the order.");
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+  function handleCheckoutReturn() {
+    const params = new URLSearchParams(window.location.search || "");
+    if (params.get("checkout") === "success") {
+      writeCart([]);
+      renderCartPanel();
+      setCheckoutStatus("success", "Payment complete. Thank you — Seven Wonders will prepare your order.");
+    } else if (params.get("checkout") === "cancel") {
+      setCheckoutStatus("warn", "Checkout was canceled. Your cart is still here when you are ready.");
+    }
+  }
   function initCart() {
     renderBadge(false);
     $$("[data-add-to-cart]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        localStorage.setItem(CART_KEY, String(getCartCount() + 1));
+        const id = btn.getAttribute("data-add-to-cart");
+        addToCart(id);
         renderBadge(true);
-        const original = btn.dataset.label || btn.textContent.trim();
+        const original = btn.dataset.label || btn.innerHTML;
         btn.dataset.label = original;
-        btn.textContent = "✓ Added";
-        setTimeout(() => { btn.textContent = original; }, 1200);
+        btn.textContent = "Added";
+        setTimeout(() => { btn.innerHTML = original; }, 1200);
       });
     });
+    const checkout = $("#stripe-checkout");
+    if (checkout) checkout.addEventListener("click", startStripeCheckout);
+    const clear = $("[data-cart-clear]");
+    if (clear) clear.addEventListener("click", () => { writeCart([]); clearCheckoutStatus(); renderCartPanel(); });
+    renderCartPanel();
+    handleCheckoutReturn();
   }
 
   /* -----------------------------------------------------
