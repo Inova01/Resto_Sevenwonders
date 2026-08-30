@@ -100,6 +100,7 @@ function checkRenderedImages(file) {
 }
 
 const CSS_TEXT = fs.readFileSync(path.join(ROOT, "css", "style.css"), "utf8");
+const ADMIN_CSS_TEXT = fs.readFileSync(path.join(ROOT, "css", "admin.css"), "utf8");
 function firstBlockAfter(needle) {
   const start = CSS_TEXT.indexOf(needle);
   if (start === -1) return "";
@@ -627,8 +628,18 @@ console.log("\n=== keyboard accessibility ===");
 /* ============ admin.html ============ */
 console.log("\n=== admin.html ===");
 {
+  const adminHtml = fs.readFileSync(path.join(ROOT, "admin.html"), "utf8");
   const { doc, win, errors } = loadPage("admin.html");
   check("no script errors", errors.length === 0, errors.join("\n         "));
+  check("dashboard uses the bumped readable stylesheet",
+    /css\/admin\.css\?v=dashboard-readable/.test(adminHtml));
+  check("dashboard uses the full screen instead of a capped half-width layout",
+    /\.main\s*\{[\s\S]*max-width:\s*none/.test(ADMIN_CSS_TEXT) &&
+    !/\.main\s*\{[^}]*max-width:\s*1080px/.test(ADMIN_CSS_TEXT));
+  check("dashboard base font is larger for managers",
+    /font-size:\s*clamp\(17px/.test(ADMIN_CSS_TEXT));
+  check("dashboard sidebar is wider",
+    /--sidebar:\s*clamp\(280px,\s*18vw,\s*340px\)/.test(ADMIN_CSS_TEXT));
   check("dashboard shell is visible (no PIN set)", doc.querySelector("#shell").hidden === false);
   check("gate stays hidden", doc.querySelector("#gate").hidden === true);
 
