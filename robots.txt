@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# The manager's dashboard. Keeping it out of search results is not
+# security — it is a plain file and anyone with the address can open it.
+# What protects the live site is the publish token, which is stored only
+# in the manager's browser. See ADMIN.md for how to put a real login in
+# front of this page.
+Disallow: /admin.html
+
 Sitemap: sitemap.xml

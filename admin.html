@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Seven Wonders Bakery &amp; Grill</title>
+
+  <!-- Keep this page out of search results. It is not a secret (see the
+       notice on the Overview screen), but it should not be indexed. -->
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="no-referrer" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- ============ OPTIONAL SCREEN LOCK ============
+       Off unless a PIN has been set in Settings. It hides the screen
+       from someone who wanders onto the URL; it is NOT security, and
+       the dashboard says so plainly. What actually protects the live
+       site is the publish token. -->
+  <div class="gate" id="gate" hidden>
+    <form class="gate__box" id="gate-form">
+      <h1>Seven <span style="color:var(--apricot)">Wonders</span></h1>
+      <p style="margin-bottom:1.1rem">Enter the dashboard PIN.</p>
+      <div class="field">
+        <label for="gate-pin">PIN</label>
+        <input id="gate-pin" type="password" autocomplete="current-password" inputmode="numeric" />
+      </div>
+      <p class="note" id="gate-msg" style="color:var(--danger);min-height:1.2rem;margin:.4rem 0 0"></p>
+      <button class="btn btn--primary btn--block" type="submit" style="width:100%;justify-content:center;margin-top:.6rem">Open dashboard</button>
+      <p style="margin-top:1rem;font-size:.8rem">This PIN only hides the screen. It is checked in your browser, so it is a privacy screen, not a lock.</p>
+    </form>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div class="shell" id="shell" hidden>
+    <aside class="side">
+      <a class="side__brand" href="index.html">Seven<span>Wonders</span></a>
+      <div class="side__sub">Manager dashboard</div>
+
+      <nav class="side__nav" id="nav" aria-label="Dashboard sections"></nav>
+
+      <div class="side__foot">
+        <a class="btn btn--sm" href="index.html" style="width:100%;justify-content:center">View the website →</a>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:.8rem" id="last-published"></p>
+      </div>
+    </aside>
+
+    <main class="main" id="view">
+      <!-- rendered by js/admin/app.js -->
+    </main>
+  </div>
+
+  <!-- ============ PHOTO PICKER ============ -->
+  <div class="modal" id="photo-modal" role="dialog" aria-modal="true" aria-labelledby="photo-modal-title">
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h3 id="photo-modal-title">Choose a photo</h3>
+        <button class="btn btn--sm" type="button" data-close-modal>Close</button>
+      </div>
+      <div class="modal__body">
+        <p class="card__hint" style="margin-top:0">
+          These are the photos already in the site's <code>assets/gallery/</code> folder.
+          To use a new one, add the file to that folder first, then add it on the Gallery screen.
+        </p>
+        <div class="photo-grid" id="photo-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== The same content the website reads ===== -->
+  <script src="content/settings.js"></script>
+  <script src="content/menu.js"></script>
+  <script src="content/shop.js"></script>
+  <script src="content/gallery.js"></script>
+  <script src="content/blog.js"></script>
+  <script src="content/home.js"></script>
+  <script src="js/content.js"></script>
+
+  <!-- ===== Dashboard ===== -->
+  <script src="js/admin/store.js"></script>
+  <script src="js/admin/app.js"></script>
+</body>
+</html>

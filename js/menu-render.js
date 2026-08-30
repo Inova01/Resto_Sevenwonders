@@ -11,7 +11,12 @@
   var $ = function (s, c) { return (c || document).querySelector(s); };
 
   var LS_KEY = "sw_order_v1";
-  var WEB3_KEY = "PLACEHOLDER_WEB3FORMS_KEY";
+  /* Set in the dashboard (Info & Hours → online forms), stored in
+     content/settings.js. Empty means online ordering cannot send
+     email yet — see onSubmit, which says so instead of pretending. */
+  var SETTINGS = ((window.SW || {}).settings) || {};
+  var WEB3_KEY = (SETTINGS.forms || {}).web3formsKey || "";
+  var LEGAL_NAME = (SETTINGS.brand || {}).legalName || "Seven Wonders";
 
   var FORK_SVG =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
@@ -474,12 +479,23 @@
       recapEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
     }
 
-    if (!WEB3_KEY || WEB3_KEY.indexOf("PLACEHOLDER") !== -1) { succeed(); return; }
+    /* No key configured: do NOT show a fake confirmation. Show the
+       order back to the guest so they can read it down the phone. */
+    if (!WEB3_KEY || WEB3_KEY.indexOf("PLACEHOLDER") !== -1) {
+      var phone = (SETTINGS.contact || {}).phone || "";
+      showStatus("warn",
+        "Online ordering is not switched on yet, so this order was NOT sent." +
+        (phone ? " Please call " + phone + " and read your order below." : ""));
+      recapEl.textContent = message;
+      recapEl.classList.add("show");
+      recapEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+      return;
+    }
 
     var fd = new FormData();
     fd.append("access_key", WEB3_KEY);
-    fd.append("subject", "New Online Order — Seven Wonders");
-    fd.append("from_name", "Seven Wonders Website");
+    fd.append("subject", "New Online Order — " + LEGAL_NAME);
+    fd.append("from_name", LEGAL_NAME + " Website");
     fd.append("name", val("#o-name"));
     fd.append("email", val("#o-email"));
     fd.append("phone", val("#o-phone"));

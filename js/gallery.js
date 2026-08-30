@@ -4,70 +4,24 @@
 
    HOW TO ADD PHOTOS:
    1. Drop the image file into  assets/gallery/
-   2. Add one line to the GALLERY_IMAGES array below.
+   2. Dashboard → Gallery → "Add photo"  (or add a line to
+      content/gallery.js by hand).
    The gallery, pagination and lightbox rebuild themselves.
    ========================================================= */
 (function () {
   "use strict";
 
   /* -----------------------------------------------------
-     IMAGE MANIFEST  — add new photos here (one line each)
+     IMAGE MANIFEST — read from content/gallery.js via window.SW.
+     Hidden photos are dropped here, so hiding one in the
+     dashboard removes it from the grid, the pagination count and
+     the lightbox in a single step.
   ----------------------------------------------------- */
-  const GALLERY_IMAGES = [
-    "assets/gallery/gallery-01.jpeg",
-    "assets/gallery/gallery-02.jpeg",
-    "assets/gallery/gallery-03.jpeg",
-    "assets/gallery/gallery-04.jpeg",
-    "assets/gallery/gallery-05.jpeg",
-    "assets/gallery/gallery-06.jpeg",
-    "assets/gallery/gallery-07.jpeg",
-    "assets/gallery/gallery-08.jpeg",
-    "assets/gallery/gallery-09.jpeg",
-    "assets/gallery/gallery-10.jpeg",
-    "assets/gallery/gallery-11.jpeg",
-    "assets/gallery/gallery-12.jpeg",
-    "assets/gallery/gallery-13.jpeg",
-    "assets/gallery/gallery-14.jpeg",
-    "assets/gallery/gallery-15.jpeg",
-    "assets/gallery/gallery-16.jpeg",
-    "assets/gallery/gallery-17.jpeg",
-    "assets/gallery/gallery-18.jpeg",
-    "assets/gallery/gallery-19.jpeg",
-    "assets/gallery/gallery-20.jpeg",
-    "assets/gallery/gallery-21.jpeg",
-    "assets/gallery/gallery-22.jpeg",
-    "assets/gallery/gallery-23.jpeg",
-    "assets/gallery/gallery-24.jpeg",
-    "assets/gallery/gallery-25.jpeg",
-    "assets/gallery/gallery-26.jpeg",
-    "assets/gallery/gallery-27.jpeg",
-    "assets/gallery/gallery-28.jpeg",
-    "assets/gallery/gallery-29.jpeg",
-    "assets/gallery/gallery-30.jpeg",
-    "assets/gallery/gallery-31.jpeg",
-    "assets/gallery/gallery-32.jpeg",
-    "assets/gallery/gallery-33.jpeg",
-    "assets/gallery/gallery-34.jpeg",
-    "assets/gallery/gallery-35.jpeg",
-    "assets/gallery/gallery-36.jpeg",
-    "assets/gallery/gallery-37.jpeg",
-    "assets/gallery/gallery-38.jpeg",
-    "assets/gallery/gallery-39.jpeg",
-    "assets/gallery/gallery-40.jpeg",
-    "assets/gallery/gallery-41.jpeg",
-    "assets/gallery/gallery-42.jpeg",
-    "assets/gallery/gallery-43.jpeg",
-    "assets/gallery/gallery-44.jpeg",
-    "assets/gallery/gallery-45.jpeg",
-    "assets/gallery/gallery-46.jpeg",
-    "assets/gallery/gallery-47.jpeg",
-    "assets/gallery/gallery-48.jpeg",
-    "assets/gallery/gallery-49.jpeg",
-    "assets/gallery/gallery-50.jpeg",
-    "assets/gallery/gallery-51.jpeg",
-    "assets/gallery/gallery-52.jpeg",
-    "assets/gallery/gallery-53.jpeg",
-  ];
+  const PHOTOS = (((window.SW || {}).gallery || {}).images || [])
+    .filter((p) => p && p.src && !p.hidden);
+  const GALLERY_IMAGES = PHOTOS.map((p) => p.src);
+  const altFor = (i) =>
+    (PHOTOS[i] && PHOTOS[i].alt) || "Seven Wonders gallery photo " + (i + 1);
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $  = (sel, ctx = document) => ctx.querySelector(sel);
@@ -136,7 +90,7 @@
       img.src = src;
       img.loading = "lazy";
       img.decoding = "async";
-      img.alt = "Seven Wonders gallery photo " + (globalIndex + 1);
+      img.alt = altFor(globalIndex);
       btn.appendChild(img);
       btn.addEventListener("click", () => openLightbox(globalIndex));
       return btn;
@@ -254,7 +208,7 @@
       if (!box || !boxImg) return;
       lbIndex = (i + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
       boxImg.src = GALLERY_IMAGES[lbIndex];
-      boxImg.alt = "Seven Wonders gallery photo " + (lbIndex + 1);
+      boxImg.alt = altFor(lbIndex);
       if (boxCount) boxCount.textContent = (lbIndex + 1) + " / " + GALLERY_IMAGES.length;
       box.classList.add("open");
       document.body.style.overflow = "hidden";

@@ -1006,3 +1006,91 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
   /* Mosaic: no stagger/scale — simple instant swap (crossfade handled by JS state) */
   .mgal-tile, .mgal-tile.in, .mgal-tile.leaving { opacity: 1; transform: none; }
 }
+
+/* =========================================================
+   CONTENT-DRIVEN ADDITIONS
+   Styles for the states that only exist now that the site is
+   rendered from content/ — sold-out items, honest form
+   warnings, initials instead of stock avatars, and the draft
+   preview bar. See js/site-render.js and js/content.js.
+   ========================================================= */
+
+/* A section with nothing to show hides itself (no upcoming events,
+   no guest reviews yet). Needs !important because .section sets
+   display explicitly. */
+[hidden] { display: none !important; }
+
+/* ---- Honest form state -------------------------------------
+   Used when no Web3Forms key is configured: the form tells the
+   guest it is not connected instead of faking a confirmation. */
+.form-status.warn {
+  border: 1px solid var(--apricot);
+  background: rgba(237, 158, 88, 0.10);
+  color: var(--apricot-light);
+}
+
+/* ---- Sold out ---------------------------------------------- */
+.product-card.is-sold-out .product-card__media { opacity: 0.45; filter: grayscale(0.6); }
+.product-card.is-sold-out h3 { color: var(--muted); }
+.sale-badge--out { background: #3a3a3a; color: var(--body); }
+.product-note { color: var(--muted); font-size: 0.85rem; margin: 0.15rem 0 0.4rem; }
+
+/* ---- Placeholder art where no photo has been chosen -------- */
+.product-card__ph,
+.post-card__ph,
+.dish-card__ph,
+.event-card__ph {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(160deg, #141414, var(--panel));
+  border-bottom: 1px solid var(--line);
+  color: rgba(237, 158, 88, 0.45);
+}
+.product-card__ph svg,
+.post-card__ph svg,
+.dish-card__ph svg,
+.event-card__ph svg { width: 34px; height: 34px; }
+
+/* ---- Guest reviews: initials instead of a stranger's photo -- */
+.who__initials {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(237, 158, 88, 0.14);
+  border: 1px solid var(--line);
+  color: var(--apricot);
+  font-family: var(--serif);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  flex: 0 0 auto;
+}
+
+/* ---- Small notes ------------------------------------------- */
+.site-footer .footer-note { color: var(--apricot); font-size: 0.8rem; margin-top: 0.5rem; }
+.empty-note { color: var(--muted); text-align: center; padding: 2.5rem 0; }
+
+/* ---- Calendar: days the restaurant is closed ---------------- */
+.cal-days button.closed { text-decoration: line-through; cursor: not-allowed; }
+
+/* ---- Draft preview bar (only ever shown with ?preview=1) ---- */
+.sw-preview-bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.2rem;
+  padding: 0.7rem var(--gutter);
+  background: var(--apricot);
+  color: #1a1000;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.5);
+}
+.sw-preview-bar a { color: #1a1000; font-weight: 600; text-decoration: underline; }
+body.has-preview-bar { padding-bottom: 3.2rem; }

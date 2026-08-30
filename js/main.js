@@ -75,7 +75,12 @@
     const canvas = $("#ember-canvas");
     if (!canvas || reduceMotion) return;
 
+    // getContext can return null (canvas disabled, or too many live
+    // contexts). The hero animation is decoration — skip it rather than
+    // throwing, which would stop every init() after this one from running.
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
     let w, h, particles = [], raf;
     const MAX = 40;
     const COLORS = ["#ED9E58", "#F7C08A", "#D97E33", "#ffcf99"];
@@ -213,6 +218,7 @@
     const titleEl = $("#cal-title", root);
     const daysEl  = $("#cal-days", root);
     const dateInput = $("#res-date");
+    const closedDays = window.SW && SW.closedWeekdays ? SW.closedWeekdays() : [];
 
     function render() {
       titleEl.textContent = monthNames[viewMonth] + " " + viewYear;
@@ -240,8 +246,13 @@
         if (key === selectedKey) b.classList.add("selected");
         const dateObj = new Date(viewYear, viewMonth, d);
         const isPast = dateObj < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        if (isPast) { b.disabled = true; b.style.opacity = ".35"; }
-        b.setAttribute("aria-label", `${monthNames[viewMonth]} ${d}, ${viewYear}`);
+        // Closed days come from the opening hours in content/settings.js,
+        // so changing the hours in the dashboard also closes the calendar.
+        const isClosed = closedDays.indexOf(dateObj.getDay()) !== -1;
+        if (isPast || isClosed) { b.disabled = true; b.style.opacity = ".35"; }
+        if (isClosed) b.classList.add("closed");
+        b.setAttribute("aria-label",
+          `${monthNames[viewMonth]} ${d}, ${viewYear}` + (isClosed ? " — closed" : ""));
         b.addEventListener("click", () => {
           selectedKey = key;
           if (dateInput) {
@@ -277,11 +288,14 @@
         const key = form.querySelector('[name="access_key"]').value;
         if (status) { status.className = "form-status"; }
 
-        // If key not yet configured, simulate success gracefully.
+        // No key configured yet. Never fake a confirmation — a guest who
+        // believes a table is booked when nothing was sent is worse than
+        // no form at all. Tell them, and give them the phone number.
         if (!key || key.includes("PLACEHOLDER")) {
-          showStatus(status, "success",
-            "Thank you! Your request has been received. (Demo mode — add your Web3Forms key to send real emails.)");
-          form.reset();
+          const phone = ((window.SW && SW.settings.contact) || {}).phone || "";
+          showStatus(status, "warn",
+            "This form is not connected yet, so your request was NOT sent." +
+            (phone ? " Please call " + phone + " and we'll take your details." : ""));
           return;
         }
         const submitBtn = form.querySelector('[type="submit"]');
@@ -419,26 +433,25 @@
       return idx;
     };
 
-    const idx = seededIndex(today);
-    const dish = pool[idx].item;
+    // --- Which dish? --------------------------------------------------
+    // "manual" = the dashboard pinned a specific dish. Fall back to the
+    // date-seeded pick if that dish has since been deleted or sold out.
+    const cfg = menu.dailySpecial || { mode: "auto", discountPercent: 15 };
+    let chosen = null;
+    if (cfg.mode === "manual" && cfg.itemId) {
+      chosen = pool.filter((p) => p.item.id === cfg.itemId)[0] || null;
+    }
+    if (!chosen) chosen = pool[seededIndex(today)];
+    const dish = chosen.item;
 
-    // --- Pricing: 15% off the real price, rounded to the nearest .50 ---
+    // --- Pricing: the dashboard's discount, rounded to the nearest .50.
+    // A discount of 0 shows the normal price with no strike-through. ---
     const money = (n) => "$" + n.toFixed(2);
-    const promo = Math.round(dish.price * 0.85 * 2) / 2;
+    const pct = Math.max(0, Math.min(90, Number(cfg.discountPercent) || 0));
+    const promo = pct > 0 ? Math.round(dish.price * (1 - pct / 100) * 2) / 2 : dish.price;
 
-    // --- Photo: a matching restaurant photo, else the category photo ---
-    const PHOTO = {
-      "chicken-wings-7": "assets/gallery/gallery-16.jpeg",
-      "griot-pork-platter": "assets/gallery/gallery-11.jpeg",
-      "legume-platter": "assets/gallery/gallery-12.jpeg",
-      "tasso-beef": "assets/gallery/gallery-02.jpeg",
-      "fish-platter-sm": "assets/gallery/gallery-19.jpeg",
-      "fish-platter-md": "assets/gallery/gallery-19.jpeg",
-      "fish-platter-lg": "assets/gallery/gallery-19.jpeg",
-      "fish-platter-xl": "assets/gallery/gallery-19.jpeg",
-      "kabrit-platter": "assets/gallery/gallery-15.jpeg",
-    };
-    const photo = PHOTO[dish.id] || pool[idx].catPhoto || "assets/gallery/gallery-07.jpeg";
+    // --- Photo: the dish's own photo, else its category's ---
+    const photo = dish.img || chosen.catPhoto || "assets/gallery/gallery-07.jpeg";
 
     // --- Current weekday, straight from the visitor's device ---
     const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -457,7 +470,15 @@
       descEl.textContent = d;
       descEl.hidden = !d; // no real description on the menu → omit the line
     }
-    if (priceEl) priceEl.innerHTML = money(promo) + ' <small>' + money(dish.price) + "</small>";
+    if (priceEl) {
+      priceEl.textContent = money(promo);
+      if (promo < dish.price) {
+        const was = document.createElement("small");
+        was.textContent = money(dish.price);
+        priceEl.appendChild(document.createTextNode(" "));
+        priceEl.appendChild(was);
+      }
+    }
     if (img) {
       img.src = photo;
       img.alt = dish.name + " — special of the day";
@@ -584,21 +605,31 @@
   /* -----------------------------------------------------
      INIT ALL
   ----------------------------------------------------- */
+  // Each feature is started in isolation. Previously one throw — a canvas
+  // that refused to give a context, a field left in an odd state by the
+  // dashboard — would abort the whole handler and silently kill every
+  // feature after it. Now a broken part costs only itself.
+  function safe(name, fn) {
+    try { fn(); }
+    catch (err) { console.error("[Seven Wonders] " + name + " failed:", err); }
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    initNav();
-    initCart();
-    initEmbers();
-    initMenuTabs();
-    initSubnav();
-    initReveal();
-    initCalendar();
-    initForms();
-    initBlog();
-    initMenuOfDay();
-    initSlider();
-    initGallery();
-    // stamp footer year
-    const y = document.getElementById("year");
-    if (y) y.textContent = new Date().getFullYear();
+    safe("nav", initNav);
+    safe("cart", initCart);
+    safe("embers", initEmbers);
+    safe("menu tabs", initMenuTabs);
+    safe("subnav", initSubnav);
+    safe("reveal", initReveal);
+    safe("calendar", initCalendar);
+    safe("forms", initForms);
+    safe("blog", initBlog);
+    safe("menu of the day", initMenuOfDay);
+    safe("slider", initSlider);
+    safe("gallery", initGallery);
+    safe("year", function () {
+      const y = document.getElementById("year");
+      if (y) y.textContent = new Date().getFullYear();
+    });
   });
 })();

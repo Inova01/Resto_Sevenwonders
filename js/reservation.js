@@ -12,6 +12,28 @@
 (function () {
   "use strict";
 
+  /* Phone, restaurant name and the closed-days note all come from
+     content/settings.js via window.SW, so this widget can never
+     disagree with the footer. */
+  const SW = window.SW || {};
+  const S = SW.settings || {};
+  const CONTACT = S.contact || {};
+  const LEGAL = (S.brand || {}).legalName || "Seven Wonders";
+  const TEL = SW.telHref ? SW.telHref() : "";
+  const PHONE = CONTACT.phone || "";
+  const KEY = (S.forms || {}).web3formsKey || "";
+
+  const escAttr = (v) => String(v == null ? "" : v).replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+  const phoneLink = PHONE && TEL
+    ? `<a href="${escAttr(TEL)}">${escAttr(PHONE)}</a>`
+    : "";
+
+  const closedDays = (S.hours || []).filter((h) => h && h.closed).map((h) => h.day);
+  const closedNote = closedDays.length
+    ? ` We are closed ${closedDays.length === 1 ? closedDays[0] + "s" : closedDays.join(" and ")}.`
+    : "";
+
   const TEMPLATE = `
     <section class="section" style="padding-top:1rem">
       <div class="container reserve-grid">
@@ -19,12 +41,12 @@
         <div class="reveal">
           <p class="eyebrow">Online Reservation</p>
           <h2 class="section-title">Book A Table</h2>
-          <p class="reserve-lead">Booking request <a href="tel:+19045550199">+1-904-555-0199</a> or fill out the reservation form below and we'll confirm within the hour.</p>
+          <p class="reserve-lead">${phoneLink ? `Call ${phoneLink} or fill` : "Fill"} out the reservation form below and we'll confirm as soon as we can.</p>
 
           <form data-web3form novalidate>
-            <input type="hidden" name="access_key" value="PLACEHOLDER_WEB3FORMS_KEY" />
-            <input type="hidden" name="subject" value="New Table Reservation — Seven Wonders" />
-            <input type="hidden" name="from_name" value="Seven Wonders Website" />
+            <input type="hidden" name="access_key" value="${escAttr(KEY)}" />
+            <input type="hidden" name="subject" value="New Table Reservation — ${escAttr(LEGAL)}" />
+            <input type="hidden" name="from_name" value="${escAttr(LEGAL)} Website" />
             <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
 
             <div class="form-grid">
@@ -77,7 +99,7 @@
 
         <!-- RIGHT: photo -->
         <div class="reserve-photo reveal">
-          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80" alt="Warmly lit interior of Seven Wonders dining room" loading="lazy" />
+          <img src="assets/gallery/gallery-05.jpeg" alt="A table set at ${escAttr(LEGAL)}" loading="lazy" />
         </div>
       </div>
     </section>
@@ -86,7 +108,7 @@
     <section class="section section--near" style="padding-top:1rem">
       <div class="container">
         <p class="eyebrow">Check Availability</p>
-        <h2 class="section-title">This Month at Seven Wonders</h2>
+        <h2 class="section-title">This Month at ${escAttr((S.brand || {}).shortName || LEGAL)}</h2>
         <div class="calendar" id="calendar">
           <div class="cal-head">
             <button class="cal-nav" id="cal-prev" type="button" aria-label="Previous month">‹</button>
@@ -98,7 +120,7 @@
           </div>
           <div class="cal-days" id="cal-days"></div>
         </div>
-        <p style="color:var(--muted);font-size:.85rem;margin-top:1rem">Select a date above to auto-fill your reservation. Mondays we are closed.</p>
+        <p style="color:var(--muted);font-size:.85rem;margin-top:1rem">Select a date above to auto-fill your reservation.${closedNote}</p>
       </div>
     </section>`;
 
