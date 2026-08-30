@@ -49,7 +49,14 @@ Script order matters: `content/*.js` → `js/content.js` → page scripts →
 `js/site-render.js` → `js/main.js`.
 
 ## Design system
-- **Apricot** `#ED9E58` (light `#F7C08A`, deep `#D97E33`) on pure black `#000` / near-black `#0A0A0A`
+- **Apricot** `#ED9E58` (light `#F7C08A`, deep `#D97E33`) on pure black `#000`
+  alternating with warm charcoal `#1A1613`; cards lift to `#241D18`.
+  The charcoals are deliberately warm and deliberately *not* `#0A0A0A` —
+  that sat 1.06:1 against black, so the alternating bands were invisible
+  and every page read as one unbroken slab.
+- Exactly **one** apricot-filled section on the site: the closing reservation
+  banner, with `--gold-ink` `#1A1208` text (6.2:1 at the worst gradient stop).
+  Keeping it to one is what lets apricot go on meaning "act on this" elsewhere.
 - Typography: Playfair Display + DM Sans (Google Fonts)
 - Ember/fire canvas animation on the hero; respects `prefers-reduced-motion`
 

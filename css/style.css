@@ -9,8 +9,15 @@
   --apricot-light: #F7C08A;
   --apricot-deep: #D97E33;
   --black: #000000;
-  --near-black: #0A0A0A;
-  --panel: #0d0d0d;
+  /* Warm charcoals, not neutral ones. #0A0A0A used to sit 1.06:1 against
+     pure black, so the alternating sections were invisible and the whole
+     page read as one unbroken slab. These carry a trace of the apricot hue
+     and separate visibly while keeping body text above 14:1. */
+  --near-black: #1A1613;
+  --panel: #241D18;
+  /* Near-black ink for the one apricot band. 6.2:1 at worst against the
+     gradient, so it passes AA at every stop. */
+  --gold-ink: #1A1208;
   --line: rgba(237, 158, 88, 0.28);
   --white: #FFFFFF;
   --body: #E8E8E8;
@@ -756,14 +763,39 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
 /* =========================================================
    RESERVATION CTA BANNER
    ========================================================= */
+/* The only apricot-filled section on the site. It works precisely because
+   it is the only one: after a page of warm blacks the gold lands as an
+   arrival rather than as decoration. Everything inside it inverts to dark
+   ink, so apricot keeps meaning "act on this" everywhere else. */
 .cta-banner {
   position: relative; text-align: center; overflow: hidden; isolation: isolate;
   padding-block: clamp(3.5rem, 8vw, 6rem);
+  background: linear-gradient(150deg, var(--apricot-light), var(--apricot) 42%, var(--apricot-deep));
 }
-.cta-banner img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
-.cta-banner::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(90% 120% at 50% 100%, rgba(217,126,51,0.35), transparent 60%), rgba(0,0,0,0.72); }
-.cta-banner h2 { font-size: clamp(2rem, 5vw, 3.4rem); margin-bottom: 1rem; }
-.cta-banner p { color: var(--body); max-width: 50ch; margin: 0 auto 2rem; }
+/* The manager can still choose a photo in the dashboard; it is laid in as a
+   faint texture rather than a backdrop, so the band stays gold whatever
+   they pick and the text contrast never depends on the image. */
+.cta-banner img {
+  position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%;
+  object-fit: cover; opacity: .14; mix-blend-mode: soft-light;
+}
+.cta-banner::after { content: none; }
+.cta-banner h2 { font-size: clamp(2rem, 5vw, 3.4rem); margin-bottom: 1rem; color: var(--gold-ink); }
+.cta-banner p { color: rgba(26, 18, 8, 0.82); max-width: 50ch; margin: 0 auto 2rem; }
+.cta-banner .eyebrow,
+.cta-banner .eyebrow::before,
+.cta-banner .eyebrow::after { color: var(--gold-ink); }
+/* A dark button on gold: the inverse of the same button on black. */
+.cta-banner .btn--primary {
+  background: var(--gold-ink);
+  color: var(--apricot-light);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+}
+.cta-banner .btn--primary:hover {
+  background: #000;
+  animation: none;
+  transform: translateY(-2px);
+}
 
 /* Responsive for new sections */
 @media (max-width: 992px) {
@@ -1165,7 +1197,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--white); font-weight: 60
   place-items: center;
   width: 100%;
   aspect-ratio: 4 / 3;
-  background: linear-gradient(160deg, #141414, var(--panel));
+  background: linear-gradient(160deg, #1C1714, var(--panel));
   border-bottom: 1px solid var(--line);
   color: rgba(237, 158, 88, 0.45);
 }
