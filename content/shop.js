@@ -38,7 +38,7 @@ window.SW_CONTENT.shop = {
       id: "pate-fete-box",
       name: "Pate Fête — Box of 12",
       note: "Meat or Aransò · fresh every morning",
-      price: 12.42,
+      price: 14.00,
       sale: null,
       inStock: true,
       img: ""
@@ -47,7 +47,7 @@ window.SW_CONTENT.shop = {
       id: "patte-kode-meat-shop",
       name: "Patte Kòde",
       note: "Meat",
-      price: 6.21,
+      price: 7.99,
       sale: null,
       inStock: true,
       img: ""
@@ -56,16 +56,16 @@ window.SW_CONTENT.shop = {
       id: "griot-platter-shop",
       name: "Griot Pork Platter",
       note: "With rice & beans and banana pesé",
-      price: 17.60,
+      price: 16.99,
       sale: null,
       inStock: true,
       img: "assets/gallery/gallery-11.jpeg"
     },
     {
       id: "chicken-wings-shop",
-      name: "7 Chicken Wings",
+      name: "7 Chicken Wings Platter",
       note: "Full platter",
-      price: 13.46,
+      price: 12.99,
       sale: null,
       inStock: true,
       img: "assets/gallery/gallery-16.jpeg"
@@ -74,7 +74,7 @@ window.SW_CONTENT.shop = {
       id: "turkey-platter-shop",
       name: "Turkey Platter",
       note: "Kodenn",
-      price: 19.67,
+      price: 19.99,
       sale: null,
       inStock: true,
       img: ""
@@ -83,7 +83,7 @@ window.SW_CONTENT.shop = {
       id: "legume-platter-shop",
       name: "Legume Platter",
       note: "Slow-cooked vegetable stew",
-      price: 20.70,
+      price: 17.99,
       sale: null,
       inStock: true,
       img: "assets/gallery/gallery-12.jpeg"
@@ -91,35 +91,35 @@ window.SW_CONTENT.shop = {
     {
       id: "bouillon-kabrit-shop",
       name: "Bouillon Kabrit",
-      note: "Goat soup",
-      price: 20.70,
+      note: "Goat soup · Saturday only",
+      price: 19.99,
       sale: null,
       inStock: true,
       img: ""
     },
     {
-      id: "tasso-beef-shop",
-      name: "Tasso Beef",
-      note: "Oxtail platter",
-      price: 25.88,
+      id: "kalalou-platter-shop",
+      name: "Kalalou Platter",
+      note: "Okra",
+      price: 24.99,
       sale: null,
       inStock: true,
-      img: "assets/gallery/gallery-02.jpeg"
+      img: ""
     },
     {
       id: "kabrit-platter-shop",
       name: "Kabrit Platter",
       note: "Goat · Special Menu Night",
-      price: 25.88,
+      price: 24.99,
       sale: null,
       inStock: true,
       img: "assets/gallery/gallery-15.jpeg"
     },
     {
       id: "fish-platter-shop",
-      name: "Fish Platter — Large",
-      note: "Pwason · Special Menu Night",
-      price: 36.23,
+      name: "Fish Platter",
+      note: "Pwason · $28 and up",
+      price: 28.00,
       sale: null,
       inStock: true,
       img: "assets/gallery/gallery-19.jpeg"

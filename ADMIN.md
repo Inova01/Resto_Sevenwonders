@@ -92,6 +92,16 @@ The homepage mosaic is designed for exactly **seven** photos. The first and
 sixth are drawn wide and the second tall — that is what stops it looking like a
 plain grid. The *Homepage order* box at the bottom lets you reorder them.
 
+### Change the About page
+**About page** → your story, the founders, the photos of the restaurant.
+
+The story boxes take one paragraph per blank line. The two founder cards can
+be renamed, reordered or removed — delete both and the block disappears rather
+than leaving an empty column.
+
+The address and phone at the bottom of that page are **not** typed there. They
+come from **Info & hours**, the same as every footer, so you change them once.
+
 ### Write a blog post
 **Blog** → **+ Write a new post**.
 
@@ -259,7 +269,8 @@ content/*.js          the editable data — plain JS assigning into
 js/content.js         merges them into window.SW, applies a draft overlay
                       ONLY in preview mode, exposes shared helpers
       ↓
-js/site-render.js     paints footers, contact page, shop, blog, homepage
+js/site-render.js     paints footers, contact page, shop, blog, homepage,
+                      About page
 js/menu-data.js       shim: window.SW_MENU, minus sold-out items
 js/menu-render.js     the menu tabs + order builder (unchanged)
 js/main.js            behaviour — must load AFTER site-render.js
@@ -336,6 +347,13 @@ an id.
 
 **`content/blog.js`** — `homepageCount`, `posts[{id,title,category,date,excerpt,img,body[],published}]`.
 `date` is ISO `yyyy-mm-dd`; `body` is an array of plain-text paragraphs.
+
+**`content/about.js`** — `hero{eyebrow,title,image,imageAlt}`,
+`intro{eyebrow,title,body[]}`, `founders{label,people[{name,role,photo,photoAlt}]}`
+(empty `people` removes the block), `detail{photos[{src,alt}],body[],closing}`,
+`visit{eyebrow,title,primaryCta,secondaryCta}`. Every `body` is an array of
+plain-text paragraphs. The address and phone in the visit block come from
+`settings`, not from here.
 
 **`content/home.js`** — `hero`, `about{…,stats[]}`, `events{…,items[{title,date,time,genre,img}]}`,
 `gallery`, `testimonials{…,items[{name,context,quote,stars,avatar}]}`,

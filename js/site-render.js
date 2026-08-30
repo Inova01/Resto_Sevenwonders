@@ -139,6 +139,7 @@
     var exploreCol = h("div", {}, [
       h("h4", { text: "Explore" }),
       h("ul", {}, [
+        h("li", {}, [h("a", { href: "about.html", text: "About" })]),
         h("li", {}, [h("a", { href: "menu.html", text: "Menu" })]),
         h("li", {}, [h("a", { href: "reservation.html", text: "Reservations" })]),
         h("li", {}, [h("a", { href: "shop.html", text: "Shop" })]),
@@ -594,6 +595,116 @@
   }
 
   /* =====================================================
+     ABOUT PAGE
+     Nothing on this page is written into about.html any more.
+     The story, the founder cards and the photo stack all come
+     from content/about.js; the address and phone in the closing
+     block come from content/settings.js, so they cannot drift
+     out of step with the footer.
+     ===================================================== */
+  function paragraphs(list) {
+    return (list || []).filter(Boolean).map(function (text) {
+      return h("p", { text: text });
+    });
+  }
+
+  function renderAbout() {
+    var page = $("[data-about-page]");
+    if (!page) return;                 // not the About page
+    var a = SW.about || {};
+
+    /* --- hero --- */
+    var hero = $("[data-about-hero]", page);
+    if (hero) {
+      var d = a.hero || {};
+      var heroImg = $("img", hero);
+      if (heroImg && d.image) { heroImg.src = d.image; heroImg.alt = d.imageAlt || ""; }
+      var heroEyebrow = $(".eyebrow", hero);
+      if (heroEyebrow && d.eyebrow) heroEyebrow.textContent = d.eyebrow;
+      var heroTitle = $("h1", hero);
+      if (heroTitle && d.title) heroTitle.textContent = d.title;
+    }
+
+    /* --- intro story --- */
+    var intro = $("[data-about-intro]", page);
+    if (intro) {
+      var i = a.intro || {};
+      var kids = [];
+      if (i.eyebrow) kids.push(h("p", { class: "eyebrow", text: i.eyebrow }));
+      if (i.title) kids.push(h("h2", { class: "section-title", text: i.title }));
+      kids = kids.concat(paragraphs(i.body));
+      fill(intro, kids);
+    }
+
+    /* --- founder cards: no people, no empty column --- */
+    var founders = $("[data-about-founders]", page);
+    if (founders) {
+      var f = a.founders || {};
+      var people = (f.people || []).filter(function (p) { return p && p.name; });
+      if (!people.length) founders.remove();
+      else {
+        if (f.label) founders.setAttribute("aria-label", f.label);
+        fill(founders, people.map(function (p) {
+          return h("article", { class: "founder-card" }, [
+            photoOrPlaceholder(p.photo, p.photoAlt || p.name, ""),
+            h("div", {}, [
+              h("h3", { text: p.name }),
+              p.role ? h("p", { text: p.role }) : null
+            ])
+          ]);
+        }));
+      }
+    }
+
+    /* --- photo stack + the rest of the story --- */
+    var stack = $("[data-about-photos]", page);
+    if (stack) {
+      var photos = ((a.detail || {}).photos || []).filter(function (p) { return p && p.src; });
+      if (!photos.length) stack.remove();
+      else fill(stack, photos.map(function (p) {
+        return h("img", { src: p.src, alt: p.alt || "", loading: "lazy" });
+      }));
+    }
+
+    var detail = $("[data-about-detail]", page);
+    if (detail) {
+      var dt = a.detail || {};
+      var body = paragraphs(dt.body);
+      if (dt.closing) body.push(h("p", {}, [h("strong", { text: dt.closing })]));
+      fill(detail, body);
+    }
+
+    /* --- closing "visit us" block: address and phone from settings --- */
+    var visit = $("[data-about-visit]", page);
+    if (visit) {
+      var v = a.visit || {};
+      var c = SW.settings.contact || {};
+      var kids2 = [];
+      if (v.eyebrow) kids2.push(h("p", { class: "eyebrow", text: v.eyebrow }));
+      if (v.title) kids2.push(h("h2", { class: "section-title", text: v.title }));
+
+      var addr = [];
+      if (c.address1) addr.push(document.createTextNode(c.address1));
+      if (c.address1 && c.address2) addr.push(h("br", {}));
+      if (c.address2) addr.push(document.createTextNode(c.address2));
+      if (addr.length) kids2.push(h("p", {}, addr));
+      if (c.phone) kids2.push(h("p", {}, [h("a", { href: SW.telHref(), text: c.phone })]));
+
+      var ctas = [];
+      [[v.primaryCta, "btn btn--primary"], [v.secondaryCta, "btn btn--ghost"]]
+        .forEach(function (pair) {
+          var cta = pair[0];
+          if (cta && cta.label && cta.href) {
+            ctas.push(h("a", { class: pair[1], href: cta.href, text: cta.label }));
+          }
+        });
+      if (ctas.length) kids2.push(h("div", { class: "hero__cta" }, ctas));
+
+      fill(visit, kids2);
+    }
+  }
+
+  /* =====================================================
      RUN
      ===================================================== */
   document.addEventListener("DOMContentLoaded", function () {
@@ -603,6 +714,7 @@
     renderContact();
     renderShop();
     renderBlogPage();
+    renderAbout();
 
     renderHomeHero();
     renderHomeAbout();

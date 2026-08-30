@@ -44,7 +44,7 @@ window.SW_CONTENT.menu = {
      Three dish ids. Names, prices and photos are pulled from
      the menu below, so a price change updates the homepage
      too — no second place to forget.                        */
-  featuredIds: ["fish-platter-lg", "tasso-beef", "legume-platter"],
+  featuredIds: ["fish-platter-lg", "kabrit-platter", "legume-platter"],
 
   /* ---- Four top-level categories ---- */
   categories: [
@@ -57,18 +57,18 @@ window.SW_CONTENT.menu = {
           id: "bk-plates",
           label: "Plates",
           items: [
-            { id: "spaghetti", name: "Spaghetti", desc: "Meat or Aransò", price: null, priceLabel: "Variable", soldOut: false },
-            { id: "sandwich", name: "Sandwich", desc: "Egg or Chicken", price: 6, soldOut: false }
+            { id: "spaghetti", name: "Spaghetti", desc: "Meat or Aransò", price: 12.99, soldOut: false },
+            { id: "sandwich", name: "Sandwich", desc: "Egg or Chicken", price: 6.99, soldOut: false }
           ]
         },
         {
           id: "bk-patties",
           label: "Patties",
           items: [
-            { id: "patte-kode-meat", name: "Patte Kòde", desc: "Meat", price: 6.21, soldOut: false },
-            { id: "patte-kode-aranso", name: "Patté Kòde", desc: "Aransò", price: 7.25, soldOut: false },
-            { id: "pate-fete-1", name: "Pate Fete (1)", desc: "Meat or Aransò", price: 1.24, soldOut: false },
-            { id: "pate-fete-12", name: "Pate Fête (Bwat) 12", desc: "Meat or Aransò", price: 12.42, soldOut: false }
+            { id: "patte-kode-meat", name: "Patte Kòde", desc: "Meat", price: 7.99, soldOut: false },
+            { id: "patte-kode-aranso", name: "Patte Kòde", desc: "Aransò", price: 8.99, soldOut: false },
+            { id: "pate-fete-1", name: "Pate Fête (1)", desc: "Meat or Aransò", price: 1.25, soldOut: false },
+            { id: "pate-fete-12", name: "Pate Fête (Bwat) 12", desc: "Meat or Aransò", price: 14.00, soldOut: false }
           ]
         }
       ]
@@ -83,24 +83,25 @@ window.SW_CONTENT.menu = {
           id: "ln-mains",
           label: "Main Dishes",
           items: [
-            { id: "chicken-wings-7", name: "7 Chicken Wings", desc: "", price: 13.46, soldOut: false, img: "assets/gallery/gallery-16.jpeg" },
-            { id: "side-chicken", name: "Side Chicken", desc: "", price: 10.43, soldOut: false },
-            { id: "griot-pork-platter", name: "Griot Pork Platter", desc: "", price: 17.60, soldOut: false, img: "assets/gallery/gallery-11.jpeg" },
-            { id: "side-griot", name: "Side Griot", desc: "", price: 12.42, soldOut: false },
-            { id: "fritay", name: "Fritay", desc: "Variable", price: null, priceLabel: "Variable", soldOut: false }
+            { id: "chicken-wings-7", name: "7 Chicken Wings Platter", desc: "", price: 12.99, soldOut: false, img: "assets/gallery/gallery-16.jpeg" },
+            { id: "griot-pork-platter", name: "Griot Pork Platter", desc: "", price: 16.99, soldOut: false, img: "assets/gallery/gallery-11.jpeg" },
+            { id: "chicken-plate", name: "Chicken Plate", desc: "", price: 16.99, soldOut: false },
+            { id: "lunch-special", name: "Lunch Special", desc: "11:30 AM – 4:00 PM", price: 9.99, soldOut: false }
           ]
         },
         {
           id: "ln-sides",
-          label: "Sides",
+          label: "Sides & Others",
           items: [
             { id: "salad", name: "Salad", desc: "", price: 5.00, soldOut: false },
             { id: "fries", name: "Fries", desc: "Pomme de Terre", price: 3.00, soldOut: false },
             { id: "rice-beans", name: "Rice & Beans", desc: "Diri Kole", price: 6.00, soldOut: false },
-            { id: "side-diri", name: "Side Diri", desc: "Rice", price: 6.21, soldOut: false },
-            { id: "side-banana-3", name: "Side Banana 3 Pics", desc: "", price: 4.14, soldOut: false },
-            { id: "side-banana-7", name: "Side Banana 7 Pics", desc: "", price: 9.40, soldOut: false },
-            { id: "side-acra", name: "Side Acra", desc: "", price: 6.21, soldOut: false }
+            { id: "side-legume", name: "Legume", desc: "Side", price: 11.00, soldOut: false },
+            { id: "side-turkey", name: "Turkey", desc: "Side", price: 12.00, soldOut: false },
+            { id: "side-griot", name: "Griot", desc: "Side", price: 10.00, soldOut: false },
+            { id: "side-chicken", name: "Chicken", desc: "Side", price: 10.00, soldOut: false },
+            { id: "plantain-3", name: "Plantain", desc: "3 for $2", price: 2.00, soldOut: false },
+            { id: "akra-9", name: "Akra", desc: "9 for $6", price: 6.00, soldOut: false }
           ]
         }
       ]
@@ -115,18 +116,18 @@ window.SW_CONTENT.menu = {
           id: "dn-mains",
           label: "Main Dishes",
           items: [
-            { id: "turkey-platter", name: "Turkey Platter", desc: "Kodenn", price: 19.67, soldOut: false },
-            { id: "side-turkey", name: "Side Turkey", desc: "Kodenn", price: 13.46, soldOut: false },
-            { id: "legume-platter", name: "Legume Platter", desc: "", price: 20.70, soldOut: false, img: "assets/gallery/gallery-12.jpeg" },
-            { id: "kalalou-platter", name: "Kalalou Platter", desc: "Okra", price: 21.83, soldOut: false },
-            { id: "tasso-beef", name: "Tasso Beef", desc: "Oxtail Platter", price: 25.88, soldOut: false, img: "assets/gallery/gallery-02.jpeg" }
+            { id: "legume-platter", name: "Legume Platter", desc: "", price: 17.99, soldOut: false, img: "assets/gallery/gallery-12.jpeg" },
+            { id: "turkey-platter", name: "Turkey Platter", desc: "Kodenn", price: 19.99, soldOut: false },
+            { id: "fish-platter-lg", name: "Fish Platter", desc: "Pwason — $28 and up", price: 28.00, soldOut: false, img: "assets/gallery/gallery-19.jpeg" },
+            { id: "kabrit-platter", name: "Kabrit Platter", desc: "Goat", price: 24.99, soldOut: false, img: "assets/gallery/gallery-15.jpeg" },
+            { id: "kalalou-platter", name: "Kalalou Platter", desc: "Okra", price: 24.99, soldOut: false }
           ]
         },
         {
           id: "dn-soups",
           label: "Soups",
           items: [
-            { id: "bouillon-kabrit", name: "Bouillon Kabrit", desc: "Goat Soup", price: 20.70, soldOut: false }
+            { id: "bouillon-kabrit", name: "Bouillon Kabrit", desc: "Goat Soup — Saturday only", price: 19.99, soldOut: false }
           ]
         }
       ]
@@ -138,21 +139,12 @@ window.SW_CONTENT.menu = {
       photo: "assets/gallery/gallery-09.jpeg",
       subcats: [
         {
-          id: "sp-seafood",
-          label: "Seafood (Pwason)",
+          id: "sp-night",
+          label: "Special",
           items: [
-            { id: "fish-platter-sm", name: "Fish Platter", desc: "Pwason · Small", price: 31.05, soldOut: false, img: "assets/gallery/gallery-19.jpeg" },
-            { id: "fish-platter-md", name: "Fish Platter", desc: "Pwason · Medium", price: 33.12, soldOut: false, img: "assets/gallery/gallery-19.jpeg" },
-            { id: "fish-platter-lg", name: "Fish Platter", desc: "Pwason · Large", price: 36.23, soldOut: false, img: "assets/gallery/gallery-19.jpeg" },
-            { id: "fish-platter-xl", name: "Fish Platter", desc: "Pwason · XL", price: 41.40, badge: "New", soldOut: false, img: "assets/gallery/gallery-19.jpeg" }
-          ]
-        },
-        {
-          id: "sp-goat",
-          label: "Goat (Kabrit)",
-          items: [
-            { id: "kabrit-platter", name: "Kabrit Platter", desc: "Goat", price: 25.88, badge: "New", soldOut: false, img: "assets/gallery/gallery-15.jpeg" },
-            { id: "side-kabrit", name: "Side Kabrit", desc: "Goat", price: 18.63, soldOut: false }
+            { id: "lanbi-conch", name: "Lanbi", desc: "Conch", price: 35.00, soldOut: false, img: "assets/gallery/gallery-19.jpeg" },
+            { id: "lalo", name: "Lalo", desc: "", price: 25.00, soldOut: false },
+            { id: "tonmtonm", name: "Tonmtonm", desc: "", price: 25.00, soldOut: false }
           ]
         }
       ]
@@ -166,8 +158,8 @@ window.SW_CONTENT.menu = {
     { id: "coconut-water", name: "Coconut Water", price: 3.00, soldOut: false },
     { id: "mystic", name: "Mystic", price: 2.00, soldOut: false },
     { id: "corossol-juice", name: "Corossol Juice", price: 6.00, soldOut: false },
-    { id: "papaya-smoothie", name: "Papaya Smoothie", price: 6.00, soldOut: false },
-    { id: "pineapple-smoothie", name: "Pineapple Smoothie", price: 2.07, soldOut: false },
+    { id: "papaya-smoothie", name: "Papaya Smoothies", price: 6.00, soldOut: false },
+    { id: "pineapple-smoothie", name: "Pineapple Smoothies", price: 2.07, soldOut: false },
     { id: "lemon-juice", name: "Lemon Juice", price: 6.00, soldOut: false },
     { id: "red-bull", name: "Red Bull", price: 2.50, soldOut: false },
     { id: "pina-juice", name: "Pina Juice", price: 6.00, soldOut: false },

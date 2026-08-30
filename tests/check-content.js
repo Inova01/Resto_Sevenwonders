@@ -51,7 +51,7 @@ function run(rel) {
 
 console.log("\n=== 1. Content files load ===");
 try {
-  ["settings", "menu", "shop", "gallery", "blog", "home"].forEach(s => run("content/" + s + ".js"));
+  ["settings", "menu", "shop", "gallery", "blog", "home", "about"].forEach(s => run("content/" + s + ".js"));
   run("js/content.js");
   ok("content/*.js and js/content.js evaluate without throwing");
 } catch (e) {
@@ -61,7 +61,7 @@ try {
 
 const SW = sandbox.window.SW;
 check("window.SW was created", !!SW);
-["settings", "menu", "shop", "gallery", "blog", "home"].forEach(s =>
+["settings", "menu", "shop", "gallery", "blog", "home", "about"].forEach(s =>
   check("SW." + s + " present", SW && SW[s] && typeof SW[s] === "object"));
 check("SW.published snapshot present", SW.published && !!SW.published.menu);
 check("preview is OFF with no query string", SW.isPreview === false);
@@ -148,7 +148,7 @@ let shimIds = [];
 shim.categories.forEach(c => c.subcats.forEach(s => s.items.forEach(i => shimIds.push(i.id))));
 check("a sold-out dish is removed from the rendered menu",
   shimIds.indexOf("griot-pork-platter") === -1);
-check("other dishes are untouched", shimIds.indexOf("tasso-beef") !== -1);
+check("other dishes are untouched", shimIds.indexOf("legume-platter") !== -1);
 check("shim exposes info from settings",
   shim.info.phone === "904 402 9212" && /University Blvd/.test(shim.info.address),
   JSON.stringify(shim.info));
@@ -169,7 +169,7 @@ SW.findMenuItem("griot-pork-platter").item.soldOut = false;
 console.log("\n=== 6. Serializer round-trip ===");
 run("js/admin/store.js");
 const Store = sandbox.window.SWStore;
-["settings", "menu", "shop", "gallery", "blog", "home"].forEach(section => {
+["settings", "menu", "shop", "gallery", "blog", "home", "about"].forEach(section => {
   const text = Store.Serializer.render(section, SW.published[section]);
   const box = { window: { SW_CONTENT: {} } };
   box.window.window = box.window;
@@ -217,7 +217,7 @@ console.log("\n=== 8. Draft preview only applies in preview mode ===");
     };
     bx.window = bx; bx.globalThis = bx;
     vm.createContext(bx);
-    ["settings", "menu", "shop", "gallery", "blog", "home"].forEach(s =>
+    ["settings", "menu", "shop", "gallery", "blog", "home", "about"].forEach(s =>
       vm.runInContext(fs.readFileSync(path.join(ROOT, "content", s + ".js"), "utf8"), bx));
     vm.runInContext(fs.readFileSync(path.join(ROOT, "js", "content.js"), "utf8"), bx);
     return bx.window.SW;

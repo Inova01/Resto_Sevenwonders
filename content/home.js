@@ -36,7 +36,7 @@ window.SW_CONTENT.home = {
     eyebrow: "Our Story",
     title: "Cooked the Way It Should Be",
     body:
-      "Seven Wonders Bakery & Grill is a Haitian kitchen on University Boulevard. " +
+      "Seven Wonders Restaurant & Bakery is a Haitian kitchen on University Boulevard. " +
       "We bake patties fresh every morning, marinate the griot overnight, and cook the " +
       "platters in small batches through the day instead of holding them under a lamp. " +
       "Nothing here is quick, and that is the point.",

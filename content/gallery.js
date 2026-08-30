@@ -89,6 +89,16 @@ window.SW_CONTENT.gallery = {
     { src: "assets/gallery/gallery-50.jpeg", alt: "", hidden: false },
     { src: "assets/gallery/gallery-51.jpeg", alt: "", hidden: false },
     { src: "assets/gallery/gallery-52.jpeg", alt: "", hidden: false },
-    { src: "assets/gallery/gallery-53.jpeg", alt: "", hidden: false }
+    { src: "assets/gallery/gallery-53.jpeg", alt: "", hidden: false },
+
+    /* The restaurant itself. The two founder portraits are hidden
+       from the public gallery grid on purpose - they belong to the
+       About page, not to a lightbox of food. Untick "Hidden" in the
+       dashboard if you want them in the gallery too. */
+    { src: "assets/restaurant/seven-wonders-exterior.jpeg", alt: "The Seven Wonders Restaurant & Bakery storefront on University Boulevard", hidden: false },
+    { src: "assets/restaurant/seven-wonders-dining-room-front.jpeg", alt: "The Seven Wonders dining room, warmly lit", hidden: false },
+    { src: "assets/restaurant/seven-wonders-dining-room-art.jpeg", alt: "The Seven Wonders dining room, with Haitian artwork on the wall", hidden: false },
+    { src: "assets/restaurant/oswald-gaboyau.jpeg", alt: "Oswald Gaboyau, co-founder of Seven Wonders", hidden: true },
+    { src: "assets/restaurant/marjorie-gaboyau.jpeg", alt: "Marjorie Gaboyau, co-founder of Seven Wonders", hidden: true }
   ]
 };

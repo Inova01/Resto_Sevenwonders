@@ -21,16 +21,16 @@ window.SW_CONTENT.settings = {
     /* The logo is drawn as two words: "Seven" + accent "Wonders" */
     first: "Seven",
     second: "Wonders",
-    legalName: "Seven Wonders Bakery & Grill",
+    legalName: "Seven Wonders Restaurant & Bakery",
     shortName: "Seven Wonders"
   },
 
-  tagline: "Haitian kitchen & bakery in Jacksonville",
+  tagline: "Authentic Haitian & Caribbean cuisine in Jacksonville",
 
   /* Footer paragraph under the logo, and the default meta description */
   blurb:
-    "Haitian home cooking in Jacksonville, Florida. Fresh patties every morning, " +
-    "griot and tasso off the grill, and Special Menu Night when the fish comes in.",
+    "Authentic Haitian & Caribbean cuisine, fresh bakery favorites, and warm " +
+    "Jacksonville hospitality.",
 
   contact: {
     address1: "2145 University Blvd N",

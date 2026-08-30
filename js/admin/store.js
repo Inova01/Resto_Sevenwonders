@@ -34,7 +34,7 @@
 (function () {
   "use strict";
 
-  var SECTIONS = ["settings", "menu", "shop", "gallery", "blog", "home"];
+  var SECTIONS = ["settings", "menu", "shop", "gallery", "blog", "home", "about"];
 
   var DRAFT_KEY = "sw_admin_draft_v1";
   var GH_KEY = "sw_admin_github_v1";

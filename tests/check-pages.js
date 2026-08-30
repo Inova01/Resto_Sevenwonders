@@ -91,7 +91,7 @@ console.log("\n=== index.html ===");
   const dishes = Array.from(doc.querySelectorAll(".dish-grid .dish-card"));
   check("3 featured dishes rendered", dishes.length === 3, "got " + dishes.length);
   check("featured dish 1 is the Fish Platter", /Fish Platter/.test(text(dishes[0])), text(dishes[0]));
-  check("featured prices come from the menu", /\$36\.23/.test(text(dishes[0])), text(dishes[0]));
+  check("featured prices come from the menu", /\$28\.00/.test(text(dishes[0])), text(dishes[0]));
 
   const gal = doc.querySelectorAll("#gallery button");
   check("homepage gallery has 7 tiles", gal.length === 7, "got " + gal.length);
@@ -128,7 +128,7 @@ console.log("\n=== index.html ===");
   check("menu of the day photo is a local file",
     /^assets\//.test(doc.querySelector("#mod-img").getAttribute("src")));
 
-  check("nav has 5 items, no duplicates", doc.querySelectorAll("#nav-links li").length === 5);
+  check("nav has 6 items, no duplicates", doc.querySelectorAll("#nav-links li").length === 6);
   check("exactly one aria-current in the page",
     doc.querySelectorAll('[aria-current="page"]').length === 1);
   check("no preview bar for a normal visitor", !doc.querySelector(".sw-preview-bar"));
@@ -145,7 +145,7 @@ console.log("\n=== shop.html ===");
     text(doc.querySelector(".results")));
   check("the wrong '1–9 of 16' line is gone", !/of 16/.test(visible(doc)));
   check("no fake Sale! badges", doc.querySelectorAll(".sale-badge").length === 0);
-  check("prices are the real menu prices", /\$17\.60/.test(visible(doc)));
+  check("prices are the real menu prices", /\$16\.99/.test(visible(doc)));
   check("invented products are gone", !/Wagyu|Soufflé|Scallops/i.test(visible(doc)));
   check("add-to-cart buttons are wired", cards.every(c => c.querySelector("[data-add-to-cart]")));
   const sortOpts = Array.from(doc.querySelectorAll("#sort option")).map(o => o.textContent);
@@ -215,6 +215,53 @@ console.log("\n=== contact.html ===");
     doc.querySelector(".form-status").className.indexOf("warn") !== -1);
 }
 
+/* ============ about.html ============ */
+console.log("\n=== about.html ===");
+{
+  const { doc, win, errors } = loadPage("about.html");
+  check("no script errors", errors.length === 0, errors.join("\n         "));
+
+  const story = text(doc.querySelector("[data-about-intro]"));
+  check("the founding story is rendered from content/about.js",
+    /November 24, 2018/.test(story) && /Oswald Gaboyau/.test(story), story.slice(0, 90));
+
+  const founders = Array.from(doc.querySelectorAll("[data-about-founders] .founder-card"));
+  check("both founder cards rendered", founders.length === 2, "got " + founders.length);
+  check("founder portraits are local files",
+    founders.every(c => /^assets\/restaurant\//.test(c.querySelector("img").getAttribute("src"))));
+  check("founder portraits have real alt text",
+    founders.every(c => /Gaboyau/.test(c.querySelector("img").getAttribute("alt"))));
+
+  const photos = Array.from(doc.querySelectorAll("[data-about-photos] img"));
+  check("the restaurant photo stack rendered", photos.length === 2, "got " + photos.length);
+
+  const detail = text(doc.querySelector("[data-about-detail]"));
+  check("the rest of the story is rendered", /more than 200 weddings/.test(detail));
+  check("the closing line is bold, not a paragraph",
+    /Freshly Baked Daily/.test(text(doc.querySelector("[data-about-detail] strong"))));
+
+  /* The whole point of moving this page into content/: the address is
+     printed once, in settings, and the About page follows it. */
+  const visit = text(doc.querySelector("[data-about-visit]"));
+  check("visit block takes the address from settings",
+    /2145 University Blvd N/.test(visit) && /904 402 9212/.test(visit), visit);
+  check("visit block has both buttons",
+    doc.querySelectorAll("[data-about-visit] .hero__cta a").length === 2);
+
+  check("nav marks About as the current page",
+    doc.querySelectorAll('[aria-current="page"]').length === 1 &&
+    doc.querySelector('[aria-current="page"]').getAttribute("href") === "about.html");
+  check("footer rendered from settings", /University Blvd/.test(text(doc.querySelector(".site-footer"))));
+  check("no invented phone anywhere", !/555-0199/.test(visible(doc)));
+
+  /* An empty founders list must remove the block, not leave a gap. */
+  const draft = JSON.parse(JSON.stringify(win.SW.published));
+  draft.about.founders.people = [];
+  const empty = loadPage("about.html", { query: "?preview=1", draft });
+  check("no founders means no empty column",
+    empty.doc.querySelectorAll("[data-about-founders]").length === 0);
+}
+
 /* ============ reservation.html ============ */
 console.log("\n=== reservation.html ===");
 {
@@ -241,10 +288,20 @@ console.log("\n=== menu.html ===");
   check("4 menu categories", cats.length === 4, cats.join(", "));
   check("categories are the real ones",
     cats.join("|") === "Breakfast|Lunch|Dinner|Special Menu Night", cats.join("|"));
-  check("mosaic gallery built from all 53 photos",
-    doc.querySelectorAll("#mgal .mgal-tile").length > 0);
+  /* The mosaic pages 12 photos at a time. What matters here is that a
+     page is drawn and that the two hidden founder portraits — which
+     belong to the About page, not to a lightbox of food — stay out. */
+  const tiles = Array.from(doc.querySelectorAll("#mgal .mgal-tile"));
+  check("mosaic gallery draws a full page of photos", tiles.length === 12, "got " + tiles.length);
+  check("hidden photos are kept out of the gallery",
+    !/oswald-gaboyau|marjorie-gaboyau/.test(doc.querySelector("#mgal").innerHTML));
   check("order builder present", !!doc.querySelector("#order-form"));
   check("reservation widget also on this page", !!doc.querySelector("#calendar"));
+  const board = Array.from(doc.querySelectorAll(".menu-board-card img"));
+  check("printed menu board shows both photos", board.length === 2, "got " + board.length);
+  check("menu board photos are the real scans",
+    board.every(i => /^assets\/menu\/menu-[12]\.jpeg$/.test(i.getAttribute("src"))),
+    board.map(i => i.getAttribute("src")).join(", "));
 }
 
 /* ============ draft preview ============ */
@@ -281,17 +338,17 @@ console.log("\n=== admin.html ===");
   check("gate stays hidden", doc.querySelector("#gate").hidden === true);
 
   const nav = Array.from(doc.querySelectorAll("#nav .side__link span:first-child")).map(text);
-  check("all 9 sections in the sidebar", nav.length === 9, nav.join(", "));
+  check("all 10 sections in the sidebar", nav.length === 10, nav.join(", "));
   check("sidebar names the manager's tasks",
     nav.join("|").indexOf("Menu & prices") !== -1 && nav.join("|").indexOf("Info & hours") !== -1,
     nav.join("|"));
 
   const counts = Array.from(doc.querySelectorAll("#nav .count")).map(text);
-  check("menu count = 30 dishes + 23 drinks = 53", counts[1] === "53", counts.join(","));
-  check("gallery count is 53", counts[3] === "53", counts.join(","));
+  check("menu count = 28 dishes + 23 drinks = 51", counts[1] === "51", counts.join(","));
+  check("gallery count is 58", counts[3] === "58", counts.join(","));
   check("shop count is 10", counts[2] === "10");
   check("blog count is 6", counts[4] === "6");
-  check("publish badge empty when nothing has changed", counts[7] === "");
+  check("publish badge empty when nothing has changed", counts[8] === "");
 
   const body = doc.querySelector("#view").textContent;
   check("overview warns that forms are not connected", /not reaching you/i.test(body));

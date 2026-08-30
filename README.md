@@ -1,4 +1,4 @@
-# Seven Wonders Bakery & Grill — Jacksonville FL
+# Seven Wonders Restaurant & Bakery — Jacksonville FL
 
 A Haitian kitchen and bakery at 2145 University Blvd N. Pure HTML / CSS /
 vanilla JavaScript — no frameworks, no build step, no server.
@@ -8,6 +8,7 @@ See **[ADMIN.md](ADMIN.md)** — written for them, not for a developer.
 
 ## Pages
 - `index.html` — Home: hero, our story, menu of the day, featured dishes, events, gallery, guest reviews, blog preview
+- `about.html` — The founding story, the founders, photos of the restaurant
 - `menu.html` — Gallery / Menu / Reservation in one page, plus the online order builder
 - `shop.html` — Product grid with a localStorage cart
 - `reservation.html` — Booking form + availability calendar
@@ -28,6 +29,7 @@ content/shop.js       shop products
 content/gallery.js    all 53 photos + the 7 on the homepage
 content/blog.js       posts
 content/home.js       homepage copy, events, guest reviews
+content/about.js      the About page: story, founders, venue photos
         ↓
 js/content.js         → window.SW  (+ draft preview, shared helpers)
         ↓
@@ -75,8 +77,8 @@ Without one, the dashboard still works and can hand you the files to upload.
 
 ## Tests
 ```bash
-node tests/check-content.js    # 58 checks, no dependencies
-npm i jsdom && node tests/check-pages.js   # 115 checks, renders every page
+node tests/check-content.js    # 60 checks, no dependencies
+npm i jsdom && node tests/check-pages.js   # 133 checks, renders every page
 ```
 See [tests/README.md](tests/README.md). Run the first one after hand-editing
 anything in `content/`.

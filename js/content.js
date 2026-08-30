@@ -25,7 +25,7 @@
 (function () {
   "use strict";
 
-  var SECTIONS = ["settings", "menu", "shop", "gallery", "blog", "home"];
+  var SECTIONS = ["settings", "menu", "shop", "gallery", "blog", "home", "about"];
 
   var DRAFT_KEY = "sw_admin_draft_v1";
   var PREVIEW_FLAG = "sw_preview_on";
@@ -58,6 +58,10 @@
     home: {
       hero: {}, about: { stats: [] }, events: { items: [] }, gallery: {},
       testimonials: { items: [] }, blogPreview: {}, ctaBanner: {}, menuOfDay: {}
+    },
+    about: {
+      hero: {}, intro: { body: [] }, founders: { people: [] },
+      detail: { photos: [], body: [], closing: "" }, visit: {}
     }
   };
 

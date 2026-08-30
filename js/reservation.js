@@ -99,7 +99,7 @@
 
         <!-- RIGHT: photo -->
         <div class="reserve-photo reveal">
-          <img src="assets/gallery/gallery-05.jpeg" alt="A table set at ${escAttr(LEGAL)}" loading="lazy" />
+          <img src="assets/restaurant/seven-wonders-dining-room-front.jpeg" alt="The dining room at ${escAttr(LEGAL)}" loading="lazy" />
         </div>
       </div>
     </section>

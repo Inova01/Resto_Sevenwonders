@@ -7,3 +7,7 @@ Thumbs.db
 
 # Local server / dependency artifacts
 node_modules/
+# jsdom is only needed to run tests/check-pages.js. Installed ad-hoc
+# (see README) so the site itself stays dependency-free.
+package.json
+package-lock.json
