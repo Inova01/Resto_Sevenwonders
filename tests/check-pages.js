@@ -24,12 +24,17 @@ function loadPage(file, opts = {}) {
     pretendToBeVisual: true,
     virtualConsole: vc,
     beforeParse(win) {
-      win.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
+      win.matchMedia = (query) => ({
+        matches: !!opts.prefersDark && /prefers-color-scheme:\s*dark/i.test(query),
+        addEventListener() {},
+        removeEventListener() {}
+      });
       win.requestAnimationFrame = () => 0;
       win.cancelAnimationFrame = () => {};
       win.HTMLCanvasElement.prototype.getContext = () => null;
       win.scrollTo = () => {};
       win.fetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) });
+      if (opts.themeChoice) win.localStorage.setItem("sw_theme", opts.themeChoice);
       if (opts.draft) win.localStorage.setItem("sw_admin_draft_v1", JSON.stringify(opts.draft));
     }
   });
@@ -65,6 +70,111 @@ function visible(doc) {
   c.querySelectorAll("script, style, template").forEach(n => n.remove());
   c.querySelectorAll("[hidden]").forEach(n => n.remove());
   return c.textContent.replace(/\s+/g, " ").trim();
+}
+
+const CSS_TEXT = fs.readFileSync(path.join(ROOT, "css", "style.css"), "utf8");
+function firstBlockAfter(needle) {
+  const start = CSS_TEXT.indexOf(needle);
+  if (start === -1) return "";
+  const open = CSS_TEXT.indexOf("{", start);
+  if (open === -1) return "";
+  let depth = 0;
+  for (let i = open; i < CSS_TEXT.length; i++) {
+    if (CSS_TEXT[i] === "{") depth++;
+    else if (CSS_TEXT[i] === "}" && --depth === 0) return CSS_TEXT.slice(open + 1, i);
+  }
+  return "";
+}
+function props(block) {
+  const out = {};
+  block.replace(/--([a-z0-9-]+)\s*:\s*([^;]+);/gi, (_, k, v) => { out[k] = v.trim(); return ""; });
+  return out;
+}
+function resolveToken(name, maps, seen = new Set()) {
+  if (seen.has(name)) return "";
+  seen.add(name);
+  const found = maps.find(m => m[name] != null);
+  if (!found) return "";
+  const val = found[name];
+  const ref = /^var\(--([a-z0-9-]+)\)$/i.exec(val);
+  return ref ? resolveToken(ref[1], maps, seen) : val;
+}
+function rgb(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || "").trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+}
+function contrast(a, b) {
+  const ra = rgb(a), rb = rgb(b);
+  if (!ra || !rb) return 0;
+  const la = 0.2126 * ra[0] + 0.7152 * ra[1] + 0.0722 * ra[2];
+  const lb = 0.2126 * rb[0] + 0.7152 * rb[1] + 0.0722 * rb[2];
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+/* ============ theme + static links ============ */
+console.log("\n=== theme and portable links ===");
+{
+  const guestPages = ["index.html", "about.html", "menu.html", "shop.html", "blog.html", "contact.html", "reservation.html"];
+  const allPages = guestPages.concat(["404.html"]);
+  allPages.forEach(file => {
+    const html = fs.readFileSync(path.join(ROOT, file), "utf8");
+    check(file + " uses the bumped stylesheet",
+      /css\/style\.css\?v=theme-payments/.test(html));
+    check(file + " sets the theme before CSS loads",
+      html.indexOf("sw_theme") !== -1 && html.indexOf("sw_theme") < html.indexOf("css/style.css"));
+    check(file + " has no github.io absolute links",
+      !/inova01\.github\.io\/Resto_Sevenwonders/i.test(html));
+  });
+  guestPages.forEach(file => {
+    const html = fs.readFileSync(path.join(ROOT, file), "utf8");
+    check(file + " has the day/night toggle", /data-theme-toggle/.test(html));
+    check(file + " loads theme.js", /<script src="js\/theme\.js"><\/script>/.test(html));
+  });
+
+  const dark = loadPage("index.html", { prefersDark: true });
+  check("system dark preference applies without a saved choice",
+    dark.doc.documentElement.getAttribute("data-theme") === "dark");
+  check("dark toggle announces the next action",
+    dark.doc.querySelector("[data-theme-toggle]").getAttribute("aria-label") === "Switch to light theme");
+  dark.doc.querySelector("[data-theme-toggle]").dispatchEvent(new dark.win.Event("click", { bubbles: true }));
+  check("theme toggle persists an explicit choice",
+    dark.win.localStorage.getItem("sw_theme") === "light" &&
+    dark.doc.documentElement.getAttribute("data-theme") === "light");
+
+  const lightOverride = loadPage("index.html", { prefersDark: true, themeChoice: "light" });
+  check("saved light choice overrides system dark",
+    lightOverride.doc.documentElement.getAttribute("data-theme") === "light");
+  const darkChoice = loadPage("index.html", { themeChoice: "dark" });
+  check("saved dark choice overrides system light",
+    darkChoice.doc.documentElement.getAttribute("data-theme") === "dark");
+  check("404 honors system dark before CSS",
+    loadPage("404.html", { prefersDark: true }).doc.documentElement.getAttribute("data-theme") === "dark");
+
+  const brand = props(firstBlockAfter(":root {"));
+  const lightTokens = props(firstBlockAfter('[data-theme="light"]'));
+  const darkTokens = props(firstBlockAfter('[data-theme="dark"]'));
+  const token = (name, scope) => resolveToken(name, [scope, brand]);
+  check("dark ground is black and ground-2 is warm charcoal",
+    token("ground", darkTokens) === "#000000" &&
+    token("ground-2", darkTokens) === "#1A1613" &&
+    token("ground", darkTokens) !== token("ground-2", darkTokens));
+  check("light accent clears AA on light secondary ground",
+    contrast(token("accent", lightTokens), token("ground-2", lightTokens)) >= 4.5,
+    contrast(token("accent", lightTokens), token("ground-2", lightTokens)).toFixed(2));
+  check("dark accent clears AA on black",
+    contrast(token("accent", darkTokens), token("ground", darkTokens)) >= 4.5,
+    contrast(token("accent", darkTokens), token("ground", darkTokens)).toFixed(2));
+  check("dark body text clears AA on black",
+    contrast(token("ink", darkTokens), token("ground", darkTokens)) >= 4.5,
+    contrast(token("ink", darkTokens), token("ground", darkTokens)).toFixed(2));
+  check("dark muted text clears AA on warm charcoal",
+    contrast(token("ink-muted", darkTokens), token("ground-2", darkTokens)) >= 4.5,
+    contrast(token("ink-muted", darkTokens), token("ground-2", darkTokens)).toFixed(2));
 }
 
 /* ============ index.html ============ */
@@ -148,6 +258,8 @@ console.log("\n=== shop.html ===");
   check("prices are the real menu prices", /\$16\.99/.test(visible(doc)));
   check("invented products are gone", !/Wagyu|Soufflé|Scallops/i.test(visible(doc)));
   check("add-to-cart buttons are wired", cards.every(c => c.querySelector("[data-add-to-cart]")));
+  check("blank payment links keep the regular cart flow",
+    doc.querySelectorAll("[data-payment-link]").length === 0);
   const sortOpts = Array.from(doc.querySelectorAll("#sort option")).map(o => o.textContent);
   check("sort dropdown only offers implemented options",
     !sortOpts.some(o => /popularity|latest/i.test(o)), sortOpts.join(", "));
@@ -309,7 +421,7 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
 {
   const draft = {
     settings: { contact: { address1: "DRAFT STREET", address2: "Draft City, FL", phone: "000 000 0000", phoneDigits: "+10000000000" } },
-    shop: { products: [{ id: "d1", name: "Draft Dish", note: "", price: 9.5, sale: null, inStock: true, img: "" }] }
+    shop: { products: [{ id: "d1", name: "Draft Dish", note: "", price: 9.5, sale: null, inStock: true, img: "", paymentLink: "https://buy.stripe.com/test_123" }] }
   };
   const { doc, errors } = loadPage("shop.html", { query: "?preview=1", draft });
   check("no script errors", errors.length === 0, errors.join("\n         "));
@@ -321,12 +433,24 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
   check("count line follows the draft",
     text(doc.querySelector(".results")) === "Showing 1 product",
     text(doc.querySelector(".results")));
+  check("Stripe Payment Link renders as a checkout link",
+    doc.querySelector("[data-payment-link]").getAttribute("href") === "https://buy.stripe.com/test_123");
+  check("Stripe products no longer bind the local cart button",
+    !doc.querySelector(".product-card [data-add-to-cart]"));
 
   const plain = loadPage("shop.html", { draft });
   check("the same browser WITHOUT ?preview=1 sees the published site",
     plain.doc.querySelectorAll(".product-card").length === 10 &&
     !/DRAFT STREET/.test(visible(plain.doc)),
     plain.doc.querySelectorAll(".product-card").length + " products");
+
+  const invalid = loadPage("shop.html", {
+    query: "?preview=1",
+    draft: { shop: { products: [{ id: "bad", name: "Bad Link", note: "", price: 1, sale: null, inStock: true, img: "", paymentLink: "javascript:alert(1)" }] } }
+  });
+  check("non-Stripe payment links are ignored",
+    !invalid.doc.querySelector("[data-payment-link]") &&
+    !!invalid.doc.querySelector("[data-add-to-cart]"));
 }
 
 /* ============ admin.html ============ */
@@ -368,6 +492,13 @@ console.log("\n=== admin.html ===");
     win.SWStore.get("github").isConfigured() === false);
   check("download publisher always works",
     win.SWStore.get("download").isConfigured() === true);
+
+  Array.from(doc.querySelectorAll("#nav .side__link"))
+    .find(l => /Shop/.test(l.textContent))
+    .dispatchEvent(new win.Event("click", { bubbles: true }));
+  check("shop editor exposes Stripe Payment Link fields",
+    /Stripe Payment Link/.test(doc.querySelector("#view").textContent) &&
+    !!doc.querySelector('#view input[type="url"][placeholder="https://buy.stripe.com/..."]'));
 }
 
 /* ============ every section of the dashboard renders ============ */
@@ -425,6 +556,34 @@ console.log("\n=== dashboard: an edit becomes a publishable file ===");
   check("publish is blocked until a method is connected",
     Array.from(doc.querySelectorAll("#view button")).some(b => /Publish now/.test(b.textContent) && b.disabled));
   check("no script errors while editing", errors.length === 0, errors.join("\n         "));
+}
+
+console.log("\n=== dashboard: a Stripe Payment Link becomes a publishable file ===");
+{
+  const { doc, win, errors } = loadPage("admin.html");
+  Array.from(doc.querySelectorAll("#nav .side__link"))
+    .find(l => /Shop/.test(l.textContent))
+    .dispatchEvent(new win.Event("click", { bubbles: true }));
+
+  const linkInput = doc.querySelector('#view input[type="url"][placeholder="https://buy.stripe.com/..."]');
+  check("a Stripe Payment Link field is on screen", !!linkInput);
+  linkInput.value = "https://buy.stripe.com/test_abc123";
+  linkInput.dispatchEvent(new win.Event("input", { bubbles: true }));
+
+  const draft = JSON.parse(win.localStorage.getItem("sw_admin_draft_v1"));
+  const changed = win.SWStore.Draft.changedSections(draft, win.SW.published);
+  check("only the shop is reported as changed",
+    changed.length === 1 && changed[0] === "shop", JSON.stringify(changed));
+
+  const files = win.SWStore.Serializer.filesFor(draft, win.SW.published);
+  check("one file queued: content/shop.js",
+    files.length === 1 && files[0].path === "content/shop.js");
+  check("the Stripe Payment Link is in the generated file",
+    /https:\/\/buy\.stripe\.com\/test_abc123/.test(files[0].text));
+  check("the generated shop file is valid JavaScript", (() => {
+    try { new win.Function(files[0].text); return true; } catch (e) { return false; }
+  })());
+  check("no script errors while editing Stripe links", errors.length === 0, errors.join("\n         "));
 }
 
 console.log("\n" + "=".repeat(52));

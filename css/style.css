@@ -27,7 +27,16 @@
   --black: #000000;
   --near-black: #1A1613;
   --gold-ink: #1A1208;
+  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --sans: "DM Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --maxw: 1240px;
+  --radius: 14px;
+  --gutter: clamp(1.1rem, 4vw, 2.5rem);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
 
+:root,
+[data-theme="light"] {
   /* ---- Light ground (the default) ---- */
   --ground: #FBF7F1;
   --ground-2: #F3EADD;
@@ -44,15 +53,21 @@
   --accent: #9A5112;
   --accent-soft: #8A4A0F;
   --shadow-card: 0 1px 2px rgba(36,26,18,.05), 0 10px 26px rgba(36,26,18,.07);
+}
 
-  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
-  --sans: "DM Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-
-  --maxw: 1240px;
-  --radius: 14px;
-  --gutter: clamp(1.1rem, 4vw, 2.5rem);
-
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+[data-theme="dark"] {
+  --ground: #000000;
+  --ground-2: #1A1613;
+  --surface: #241D18;
+  --ink-strong: #FFFFFF;
+  --ink: #E8E8E8;
+  --ink-muted: #9A9A9A;
+  --line: rgba(237, 158, 88, 0.28);
+  --fill-subtle: var(--line);
+  --dot-idle: rgba(255, 255, 255, 0.20);
+  --accent: var(--apricot);
+  --accent-soft: var(--apricot-light);
+  --shadow-card: 0 10px 30px rgba(0,0,0,.45);
 }
 
 /* ---- Dark regions -------------------------------------------
@@ -263,6 +278,45 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
   0% { transform: scale(1); }
   40% { transform: scale(1.5); }
   100% { transform: scale(1); }
+}
+
+/* Theme toggle */
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink-strong);
+  background: rgba(255,255,255,.03);
+  transition: border-color .25s var(--ease), color .25s var(--ease), background .25s var(--ease), transform .25s var(--ease);
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--fill-subtle);
+  transform: translateY(-1px);
+}
+.theme-toggle svg {
+  grid-area: 1 / 1;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity .2s var(--ease), transform .25s var(--ease);
+}
+.theme-toggle .theme-moon,
+[data-theme="dark"] .theme-toggle .theme-sun {
+  opacity: 0;
+  transform: scale(.72) rotate(-16deg);
+}
+[data-theme="dark"] .theme-toggle .theme-moon {
+  opacity: 1;
+  transform: scale(1) rotate(0);
 }
 
 /* Hamburger */

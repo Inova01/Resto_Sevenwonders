@@ -706,6 +706,11 @@
             priceField("Sale price", p, "sale", { hint: "Blank = not on sale" }),
             photoField("Photo", p, "img")
           ]),
+          textField("Stripe Payment Link", p, "paymentLink", {
+            type: "url",
+            placeholder: "https://buy.stripe.com/...",
+            hint: "Optional. Leave blank to keep Add to cart. Paste Payment Links only, never Stripe secret keys."
+          }),
           h("div", { class: "row__tools", style: "justify-content:space-between" }, [
             checkField("In stock", p, "inStock", { rerender: true }),
             tools(list, i, { confirm: "Delete “" + (p.name || "this product") + "”?" })
@@ -719,7 +724,7 @@
             if (!name) return;
             list.push({
               id: slug(name, list.map(function (x) { return x.id; })),
-              name: name, note: "", price: 0, sale: null, inStock: true, img: ""
+              name: name, note: "", price: 0, sale: null, inStock: true, img: "", paymentLink: ""
             });
             touch(true);
           }

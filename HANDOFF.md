@@ -1,7 +1,7 @@
 # Handoff — Seven Wonders Restaurant & Bakery
 
 Written 2026-08-30. Everything described here is committed and live.
-Repo: `github.com/Inova01/Resto_Sevenwonders` · Live: https://inova01.github.io/Resto_Sevenwonders/
+Repo: `github.com/Inova01/Resto_Sevenwonders` · GitHub Pages deploys from `main`.
 
 ---
 

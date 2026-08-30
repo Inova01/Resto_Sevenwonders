@@ -19,6 +19,8 @@
      img       photo path, or "" for the fork placeholder.
                Pick one visually in the dashboard — it lists
                every photo in assets/gallery/.
+     paymentLink optional Stripe Payment Link URL. Leave blank
+               to keep the normal add-to-cart button.
    ========================================================= */
 window.SW_CONTENT = window.SW_CONTENT || {};
 
@@ -41,7 +43,8 @@ window.SW_CONTENT.shop = {
       price: 14.00,
       sale: null,
       inStock: true,
-      img: ""
+      img: "",
+      paymentLink: ""
     },
     {
       id: "patte-kode-meat-shop",
@@ -50,7 +53,8 @@ window.SW_CONTENT.shop = {
       price: 7.99,
       sale: null,
       inStock: true,
-      img: ""
+      img: "",
+      paymentLink: ""
     },
     {
       id: "griot-platter-shop",
@@ -59,7 +63,8 @@ window.SW_CONTENT.shop = {
       price: 16.99,
       sale: null,
       inStock: true,
-      img: "assets/gallery/gallery-11.jpeg"
+      img: "assets/gallery/gallery-11.jpeg",
+      paymentLink: ""
     },
     {
       id: "chicken-wings-shop",
@@ -68,7 +73,8 @@ window.SW_CONTENT.shop = {
       price: 12.99,
       sale: null,
       inStock: true,
-      img: "assets/gallery/gallery-16.jpeg"
+      img: "assets/gallery/gallery-16.jpeg",
+      paymentLink: ""
     },
     {
       id: "turkey-platter-shop",
@@ -77,7 +83,8 @@ window.SW_CONTENT.shop = {
       price: 19.99,
       sale: null,
       inStock: true,
-      img: ""
+      img: "",
+      paymentLink: ""
     },
     {
       id: "legume-platter-shop",
@@ -86,7 +93,8 @@ window.SW_CONTENT.shop = {
       price: 17.99,
       sale: null,
       inStock: true,
-      img: "assets/gallery/gallery-12.jpeg"
+      img: "assets/gallery/gallery-12.jpeg",
+      paymentLink: ""
     },
     {
       id: "bouillon-kabrit-shop",
@@ -95,7 +103,8 @@ window.SW_CONTENT.shop = {
       price: 19.99,
       sale: null,
       inStock: true,
-      img: ""
+      img: "",
+      paymentLink: ""
     },
     {
       id: "kalalou-platter-shop",
@@ -104,7 +113,8 @@ window.SW_CONTENT.shop = {
       price: 24.99,
       sale: null,
       inStock: true,
-      img: ""
+      img: "",
+      paymentLink: ""
     },
     {
       id: "kabrit-platter-shop",
@@ -113,7 +123,8 @@ window.SW_CONTENT.shop = {
       price: 24.99,
       sale: null,
       inStock: true,
-      img: "assets/gallery/gallery-15.jpeg"
+      img: "assets/gallery/gallery-15.jpeg",
+      paymentLink: ""
     },
     {
       id: "fish-platter-shop",
@@ -122,7 +133,8 @@ window.SW_CONTENT.shop = {
       price: 28.00,
       sale: null,
       inStock: true,
-      img: "assets/gallery/gallery-19.jpeg"
+      img: "assets/gallery/gallery-19.jpeg",
+      paymentLink: ""
     }
   ]
 };

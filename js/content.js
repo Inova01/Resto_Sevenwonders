@@ -138,6 +138,14 @@
     SW[name] = draft && draft[name] ? merge(base, draft[name]) : base;
   });
 
+  function normalizeShopProducts(shop) {
+    (shop.products || []).forEach(function (product) {
+      if (typeof product.paymentLink !== "string") product.paymentLink = "";
+    });
+  }
+  normalizeShopProducts(SW.shop || {});
+  normalizeShopProducts(SW.published.shop || {});
+
   /* -----------------------------------------------------
      Shared formatting helpers
   ----------------------------------------------------- */

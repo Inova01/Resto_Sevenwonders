@@ -16,8 +16,9 @@ often as you like.
 2. [Everyday jobs](#everyday-jobs)
 3. [First-time setup](#first-time-setup)
 4. [Who can open the dashboard](#who-can-open-the-dashboard)
-5. [When something looks wrong](#when-something-looks-wrong)
-6. [For a developer](#for-a-developer)
+5. [Payments with Stripe](#payments-with-stripe)
+6. [When something looks wrong](#when-something-looks-wrong)
+7. [For a developer](#for-a-developer)
 
 ---
 
@@ -59,6 +60,16 @@ empty.
 
 For Shop items the equivalent is untickng **In stock** — the card stays but
 shows "Sold out" and cannot be added to a cart.
+
+### Take payment for a shop item
+Create a Stripe **Payment Link** in Stripe, then open **Shop** → paste it into
+**Stripe Payment Link** for that item → **Publish**.
+
+Guests will see **Pay with Stripe** instead of **Add to cart** for that item.
+Leave the box blank to keep the normal cart button.
+
+Only paste links that start with `https://buy.stripe.com/`. Never paste a
+Stripe secret key into the dashboard or into any website file.
 
 ### Set today's special
 **Menu & prices** → *Menu of the Day*.
@@ -227,6 +238,31 @@ stops working immediately.
 
 ---
 
+## Payments with Stripe
+
+The safe option for this GitHub Pages site is **Stripe Payment Links**. They are
+public checkout URLs, so they can live in `content/shop.js` and be edited in the
+dashboard.
+
+Do **not** put Stripe API secret keys in this project. Anything committed here
+is public. That means values beginning with `sk_live_` or `sk_test_` never
+belong in `content/`, `js/`, HTML, tests, screenshots, or docs.
+
+If the restaurant later wants a full cart checkout, move the site to a host that
+can run serverless code, such as Cloudflare Pages + Workers. The backend should:
+
+- receive the cart from the browser and ignore any browser-provided prices
+- load the authoritative prices from `content/menu.js` or an equivalent private
+  product table
+- create the Stripe Checkout Session with the secret key on the server only
+- verify payment events with a Stripe webhook signing secret
+- record the order after the webhook confirms payment
+
+GitHub Pages cannot run that backend, so Payment Links are the production-ready
+payment path while the website remains fully static.
+
+---
+
 ## When something looks wrong
 
 **I published, but the site still shows the old text.**
@@ -340,7 +376,9 @@ builder and the daily special key off them, so rename freely but do not reuse
 an id.
 
 **`content/shop.js`** — `sortOptions[]` (only options the code implements),
-`products[{id,name,note,price,sale,inStock,img}]`. `sale: null` = not on sale.
+`products[{id,name,note,price,sale,inStock,img,paymentLink}]`. `sale: null` =
+not on sale. `paymentLink` is blank or a Stripe Payment Link beginning with
+`https://buy.stripe.com/`.
 
 **`content/gallery.js`** — `homepage[]` (7 paths, must also appear in `images`),
 `images[{src,alt,hidden}]`.

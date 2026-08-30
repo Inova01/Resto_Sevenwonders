@@ -12,6 +12,16 @@ function ok(name) { passes++; console.log("  ok   " + name); }
 function bad(name, detail) { fails++; console.log("  FAIL " + name + (detail ? "\n         " + detail : "")); }
 function check(name, cond, detail) { cond ? ok(name) : bad(name, detail); }
 
+function walk(dir, out = []) {
+  fs.readdirSync(dir, { withFileTypes: true }).forEach(entry => {
+    if ([".git", "node_modules"].includes(entry.name)) return;
+    const abs = path.join(dir, entry.name);
+    if (entry.isDirectory()) walk(abs, out);
+    else out.push(abs);
+  });
+  return out;
+}
+
 /* ---- minimal browser stubs ---- */
 const listeners = {};
 const noopEl = new Proxy(function () {}, {
@@ -65,6 +75,18 @@ check("window.SW was created", !!SW);
   check("SW." + s + " present", SW && SW[s] && typeof SW[s] === "object"));
 check("SW.published snapshot present", SW.published && !!SW.published.menu);
 check("preview is OFF with no query string", SW.isPreview === false);
+
+console.log("\n=== 1b. Public repo safety ===");
+{
+  const textExt = new Set([".css", ".html", ".js", ".json", ".md", ".txt", ".xml", ".svg"]);
+  const offenders = [];
+  walk(ROOT).forEach(file => {
+    if (!textExt.has(path.extname(file).toLowerCase())) return;
+    const body = fs.readFileSync(file, "utf8");
+    if (/sk_(live|test)_[A-Za-z0-9]/.test(body)) offenders.push(path.relative(ROOT, file));
+  });
+  check("no Stripe secret keys are committed", offenders.length === 0, offenders.join(", "));
+}
 
 console.log("\n=== 2. Helpers ===");
 check("money() formats", SW.money(17.6) === "$17.60", SW.money(17.6));
@@ -138,6 +160,10 @@ check("shop product ids are unique",
   new Set(SW.shop.products.map(p => p.id)).size === SW.shop.products.length);
 check("no shop product has a sale price above its normal price",
   SW.shop.products.every(p => p.sale == null || p.sale < p.price));
+check("shop products have blank or valid Stripe Payment Links",
+  SW.shop.products.every(p => typeof p.paymentLink === "string" &&
+    (p.paymentLink === "" || /^https:\/\/buy\.stripe\.com\//i.test(p.paymentLink))),
+  JSON.stringify(SW.shop.products.map(p => ({ id: p.id, paymentLink: p.paymentLink }))));
 check("hours has exactly 7 days", SW.settings.hours.length === 7);
 
 console.log("\n=== 5. Sold-out filtering (js/menu-data.js shim) ===");

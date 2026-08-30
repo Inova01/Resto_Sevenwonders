@@ -78,6 +78,11 @@
     return h("span", { class: (cls || "") + " menu-item__thumb--ph", "aria-hidden": "true", svg: FORK_SVG });
   }
 
+  function stripePaymentLink(url) {
+    var clean = String(url || "").trim();
+    return /^https:\/\/buy\.stripe\.com\//i.test(clean) ? clean : "";
+  }
+
   /* =====================================================
      BRAND — header and footer logos, on every page
      ===================================================== */
@@ -267,10 +272,14 @@
             h("span", { class: "price-new", text: SW.money(p.price) })
           ]);
 
+      var paymentLink = stripePaymentLink(p.paymentLink);
       var button = p.inStock === false
         ? h("button", { class: "btn btn--ghost btn--block", type: "button", disabled: true, text: "Sold out" })
-        : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": "" },
-            [h("span", { svg: CART_SVG }), document.createTextNode(" Add to cart")]);
+        : paymentLink
+          ? h("a", { class: "btn btn--primary btn--block", href: paymentLink, "data-payment-link": "", rel: "noopener" },
+              [h("span", { svg: CART_SVG }), document.createTextNode(" Pay with Stripe")])
+          : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": "" },
+              [h("span", { svg: CART_SVG }), document.createTextNode(" Add to cart")]);
 
       return h("article", { class: "product-card reveal" + (p.inStock === false ? " is-sold-out" : "") }, [
         onSale ? h("span", { class: "sale-badge", text: "Sale!" }) : null,
