@@ -23,7 +23,23 @@
   const PHONE = CONTACT.phone || "";
   const KEY = (S.forms || {}).web3formsKey || "";
 
-  const escAttr = (v) => String(v == null ? "" : v).replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  const escAttr = (v) => String(v == null ? "" : v)
+    .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const imageAttrs = (src, alt, opts = {}) => {
+    const attrs = window.SWImage
+      ? window.SWImage.attrs(src, opts)
+      : { src, width: opts.width || 1, height: opts.height || 1, loading: opts.loading || "lazy", decoding: "async" };
+    attrs.alt = alt || "";
+    if (opts.className) attrs.class = opts.className;
+    return attrs;
+  };
+  const imageHtml = (src, alt, opts = {}) => {
+    const attrs = imageAttrs(src, alt, opts);
+    return "<img " + Object.keys(attrs).map((k) =>
+      `${k}="${escAttr(attrs[k])}"`
+    ).join(" ") + " />";
+  };
 
   const phoneLink = PHONE && TEL
     ? `<a href="${escAttr(TEL)}">${escAttr(PHONE)}</a>`
@@ -99,7 +115,10 @@
 
         <!-- RIGHT: photo -->
         <div class="reserve-photo reveal">
-          <img src="assets/restaurant/seven-wonders-dining-room-front.jpeg" alt="The dining room at ${escAttr(LEGAL)}" loading="lazy" />
+          ${imageHtml("assets/restaurant/seven-wonders-dining-room-front.jpeg", "The dining room at " + LEGAL, {
+            loading: "lazy",
+            sizes: "(max-width: 900px) 92vw, 50vw"
+          })}
         </div>
       </div>
     </section>

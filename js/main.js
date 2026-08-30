@@ -8,6 +8,19 @@
   const $  = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
+  function applyImageMeta(img, src, alt, opts = {}) {
+    if (!img || !src) return;
+    if (window.SWImage) window.SWImage.applyToImage(img, src, alt || "", opts);
+    else {
+      img.src = src;
+      img.alt = alt || "";
+      img.width = opts.width || 1;
+      img.height = opts.height || 1;
+      img.loading = opts.loading || "lazy";
+      img.decoding = "async";
+    }
+  }
+
   /* -----------------------------------------------------
      1. MOBILE NAV DRAWER
   ----------------------------------------------------- */
@@ -16,21 +29,51 @@
     const links    = $("#nav-links");
     const backdrop = $(".drawer-backdrop");
     if (!burger || !links) return;
+    let lastFocus = null;
+    const drawerFocusables = () => [burger].concat($$("a", links))
+      .filter((el) => !el.disabled && !el.hidden);
 
-    const setOpen = (open) => {
+    const setOpen = (open, moveFocus = false) => {
       burger.setAttribute("aria-expanded", String(open));
       links.classList.toggle("open", open);
       if (backdrop) backdrop.classList.toggle("open", open);
       document.body.style.overflow = open ? "hidden" : "";
+      if (open) {
+        lastFocus = document.activeElement;
+        if (moveFocus) {
+          const firstLink = $("a", links);
+          if (firstLink) firstLink.focus();
+        }
+      } else if (moveFocus && lastFocus && lastFocus.focus) {
+        lastFocus.focus();
+      }
     };
 
-    burger.addEventListener("click", () =>
-      setOpen(burger.getAttribute("aria-expanded") !== "true")
-    );
-    if (backdrop) backdrop.addEventListener("click", () => setOpen(false));
+    burger.addEventListener("click", () => {
+      const opening = burger.getAttribute("aria-expanded") !== "true";
+      setOpen(opening, opening);
+    });
+    if (backdrop) backdrop.addEventListener("click", () => setOpen(false, true));
     $$("a", links).forEach((a) => a.addEventListener("click", () => setOpen(false)));
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") setOpen(false);
+      const open = burger.getAttribute("aria-expanded") === "true";
+      if (!open) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setOpen(false, true);
+      } else if (e.key === "Tab") {
+        const nodes = drawerFocusables();
+        if (!nodes.length) return;
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
   }
 
@@ -480,8 +523,10 @@
       }
     }
     if (img) {
-      img.src = photo;
-      img.alt = dish.name + " — special of the day";
+      applyImageMeta(img, photo, dish.name + " — special of the day", {
+        loading: "lazy",
+        sizes: "(max-width: 900px) 92vw, 50vw"
+      });
     }
   }
 
@@ -549,15 +594,26 @@
     const triggers = $$("button", gallery);
     const sources = triggers.map((t) => t.dataset.full || t.querySelector("img").src);
     let cur = 0;
+    let lastFocus = null;
+    const lightboxFocusables = () => $$("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])", box)
+      .filter((el) => !el.disabled && !el.hidden);
 
     function open(i) {
+      if (!box.classList.contains("open")) lastFocus = document.activeElement;
       cur = (i + sources.length) % sources.length;
-      imgEl.src = sources[cur];
+      applyImageMeta(imgEl, sources[cur], "Gallery image enlarged", {
+        loading: "lazy",
+        sizes: "92vw"
+      });
       box.classList.add("open");
       document.body.style.overflow = "hidden";
       $(".lightbox__close", box).focus();
     }
-    function close() { box.classList.remove("open"); document.body.style.overflow = ""; }
+    function close() {
+      box.classList.remove("open");
+      document.body.style.overflow = "";
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
 
     triggers.forEach((t, i) => t.addEventListener("click", () => open(i)));
     $(".lightbox__close", box).addEventListener("click", close);
@@ -569,6 +625,19 @@
       if (e.key === "Escape") close();
       if (e.key === "ArrowRight") open(cur + 1);
       if (e.key === "ArrowLeft") open(cur - 1);
+      if (e.key === "Tab") {
+        const nodes = lightboxFocusables();
+        if (!nodes.length) return;
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     });
   }
 
@@ -597,9 +666,19 @@
       if (view === "gallery" && window.SWGallery) window.SWGallery.relayout();
     }
 
-    tabs.forEach((tab) =>
-      tab.addEventListener("click", () => select(tab.dataset.view))
-    );
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => select(tab.dataset.view));
+      tab.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        e.preventDefault();
+        const i = tabs.indexOf(tab);
+        const next = e.key === "ArrowRight"
+          ? tabs[(i + 1) % tabs.length]
+          : tabs[(i - 1 + tabs.length) % tabs.length];
+        next.focus();
+        select(next.dataset.view);
+      });
+    });
   }
 
   /* -----------------------------------------------------

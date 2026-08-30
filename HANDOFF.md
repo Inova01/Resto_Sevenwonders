@@ -105,8 +105,8 @@ These are conventions the existing code already follows. Please keep them.
 3. **One source of truth.** A price exists in `content/menu.js` and nowhere
    else. Do not reintroduce a second place to change an address, a price or
    an opening time.
-4. **Tests are the contract.** `node tests/check-content.js` (60 checks, no
-   dependencies) and `npm i jsdom && node tests/check-pages.js` (133 checks,
+4. **Tests are the contract.** `node tests/check-content.js` (65 checks, no
+   dependencies) and `npm i jsdom && node tests/check-pages.js` (239 checks,
    renders every page in jsdom). Run both before and after any change. When
    reality legitimately changes, update the assertion — do not delete it.
 5. **`textContent`, never `innerHTML`,** for anything a manager typed. Blog
@@ -127,9 +127,9 @@ These are conventions the existing code already follows. Please keep them.
 
 ---
 
-## 4. What was done on 2026-08-30
+## 4. What was done earlier on 2026-08-30
 
-Five commits, all pushed, repo in sync at 0 behind / 0 ahead.
+Earlier commits were pushed with the repo in sync at 0 behind / 0 ahead.
 
 | Commit | What |
 |---|---|
@@ -161,6 +161,72 @@ Highlights:
 - Fixed three raw NUL bytes in `js/admin/app.js` (a "null option" sentinel
   written as literal bytes) that made git and grep treat the file as binary.
 - Tests grew 58 -> 60 and 115 -> 133.
+
+---
+
+## 4b. Continuation — performance, Stripe flow, accessibility
+
+This continuation keeps the approved visual design and focuses on the work
+that makes the static site more production-ready.
+
+### Image optimization
+
+- Every guest-facing rendered `<img>` now carries explicit `width`, `height`
+  and `loading` attributes, including images built in JavaScript.
+- Homepage hero and page hero images are eager/high priority; below-fold images
+  are lazy.
+- `scripts/optimize-images.py` re-encodes original JPEGs under the 150 KiB
+  target, creates responsive WebP variants in `assets/variants/`, and writes
+  `js/image-meta.js`.
+- Menu scans keep full-size JPEG links for legibility, but inline display uses
+  responsive WebP candidates instead of forcing the largest scan.
+- Run the optimizer with:
+
+```powershell
+C:\Users\Asus\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe scripts\optimize-images.py
+```
+
+The content test now enforces the budget: no raster asset can exceed 153,600
+bytes, the manifest must cover every original raster, and all generated WebP
+variants must exist and remain under budget.
+
+Measured unique rendered image bytes, using the current browser-selected image
+URLs for the after column and `HEAD` JPEG sources for the before column:
+
+| Page / viewport | Before | After |
+|---|---:|---:|
+| Homepage 375px | 1,566,939 B | 818,717 B |
+| Menu 375px | 2,364,999 B | 481,463 B |
+| Homepage 1440px | 1,566,939 B | 872,385 B |
+| Menu 1440px | 3,603,183 B | 809,245 B |
+
+### Stripe Payment Links
+
+Chosen rule: **keep the local cart as the main combining flow, and show Stripe
+Payment Links as a separate single-item express checkout.** This avoids the
+old split where adding one Stripe link removed the cart button for that item
+and made mixed orders confusing.
+
+Rejected alternatives:
+
+- Hiding the cart whenever any Payment Link exists would block mixed orders.
+- Replacing Add to cart with Stripe would make cart totals inconsistent.
+- Requiring all products to have Stripe links before showing any links would
+  waste a useful express-checkout option.
+
+### Accessibility and mobile checks
+
+- Mobile drawer now moves focus into the drawer, traps Tab while open, and
+  returns focus on Escape.
+- Homepage and mosaic lightboxes trap Tab, support arrow keys/Escape, and
+  return focus to the trigger.
+- Data-rendered menu category/subcategory tabs support arrow keys, Home and
+  End.
+- `prefers-reduced-motion` skips the ember canvas and reveals content
+  immediately in both light and dark themes.
+- Browser audit at 375px and 1440px found no real horizontal overflow; the
+  only intentionally off-screen item was the skip link. Founder cards remain
+  a 1x2 row, and the mobile daily-special text stays centered.
 
 ---
 

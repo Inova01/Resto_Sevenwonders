@@ -9,6 +9,7 @@
   var DATA = window.SW_MENU;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
 
   var LS_KEY = "sw_order_v1";
   /* Set in the dashboard (Info & Hours → online forms), stored in
@@ -24,6 +25,39 @@
     '<path d="M18 3c-1.5 0-3 1.8-3 5s1.5 4 3 4"/><path d="M18 12v9"/></svg>';
 
   function money(n) { return "$" + n.toFixed(2); }
+  function escAttr(v) {
+    return String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function imageAttrs(src, alt, opts) {
+    opts = opts || {};
+    var attrs = window.SWImage
+      ? window.SWImage.attrs(src, opts)
+      : { src: src, width: opts.width || 1, height: opts.height || 1, loading: opts.loading || "lazy", decoding: "async" };
+    attrs.alt = alt || "";
+    if (opts.className) attrs.class = opts.className;
+    if (opts.id) attrs.id = opts.id;
+    return attrs;
+  }
+  function imageHtml(src, alt, opts) {
+    var attrs = imageAttrs(src, alt, opts);
+    return "<img " + Object.keys(attrs).map(function (k) {
+      return k + '="' + escAttr(attrs[k]) + '"';
+    }).join(" ") + " />";
+  }
+  function applyImageMeta(img, src, alt, opts) {
+    if (!img || !src) return;
+    if (window.SWImage) window.SWImage.applyToImage(img, src, alt || "", opts || {});
+    else {
+      img.src = src;
+      img.alt = alt || "";
+      img.width = (opts && opts.width) || 1;
+      img.height = (opts && opts.height) || 1;
+      img.loading = (opts && opts.loading) || "lazy";
+      img.decoding = "async";
+    }
+  }
 
   /* ---------- persistent state ---------- */
   var state = {
@@ -70,7 +104,7 @@
      ===================================================== */
   function thumb(item) {
     if (item.img) {
-      return '<img class="menu-item__thumb" src="' + item.img + '" alt="' + item.name + '" loading="lazy" />';
+      return imageHtml(item.img, item.name, { className: "menu-item__thumb", loading: "lazy", sizes: "66px" });
     }
     return '<span class="menu-item__thumb menu-item__thumb--ph" aria-hidden="true">' + FORK_SVG + "</span>";
   }
@@ -85,8 +119,12 @@
       b.setAttribute("role", "tab");
       b.dataset.cat = cat.id;
       b.setAttribute("aria-selected", String(cat.id === state.cat));
+      b.tabIndex = cat.id === state.cat ? 0 : -1;
       b.textContent = cat.label;
       b.addEventListener("click", function () { selectCat(cat.id); });
+      b.addEventListener("keydown", function (e) {
+        moveTab(e, "#menu-cats button", "cat", selectCat);
+      });
       wrap.appendChild(b);
     });
   }
@@ -102,10 +140,32 @@
       b.setAttribute("role", "tab");
       b.dataset.sub = sub.id;
       b.setAttribute("aria-selected", String(sub.id === state.sub));
+      b.tabIndex = sub.id === state.sub ? 0 : -1;
       b.textContent = sub.label;
       b.addEventListener("click", function () { selectSub(sub.id); });
+      b.addEventListener("keydown", function (e) {
+        moveTab(e, "#menu-subcats button", "sub", selectSub);
+      });
       wrap.appendChild(b);
     });
+  }
+
+  function moveTab(e, selector, dataKey, choose) {
+    var keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
+    if (keys.indexOf(e.key) === -1) return;
+    var tabs = $$(selector);
+    if (!tabs.length) return;
+    e.preventDefault();
+    var i = tabs.indexOf(e.currentTarget);
+    var next = i;
+    if (e.key === "ArrowRight") next = (i + 1) % tabs.length;
+    else if (e.key === "ArrowLeft") next = (i - 1 + tabs.length) % tabs.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = tabs.length - 1;
+    var value = tabs[next].dataset[dataKey];
+    choose(value);
+    var fresh = $$(selector).filter(function (b) { return b.dataset[dataKey] === value; })[0];
+    if (fresh) fresh.focus();
   }
 
   function renderPanel() {
@@ -135,7 +195,10 @@
     });
     // arched photo
     var img = $("#menu-photo-img");
-    if (img && cat.photo) { img.src = cat.photo; img.alt = cat.label + " at Seven Wonders"; }
+    applyImageMeta(img, cat.photo, cat.label + " at Seven Wonders", {
+      loading: "lazy",
+      sizes: "(max-width: 900px) 92vw, 40vw"
+    });
     // restart fade
     if (!reduceMotion) { list.style.animation = "none"; void list.offsetWidth; list.style.animation = ""; }
   }
@@ -524,7 +587,7 @@
           '<div class="subcat-row" id="menu-subcats" role="tablist" aria-label="Sub-categories"></div>' +
           '<div class="menu-panel active" id="menu-panel">' +
             '<div class="menu-list" id="menu-list"></div>' +
-            '<div class="menu-photo"><img id="menu-photo-img" src="" alt="" loading="lazy" /></div>' +
+            '<div class="menu-photo"><img id="menu-photo-img" src="" alt="" width="1" height="1" loading="lazy" decoding="async" /></div>' +
           "</div>" +
         "</div>" +
       "</div>" +
@@ -537,10 +600,10 @@
           "</div>" +
           '<div class="menu-board-grid">' +
             '<a class="menu-board-card" href="assets/menu/menu-1.jpeg" target="_blank" rel="noopener">' +
-              '<img src="assets/menu/menu-1.jpeg" alt="Seven Wonders updated food menu board" loading="lazy" />' +
+              imageHtml("assets/menu/menu-1.jpeg", "Seven Wonders updated food menu board", { loading: "lazy", sizes: "(max-width: 900px) 92vw, 45vw" }) +
             "</a>" +
             '<a class="menu-board-card" href="assets/menu/menu-2.jpeg" target="_blank" rel="noopener">' +
-              '<img src="assets/menu/menu-2.jpeg" alt="Seven Wonders updated beverage, beer and wine menu board" loading="lazy" />' +
+              imageHtml("assets/menu/menu-2.jpeg", "Seven Wonders updated beverage, beer and wine menu board", { loading: "lazy", sizes: "(max-width: 900px) 92vw, 45vw" }) +
             "</a>" +
           "</div>" +
         "</div>" +

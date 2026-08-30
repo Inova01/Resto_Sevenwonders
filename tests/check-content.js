@@ -88,6 +88,43 @@ console.log("\n=== 1b. Public repo safety ===");
   check("no Stripe secret keys are committed", offenders.length === 0, offenders.join(", "));
 }
 
+console.log("\n=== 1c. Image performance budget ===");
+{
+  run("js/image-meta.js");
+  const META = sandbox.window.SW_IMAGE_META || {};
+  const ASSET_BUDGET = 153600;
+  const rasterExt = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+  const assetsDir = path.join(ROOT, "assets");
+  const rasterFiles = walk(assetsDir).filter(file => rasterExt.has(path.extname(file).toLowerCase()));
+  const oversized = rasterFiles
+    .map(file => ({ file, size: fs.statSync(file).size }))
+    .filter(row => row.size > ASSET_BUDGET);
+  check("no raster asset exceeds the 150 KiB budget",
+    oversized.length === 0,
+    oversized.map(row => path.relative(ROOT, row.file) + " " + row.size + "B").join(", "));
+
+  const originals = rasterFiles
+    .filter(file => !path.relative(assetsDir, file).startsWith("variants" + path.sep))
+    .filter(file => /\.(jpe?g|png|webp)$/i.test(file))
+    .map(file => path.relative(ROOT, file).replace(/\\/g, "/"));
+  const missingMeta = originals.filter(src => !META[src]);
+  check("image manifest covers every original raster asset",
+    missingMeta.length === 0,
+    missingMeta.join(", "));
+
+  const badVariants = [];
+  Object.keys(META).forEach(src => {
+    (META[src].webp || []).forEach(v => {
+      const abs = path.join(ROOT, v.src.replace(/\//g, path.sep));
+      if (!fs.existsSync(abs)) badVariants.push(v.src + " missing");
+      else if (fs.statSync(abs).size > ASSET_BUDGET) badVariants.push(v.src + " over budget");
+    });
+  });
+  check("all generated WebP variants exist and stay under budget",
+    badVariants.length === 0,
+    badVariants.join(", "));
+}
+
 console.log("\n=== 2. Helpers ===");
 check("money() formats", SW.money(17.6) === "$17.60", SW.money(17.6));
 check("money() survives null", SW.money(null) === "$0.00", SW.money(null));

@@ -544,7 +544,15 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
 .price-row { display: flex; align-items: baseline; gap: .7rem; margin-bottom: 1rem; }
 .price-old { color: var(--ink-muted); text-decoration: line-through; font-size: .9rem; }
 .price-new { color: var(--ink-strong); font-weight: 700; font-size: 1.2rem; }
-.product-card .btn { margin-top: auto; }
+.product-actions { margin-top: auto; display: grid; gap: .65rem; }
+.product-actions .btn { margin-top: 0; }
+.btn--express { font-size: .82rem; padding-block: .7rem; }
+.shop-pay-note {
+  max-width: 54ch;
+  color: var(--ink-muted);
+  font-size: .88rem;
+  margin: -1.1rem 0 1.8rem;
+}
 
 /* =========================================================
    RESERVATION PAGE

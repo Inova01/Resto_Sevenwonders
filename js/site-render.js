@@ -73,8 +73,31 @@
   var SOCIAL_LABELS = { instagram: "Instagram", facebook: "Facebook", twitter: "X / Twitter" };
 
   /* Photo, or the fork placeholder when no photo is set */
+  function imageAttrs(src, alt, opts) {
+    opts = opts || {};
+    var attrs = window.SWImage
+      ? window.SWImage.attrs(src, opts)
+      : { src: src, width: opts.width || 1, height: opts.height || 1, loading: opts.loading || "lazy", decoding: "async" };
+    attrs.alt = alt || "";
+    if (opts.className) attrs.class = opts.className;
+    return attrs;
+  }
+
+  function applyImage(img, src, alt, opts) {
+    if (!img || !src) return;
+    if (window.SWImage) window.SWImage.applyToImage(img, src, alt, opts || {});
+    else {
+      img.src = src;
+      img.alt = alt || "";
+      img.setAttribute("width", (opts && opts.width) || 1);
+      img.setAttribute("height", (opts && opts.height) || 1);
+      img.setAttribute("loading", (opts && opts.loading) || "lazy");
+      img.setAttribute("decoding", "async");
+    }
+  }
+
   function photoOrPlaceholder(src, alt, cls) {
-    if (src) return h("img", { src: src, alt: alt || "", loading: "lazy" });
+    if (src) return h("img", imageAttrs(src, alt, { loading: "lazy", sizes: "(max-width: 720px) 92vw, 420px" }));
     return h("span", { class: (cls || "") + " menu-item__thumb--ph", "aria-hidden": "true", svg: FORK_SVG });
   }
 
@@ -273,13 +296,21 @@
           ]);
 
       var paymentLink = stripePaymentLink(p.paymentLink);
-      var button = p.inStock === false
+      var actions = [];
+      var cartButton = p.inStock === false
         ? h("button", { class: "btn btn--ghost btn--block", type: "button", disabled: true, text: "Sold out" })
-        : paymentLink
-          ? h("a", { class: "btn btn--primary btn--block", href: paymentLink, "data-payment-link": "", rel: "noopener" },
-              [h("span", { svg: CART_SVG }), document.createTextNode(" Pay with Stripe")])
-          : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": "" },
-              [h("span", { svg: CART_SVG }), document.createTextNode(" Add to cart")]);
+        : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": "" },
+            [h("span", { svg: CART_SVG }), document.createTextNode(" Add to cart")]);
+      actions.push(cartButton);
+      if (paymentLink && p.inStock !== false) {
+        actions.push(h("a", {
+          class: "btn btn--ghost btn--block btn--express",
+          href: paymentLink,
+          "data-payment-link": "",
+          rel: "noopener",
+          "aria-label": "Express checkout for " + p.name + " with Stripe"
+        }, [document.createTextNode("Express checkout")]));
+      }
 
       return h("article", { class: "product-card reveal" + (p.inStock === false ? " is-sold-out" : "") }, [
         onSale ? h("span", { class: "sale-badge", text: "Sale!" }) : null,
@@ -289,12 +320,24 @@
         p.note ? h("p", { class: "product-note", text: p.note }) : null,
         h("div", { class: "divider" }),
         priceRow,
-        button
+        h("div", { class: "product-actions" }, actions)
       ]);
     }
 
     function paint() {
       var list = sorted();
+      var hasPaymentLinks = list.some(function (p) {
+        return p.inStock !== false && !!stripePaymentLink(p.paymentLink);
+      });
+      var note = $(".shop-pay-note");
+      if (hasPaymentLinks && !note) {
+        note = h("p", {
+          class: "shop-pay-note",
+          text: "Use Add to cart to combine items. Express checkout buys one item through Stripe."
+        });
+        if (grid.parentNode) grid.parentNode.insertBefore(note, grid);
+      }
+      if (note) note.hidden = !hasPaymentLinks;
       fill(grid, list.map(card));
       var results = $(".shop-bar .results");
       if (results) {
@@ -352,7 +395,7 @@
           h("span", { class: "date", text: SW.formatDate(p.date) })
         ]),
         h("h2", { text: p.title }),
-        p.img ? h("img", { src: p.img, alt: p.title }) : null
+        p.img ? h("img", imageAttrs(p.img, p.title, { loading: "lazy", sizes: "(max-width: 900px) 92vw, 760px" })) : null
       ].concat((p.body || []).map(function (para) { return h("p", { text: para }); })));
     });
     fill(detail, [back].concat(articles));
@@ -378,7 +421,7 @@
     var d = SW.home.hero || {};
 
     var bg = $(".hero__bg", hero);
-    if (bg && d.image) { bg.src = d.image; bg.alt = d.imageAlt || ""; }
+    applyImage(bg, d.image, d.imageAlt || "", { loading: "eager", fetchpriority: "high", sizes: "100vw" });
 
     var eyebrow = $(".hero__inner .eyebrow", hero);
     if (eyebrow && d.eyebrow) eyebrow.textContent = d.eyebrow;
@@ -416,7 +459,7 @@
     if (body && d.body) body.textContent = d.body;
 
     var img = $("img", grid);
-    if (img && d.image) { img.src = d.image; img.alt = d.imageAlt || ""; }
+    applyImage(img, d.image, d.imageAlt || "", { loading: "lazy", sizes: "(max-width: 900px) 92vw, 50vw" });
 
     var row = $(".stat-row", grid);
     if (row) {
@@ -510,7 +553,7 @@
 
     fill(grid, picks.map(function (p, i) {
       return h("button", { type: "button", class: SHAPE[i] || null, "data-full": p.src }, [
-        h("img", { src: p.src, alt: p.alt || "Seven Wonders gallery photo", loading: "lazy" })
+        h("img", imageAttrs(p.src, p.alt || "Seven Wonders gallery photo", { loading: "lazy", sizes: "(max-width: 720px) 46vw, 25vw" }))
       ]);
     }));
   }
@@ -538,7 +581,7 @@
         h("blockquote", { text: "“" + (t.quote || "") + "”" }),
         h("div", { class: "who" }, [
           t.avatar
-            ? h("img", { src: t.avatar, alt: "" })
+            ? h("img", imageAttrs(t.avatar, "", { loading: "lazy", sizes: "64px" }))
             : h("span", { class: "who__initials", "aria-hidden": "true", text: initials || "★" }),
           h("b", { text: t.name || "" }),
           t.context ? h("span", { text: t.context }) : null
@@ -585,7 +628,7 @@
     if (!banner) return;
     var d = SW.home.ctaBanner || {};
     var img = $("img", banner);
-    if (img && d.image) { img.src = d.image; img.alt = ""; }
+    applyImage(img, d.image, "", { loading: "lazy", sizes: "100vw" });
     var eb = $(".eyebrow", banner), tt = $("h2", banner), p = $("h2 + p", banner), a = $("a.btn", banner);
     if (eb && d.eyebrow) eb.textContent = d.eyebrow;
     if (tt && d.title) tt.textContent = d.title;
@@ -627,7 +670,7 @@
     if (hero) {
       var d = a.hero || {};
       var heroImg = $("img", hero);
-      if (heroImg && d.image) { heroImg.src = d.image; heroImg.alt = d.imageAlt || ""; }
+      applyImage(heroImg, d.image, d.imageAlt || "", { loading: "eager", fetchpriority: "high", sizes: "100vw" });
       var heroEyebrow = $(".eyebrow", hero);
       if (heroEyebrow && d.eyebrow) heroEyebrow.textContent = d.eyebrow;
       var heroTitle = $("h1", hero);
@@ -671,7 +714,7 @@
       var photos = ((a.detail || {}).photos || []).filter(function (p) { return p && p.src; });
       if (!photos.length) stack.remove();
       else fill(stack, photos.map(function (p) {
-        return h("img", { src: p.src, alt: p.alt || "", loading: "lazy" });
+        return h("img", imageAttrs(p.src, p.alt || "", { loading: "lazy", sizes: "(max-width: 900px) 92vw, 44vw" }));
       }));
     }
 

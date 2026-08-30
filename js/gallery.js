@@ -26,6 +26,20 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $  = (sel, ctx = document) => ctx.querySelector(sel);
 
+  function applyImageMeta(img, src, alt, opts) {
+    opts = opts || {};
+    if (!img || !src) return;
+    if (window.SWImage) window.SWImage.applyToImage(img, src, alt || "", opts);
+    else {
+      img.src = src;
+      img.alt = alt || "";
+      img.width = opts.width || 1;
+      img.height = opts.height || 1;
+      img.loading = opts.loading || "lazy";
+      img.decoding = "async";
+    }
+  }
+
   function initMosaicGallery() {
     const root = $("#mgal");
     if (!root || !GALLERY_IMAGES.length) return;
@@ -87,10 +101,10 @@
       btn.setAttribute("aria-label", "Open photo " + (globalIndex + 1) + " of " + GALLERY_IMAGES.length);
       applySpan(btn, posInPage);
       const img = document.createElement("img");
-      img.src = src;
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.alt = altFor(globalIndex);
+      applyImageMeta(img, src, altFor(globalIndex), {
+        loading: "lazy",
+        sizes: "(max-width: 620px) 50vw, (max-width: 992px) 33vw, 25vw"
+      });
       btn.appendChild(img);
       btn.addEventListener("click", () => openLightbox(globalIndex));
       return btn;
@@ -204,11 +218,19 @@
 
     /* ---------------- Lightbox (all photos) ---------------- */
     let lbIndex = 0;
+    let lastFocus = null;
+    const lightboxFocusables = () => box
+      ? Array.from(box.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"))
+          .filter((el) => !el.disabled && !el.hidden)
+      : [];
     function openLightbox(i) {
       if (!box || !boxImg) return;
+      if (!box.classList.contains("open")) lastFocus = document.activeElement;
       lbIndex = (i + GALLERY_IMAGES.length) % GALLERY_IMAGES.length;
-      boxImg.src = GALLERY_IMAGES[lbIndex];
-      boxImg.alt = altFor(lbIndex);
+      applyImageMeta(boxImg, GALLERY_IMAGES[lbIndex], altFor(lbIndex), {
+        loading: "lazy",
+        sizes: "92vw"
+      });
       if (boxCount) boxCount.textContent = (lbIndex + 1) + " / " + GALLERY_IMAGES.length;
       box.classList.add("open");
       document.body.style.overflow = "hidden";
@@ -219,6 +241,7 @@
       if (!box) return;
       box.classList.remove("open");
       document.body.style.overflow = "";
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
     }
     function lbGo(delta) { openLightbox(lbIndex + delta); }
 
@@ -232,6 +255,19 @@
         if (e.key === "Escape") closeLightbox();
         else if (e.key === "ArrowRight") lbGo(1);
         else if (e.key === "ArrowLeft") lbGo(-1);
+        else if (e.key === "Tab") {
+          const nodes = lightboxFocusables();
+          if (!nodes.length) return;
+          const first = nodes[0];
+          const last = nodes[nodes.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       });
       // swipe inside lightbox
       let lx = null;

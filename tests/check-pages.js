@@ -25,13 +25,19 @@ function loadPage(file, opts = {}) {
     virtualConsole: vc,
     beforeParse(win) {
       win.matchMedia = (query) => ({
-        matches: !!opts.prefersDark && /prefers-color-scheme:\s*dark/i.test(query),
+        matches:
+          (!!opts.prefersDark && /prefers-color-scheme:\s*dark/i.test(query)) ||
+          (!!opts.reducedMotion && /prefers-reduced-motion:\s*reduce/i.test(query)),
         addEventListener() {},
         removeEventListener() {}
       });
       win.requestAnimationFrame = () => 0;
       win.cancelAnimationFrame = () => {};
-      win.HTMLCanvasElement.prototype.getContext = () => null;
+      win.__canvasContextCalls = 0;
+      win.HTMLCanvasElement.prototype.getContext = () => {
+        win.__canvasContextCalls++;
+        return null;
+      };
       win.scrollTo = () => {};
       win.fetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) });
       if (opts.themeChoice) win.localStorage.setItem("sw_theme", opts.themeChoice);
@@ -70,6 +76,27 @@ function visible(doc) {
   c.querySelectorAll("script, style, template").forEach(n => n.remove());
   c.querySelectorAll("[hidden]").forEach(n => n.remove());
   return c.textContent.replace(/\s+/g, " ").trim();
+}
+
+function checkRenderedImages(file) {
+  const { doc, win, errors } = loadPage(file);
+  check(file + " has no image-related script errors", errors.length === 0, errors.join("\n         "));
+  const imgs = Array.from(doc.querySelectorAll("img"));
+  const missingCore = imgs.filter(img =>
+    !img.hasAttribute("width") || !img.hasAttribute("height") || !img.hasAttribute("loading"));
+  check(file + " gives every rendered image width, height and loading",
+    missingCore.length === 0,
+    missingCore.map(img => img.outerHTML.slice(0, 140)).join(" | "));
+
+  const notResponsive = imgs.filter(img => {
+    const src = img.getAttribute("src") || "";
+    if (!/^assets\//.test(src)) return false;
+    if (!win.SW_IMAGE_META || !win.SW_IMAGE_META[src]) return false;
+    return !img.hasAttribute("srcset") || !img.hasAttribute("sizes");
+  });
+  check(file + " uses generated responsive sources for asset images",
+    notResponsive.length === 0,
+    notResponsive.map(img => img.getAttribute("src")).join(", "));
 }
 
 const CSS_TEXT = fs.readFileSync(path.join(ROOT, "css", "style.css"), "utf8");
@@ -124,7 +151,7 @@ console.log("\n=== theme and portable links ===");
   allPages.forEach(file => {
     const html = fs.readFileSync(path.join(ROOT, file), "utf8");
     check(file + " uses the bumped stylesheet",
-      /css\/style\.css\?v=theme-payments/.test(html));
+      /css\/style\.css\?v=perf-cart-a11y/.test(html));
     check(file + " sets the theme before CSS loads",
       html.indexOf("sw_theme") !== -1 && html.indexOf("sw_theme") < html.indexOf("css/style.css"));
     check(file + " has no github.io absolute links",
@@ -175,6 +202,36 @@ console.log("\n=== theme and portable links ===");
   check("dark muted text clears AA on warm charcoal",
     contrast(token("ink-muted", darkTokens), token("ground-2", darkTokens)) >= 4.5,
     contrast(token("ink-muted", darkTokens), token("ground-2", darkTokens)).toFixed(2));
+}
+
+/* ============ image performance + reduced motion ============ */
+console.log("\n=== image performance and reduced motion ===");
+{
+  ["index.html", "about.html", "menu.html", "shop.html", "blog.html", "contact.html", "reservation.html"]
+    .forEach(checkRenderedImages);
+
+  const home = loadPage("index.html");
+  const hero = home.doc.querySelector(".hero__bg");
+  check("homepage hero image is eager and high priority",
+    hero.getAttribute("loading") === "eager" && hero.getAttribute("fetchpriority") === "high",
+    hero.outerHTML.slice(0, 180));
+  check("homepage ember canvas initializes when motion is allowed",
+    home.win.__canvasContextCalls > 0,
+    String(home.win.__canvasContextCalls));
+
+  const reducedLight = loadPage("index.html", { reducedMotion: true, themeChoice: "light" });
+  check("reduced motion skips the ember canvas in light theme",
+    reducedLight.win.__canvasContextCalls === 0,
+    String(reducedLight.win.__canvasContextCalls));
+  check("reduced motion reveals content immediately in light theme",
+    Array.from(reducedLight.doc.querySelectorAll(".reveal")).every(el => el.classList.contains("in")));
+
+  const reducedDark = loadPage("index.html", { reducedMotion: true, themeChoice: "dark" });
+  check("reduced motion skips the ember canvas in dark theme",
+    reducedDark.win.__canvasContextCalls === 0,
+    String(reducedDark.win.__canvasContextCalls));
+  check("reduced motion reveals content immediately in dark theme",
+    Array.from(reducedDark.doc.querySelectorAll(".reveal")).every(el => el.classList.contains("in")));
 }
 
 /* ============ index.html ============ */
@@ -435,8 +492,10 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
     text(doc.querySelector(".results")));
   check("Stripe Payment Link renders as a checkout link",
     doc.querySelector("[data-payment-link]").getAttribute("href") === "https://buy.stripe.com/test_123");
-  check("Stripe products no longer bind the local cart button",
-    !doc.querySelector(".product-card [data-add-to-cart]"));
+  check("Stripe products still keep the regular cart button",
+    !!doc.querySelector(".product-card [data-add-to-cart]"));
+  check("Stripe checkout is presented as a separate single-item path",
+    /combine items/i.test(text(doc.querySelector(".shop-pay-note"))));
 
   const plain = loadPage("shop.html", { draft });
   check("the same browser WITHOUT ?preview=1 sees the published site",
@@ -469,6 +528,100 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
       !spoof.doc.querySelector("[data-payment-link]") &&
       !!spoof.doc.querySelector("[data-add-to-cart]"), url);
   });
+
+  const mixed = loadPage("shop.html", {
+    query: "?preview=1",
+    draft: { shop: { products: [
+      { id: "link", name: "Linked Dish", note: "", price: 9, sale: null, inStock: true, img: "", paymentLink: "https://buy.stripe.com/test_link" },
+      { id: "cart", name: "Cart Dish", note: "", price: 10, sale: null, inStock: true, img: "", paymentLink: "" }
+    ] } }
+  });
+  check("mixed Stripe/cart products all keep Add to cart",
+    mixed.doc.querySelectorAll("[data-add-to-cart]").length === 2);
+  check("mixed Stripe/cart products show only valid express links",
+    mixed.doc.querySelectorAll("[data-payment-link]").length === 1);
+
+  const allLinks = loadPage("shop.html", {
+    query: "?preview=1",
+    draft: { shop: { products: [
+      { id: "a", name: "Dish A", note: "", price: 9, sale: null, inStock: true, img: "", paymentLink: "https://buy.stripe.com/test_a" },
+      { id: "b", name: "Dish B", note: "", price: 10, sale: null, inStock: true, img: "", paymentLink: "https://buy.stripe.com/test_b" }
+    ] } }
+  });
+  check("all-Stripe products still support cart combining",
+    allLinks.doc.querySelectorAll("[data-add-to-cart]").length === 2 &&
+    allLinks.doc.querySelectorAll("[data-payment-link]").length === 2);
+}
+
+/* ============ keyboard accessibility ============ */
+console.log("\n=== keyboard accessibility ===");
+{
+  const { doc, win, errors } = loadPage("index.html");
+  check("no script errors", errors.length === 0, errors.join("\n         "));
+
+  const burger = doc.querySelector(".hamburger");
+  burger.dispatchEvent(new win.Event("click", { bubbles: true }));
+  check("mobile nav opens from the hamburger",
+    burger.getAttribute("aria-expanded") === "true" &&
+    doc.querySelector("#nav-links").classList.contains("open"));
+  check("mobile nav moves focus into the drawer",
+    doc.activeElement === doc.querySelector("#nav-links a"));
+  const navFocusables = [burger].concat(Array.from(doc.querySelectorAll("#nav-links a")));
+  navFocusables[navFocusables.length - 1].focus();
+  doc.dispatchEvent(new win.KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+  check("mobile nav traps Tab back to the hamburger",
+    doc.activeElement === burger);
+  doc.dispatchEvent(new win.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  check("Escape closes the mobile nav and restores focus",
+    burger.getAttribute("aria-expanded") === "false" && doc.activeElement === burger);
+
+  const homeTile = doc.querySelector("#gallery button");
+  homeTile.focus();
+  homeTile.dispatchEvent(new win.Event("click", { bubbles: true }));
+  const lb = doc.querySelector("#lightbox");
+  check("homepage lightbox opens and focuses close",
+    lb.classList.contains("open") && doc.activeElement === doc.querySelector(".lightbox__close"));
+  doc.querySelector(".lightbox__nav.next").focus();
+  doc.dispatchEvent(new win.KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+  check("homepage lightbox traps Tab",
+    doc.activeElement === doc.querySelector(".lightbox__close"));
+  doc.dispatchEvent(new win.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  check("homepage lightbox Escape closes and returns focus",
+    !lb.classList.contains("open") && doc.activeElement === homeTile);
+
+  const menuPage = loadPage("menu.html");
+  const subnav = Array.from(menuPage.doc.querySelectorAll(".subnav-tab"));
+  subnav[0].focus();
+  subnav[0].dispatchEvent(new menuPage.win.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  check("menu subnav supports arrow-key tabs",
+    subnav[1].classList.contains("active") && menuPage.doc.activeElement === subnav[1]);
+
+  const cats = Array.from(menuPage.doc.querySelectorAll("#menu-cats button"));
+  cats[0].focus();
+  cats[0].dispatchEvent(new menuPage.win.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  const freshCats = Array.from(menuPage.doc.querySelectorAll("#menu-cats button"));
+  check("menu category tabs support arrow keys",
+    freshCats[1].getAttribute("aria-selected") === "true" && menuPage.doc.activeElement === freshCats[1]);
+
+  const galleryTile = menuPage.doc.querySelector("#mgal .mgal-tile");
+  galleryTile.focus();
+  galleryTile.dispatchEvent(new menuPage.win.Event("click", { bubbles: true }));
+  const glb = menuPage.doc.querySelector("#mgal-lightbox");
+  check("mosaic lightbox opens and focuses close",
+    glb.classList.contains("open") && menuPage.doc.activeElement === menuPage.doc.querySelector(".mgal-lb__close"));
+  menuPage.doc.querySelector(".mgal-lb__nav.next").focus();
+  menuPage.doc.dispatchEvent(new menuPage.win.KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+  check("mosaic lightbox traps Tab",
+    menuPage.doc.activeElement === menuPage.doc.querySelector(".mgal-lb__close"));
+  menuPage.doc.dispatchEvent(new menuPage.win.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  check("mosaic lightbox Escape closes and returns focus",
+    !glb.classList.contains("open") && menuPage.doc.activeElement === galleryTile);
+
+  check("calendar day buttons expose useful labels",
+    !!menuPage.doc.querySelector("#cal-days button[aria-label*=', 2026']"));
+  check("order builder controls remain keyboard-reachable form controls",
+    menuPage.doc.querySelectorAll("#order-form input[type='radio']").length > 0 &&
+    menuPage.doc.querySelectorAll("#order-form button").length > 0);
 }
 
 /* ============ admin.html ============ */
