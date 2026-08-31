@@ -699,8 +699,13 @@
       else {
         if (f.label) founders.setAttribute("aria-label", f.label);
         fill(founders, people.map(function (p) {
+          var attrs = imageAttrs(p.photo, p.photoAlt || p.name, {
+            loading: "lazy",
+            sizes: "(max-width: 620px) 44vw, (max-width: 992px) 36vw, 22vw"
+          });
+          attrs.class = "founder-card__photo";
           return h("article", { class: "founder-card" }, [
-            photoOrPlaceholder(p.photo, p.photoAlt || p.name, ""),
+            p.photo ? h("img", attrs) : photoOrPlaceholder("", p.photoAlt || p.name, ""),
             h("div", {}, [
               h("h3", { text: p.name }),
               p.role ? h("p", { text: p.role }) : null

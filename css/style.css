@@ -818,7 +818,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
 .about-intro-grid,
 .about-detail-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+  grid-template-columns: minmax(0, .95fr) minmax(420px, 1.05fr);
   gap: clamp(2rem, 5vw, 4rem);
   align-items: start;
 }
@@ -830,8 +830,8 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
 .founder-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  max-width: 520px;
+  gap: clamp(.9rem, 2vw, 1.35rem);
+  max-width: 780px;
   justify-self: center;
   width: 100%;
 }
@@ -843,8 +843,10 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
 }
 .founder-card img {
   width: 100%;
-  aspect-ratio: 1 / 1.12;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 .founder-card div { padding: .9rem; }
 .founder-card h3 { font-size: clamp(1.05rem, 2.8vw, 1.25rem); margin-bottom: .2rem; }
@@ -907,7 +909,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--ink-strong); font-weigh
   .cart-line__price { text-align: left; }
   .form-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
-  .founder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; max-width: 380px; }
+  .founder-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; max-width: 100%; }
   .founder-card div { padding: .7rem; }
   .founder-card h3 { font-size: .95rem; }
   .founder-card p { font-size: .68rem; }

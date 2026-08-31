@@ -34,7 +34,7 @@ npm install jsdom      # once, anywhere on the path
 node tests/check-pages.js
 ```
 
-279 checks. Renders each real page in jsdom, runs every one of the site's
+280 checks. Renders each real page in jsdom, runs every one of the site's
 scripts in document order, and asserts what a guest would see: the right
 address in the footer, prices pulled from the menu, sections that hide
 themselves when empty, the forms admitting they are not connected instead of

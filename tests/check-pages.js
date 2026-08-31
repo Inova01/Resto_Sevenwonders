@@ -473,6 +473,11 @@ console.log("\n=== about.html ===");
     founders.every(c => /^assets\/restaurant\//.test(c.querySelector("img").getAttribute("src"))));
   check("founder portraits have real alt text",
     founders.every(c => /Gaboyau/.test(c.querySelector("img").getAttribute("alt"))));
+  const founderImgCss = firstBlockAfter(".founder-card img");
+  check("founder portraits use a tall portrait crop",
+    /aspect-ratio:\s*2\s*\/\s*3/.test(founderImgCss) &&
+    /object-position:\s*center top/.test(founderImgCss),
+    founderImgCss);
 
   const photos = Array.from(doc.querySelectorAll("[data-about-photos] img"));
   check("the restaurant photo stack rendered", photos.length === 2, "got " + photos.length);
