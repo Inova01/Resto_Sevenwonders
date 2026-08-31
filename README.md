@@ -119,8 +119,8 @@ Without one, the dashboard still works and can hand you the files to upload.
 
 ## Tests
 ```bash
-node tests/check-content.js    # 60 checks, no dependencies
-npm i jsdom && node tests/check-pages.js   # 133 checks, renders every page
+node tests/check-content.js    # 72 checks, no dependencies
+npm i jsdom && node tests/check-pages.js   # 253 checks, renders every page
 ```
 See [tests/README.md](tests/README.md). Run the first one after hand-editing
 anything in `content/`.

@@ -7,6 +7,11 @@ const path = require("path");
 const vm = require("vm");
 
 const ROOT = path.join(__dirname, "..");
+
+/* Line endings must never decide whether a test passes. git checks these
+   files out as CRLF on Windows (core.autocrlf) while the Serializer always
+   emits LF, so any byte-for-byte comparison has to normalise first. */
+const lfAll = (t) => t.replace(/\r\n/g, "\n");
 let fails = 0, passes = 0;
 function ok(name) { passes++; console.log("  ok   " + name); }
 function bad(name, detail) { fails++; console.log("  FAIL " + name + (detail ? "\n         " + detail : "")); }
@@ -96,7 +101,12 @@ console.log("\n=== 1d. Stripe payment architecture ===");
 {
   const checkout = read("functions/api/checkout.js");
   const webhook = read("functions/api/stripe-webhook.js");
-  const catalogText = read("functions/_shared/shop-catalog.js");
+  /* Normalise line endings before any text comparison. git checks these
+     files out as CRLF on Windows (core.autocrlf), while the Serializer
+     always emits LF, so a raw comparison passes on Linux and fails on
+     Windows for reasons that have nothing to do with the code. */
+  const lf = (t) => t.replace(/\r\n/g, "\n");
+  const catalogText = lf(read("functions/_shared/shop-catalog.js"));
   const match = /export const SHOP_CATALOG = ([\s\S]*?);\s*\n\nexport function/.exec(catalogText);
   const catalog = match ? JSON.parse(match[1]) : [];
   check("Stripe checkout function exists and uses a server secret",
@@ -278,7 +288,7 @@ check("Serializer writes the server Stripe catalog beside shop.js",
   Store.Serializer.shopCatalogPath() === "functions/_shared/shop-catalog.js" &&
   /export const SHOP_CATALOG/.test(Store.Serializer.renderShopCatalog(SW.shop)));
 check("checked-in server Stripe catalog matches dashboard serialization",
-  Store.Serializer.renderShopCatalog(SW.shop) === read("functions/_shared/shop-catalog.js"));
+  lfAll(Store.Serializer.renderShopCatalog(SW.shop)) === lfAll(read("functions/_shared/shop-catalog.js")));
 
 console.log("\n=== 7. Change detection ===");
 const base = Store.clone(SW.published);

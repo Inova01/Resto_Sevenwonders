@@ -1,0 +1,10 @@
+# Keep text files LF in the repo AND in the working tree.
+# The Serializer in js/admin/store.js emits LF and several tests compare
+# generated text against checked-in files byte for byte, so a CRLF
+# checkout on Windows breaks them for no real reason.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
