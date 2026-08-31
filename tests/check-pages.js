@@ -217,6 +217,12 @@ console.log("\n=== image performance and reduced motion ===");
   ["index.html", "about.html", "menu.html", "shop.html", "blog.html", "contact.html", "reservation.html"]
     .forEach(checkRenderedImages);
 
+  const galleryJs = fs.readFileSync(path.join(ROOT, "js", "gallery.js"), "utf8");
+  const preloadMatch = /function preload\(p\) \{([\s\S]*?)\n    \}/.exec(galleryJs);
+  check("gallery preloader uses responsive image metadata",
+    !!preloadMatch && /SWImage\.attrs/.test(preloadMatch[1]) && !/im\.src\s*=\s*GALLERY_IMAGES\[i\]\s*;/.test(preloadMatch[1]),
+    preloadMatch ? preloadMatch[1] : "preload function not found");
+
   const home = loadPage("index.html");
   const hero = home.doc.querySelector(".hero__bg");
   check("homepage hero image is eager and high priority",

@@ -6,31 +6,45 @@
   "assets/gallery/gallery-01.jpeg": {
     "bytes": 152488,
     "height": 1086,
-    "quality": 75,
+    "quality": null,
     "webp": [
       {
-        "bytes": 19638,
+        "bytes": 7240,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-01-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 12872,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-01-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 19654,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-01-480.webp",
         "width": 480
       },
       {
-        "bytes": 37952,
+        "bytes": 37968,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-01-768.webp",
         "width": 768
       },
       {
-        "bytes": 60434,
+        "bytes": 60430,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-01-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 85106,
+        "bytes": 85200,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-01-1448.webp",
@@ -42,31 +56,45 @@
   "assets/gallery/gallery-02.jpeg": {
     "bytes": 153266,
     "height": 1086,
-    "quality": 51,
+    "quality": null,
     "webp": [
       {
-        "bytes": 30802,
+        "bytes": 9978,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-02-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 19692,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-02-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 30822,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-02-480.webp",
         "width": 480
       },
       {
-        "bytes": 61952,
+        "bytes": 61964,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-02-768.webp",
         "width": 768
       },
       {
-        "bytes": 102898,
+        "bytes": 102908,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-02-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 146320,
+        "bytes": 146370,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-02-1448.webp",
@@ -78,31 +106,45 @@
   "assets/gallery/gallery-03.jpeg": {
     "bytes": 153573,
     "height": 1086,
-    "quality": 62,
+    "quality": null,
     "webp": [
       {
-        "bytes": 25260,
+        "bytes": 9176,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-03-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16632,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-03-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 25208,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-03-480.webp",
         "width": 480
       },
       {
-        "bytes": 49308,
+        "bytes": 49306,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-03-768.webp",
         "width": 768
       },
       {
-        "bytes": 81404,
+        "bytes": 81362,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-03-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 119870,
+        "bytes": 119948,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-03-1448.webp",
@@ -114,8 +156,22 @@
   "assets/gallery/gallery-04.jpeg": {
     "bytes": 153513,
     "height": 1086,
-    "quality": 66,
+    "quality": null,
     "webp": [
+      {
+        "bytes": 8698,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-04-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16048,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-04-360.webp",
+        "width": 360
+      },
       {
         "bytes": 24260,
         "height": 360,
@@ -124,21 +180,21 @@
         "width": 480
       },
       {
-        "bytes": 47124,
+        "bytes": 47082,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-04-768.webp",
         "width": 768
       },
       {
-        "bytes": 76586,
+        "bytes": 76628,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-04-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 112554,
+        "bytes": 112378,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-04-1448.webp",
@@ -150,31 +206,45 @@
   "assets/gallery/gallery-05.jpeg": {
     "bytes": 153458,
     "height": 1086,
-    "quality": 63,
+    "quality": null,
     "webp": [
       {
-        "bytes": 23688,
+        "bytes": 8546,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-05-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15750,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-05-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 23674,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-05-480.webp",
         "width": 480
       },
       {
-        "bytes": 47168,
+        "bytes": 47072,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-05-768.webp",
         "width": 768
       },
       {
-        "bytes": 78852,
+        "bytes": 78856,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-05-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 117092,
+        "bytes": 117084,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-05-1448.webp",
@@ -186,31 +256,45 @@
   "assets/gallery/gallery-06.jpeg": {
     "bytes": 153270,
     "height": 1086,
-    "quality": 69,
+    "quality": null,
     "webp": [
       {
-        "bytes": 21742,
+        "bytes": 7892,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-06-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 14138,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-06-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 21760,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-06-480.webp",
         "width": 480
       },
       {
-        "bytes": 42974,
+        "bytes": 42984,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-06-768.webp",
         "width": 768
       },
       {
-        "bytes": 69910,
+        "bytes": 69894,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-06-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 103234,
+        "bytes": 103162,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-06-1448.webp",
@@ -222,31 +306,45 @@
   "assets/gallery/gallery-07.jpeg": {
     "bytes": 153530,
     "height": 1086,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 22538,
+        "bytes": 8444,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-07-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 14918,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-07-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 22532,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-07-480.webp",
         "width": 480
       },
       {
-        "bytes": 43344,
+        "bytes": 43348,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-07-768.webp",
         "width": 768
       },
       {
-        "bytes": 70658,
+        "bytes": 70652,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-07-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 103598,
+        "bytes": 103678,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-07-1448.webp",
@@ -258,31 +356,45 @@
   "assets/gallery/gallery-08.jpeg": {
     "bytes": 137883,
     "height": 1086,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 14828,
+        "bytes": 5690,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-08-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 9940,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-08-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 14822,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-08-480.webp",
         "width": 480
       },
       {
-        "bytes": 27702,
+        "bytes": 27658,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-08-768.webp",
         "width": 768
       },
       {
-        "bytes": 43938,
+        "bytes": 43836,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-08-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 64704,
+        "bytes": 64816,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-08-1448.webp",
@@ -294,24 +406,38 @@
   "assets/gallery/gallery-09.jpeg": {
     "bytes": 153178,
     "height": 1448,
-    "quality": 76,
+    "quality": null,
     "webp": [
       {
-        "bytes": 27930,
+        "bytes": 10150,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-09-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18478,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-09-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 27924,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-09-480.webp",
         "width": 480
       },
       {
-        "bytes": 53984,
+        "bytes": 54096,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-09-768.webp",
         "width": 768
       },
       {
-        "bytes": 85740,
+        "bytes": 85816,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-09-1086.webp",
@@ -323,38 +449,52 @@
   "assets/gallery/gallery-10.jpeg": {
     "bytes": 153493,
     "height": 1024,
-    "quality": 52,
+    "quality": null,
     "webp": [
       {
-        "bytes": 26464,
+        "bytes": 8990,
+        "height": 160,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-10-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16964,
+        "height": 240,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-10-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 26158,
         "height": 320,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-10-480.webp",
         "width": 480
       },
       {
-        "bytes": 56274,
+        "bytes": 54800,
         "height": 512,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-10-768.webp",
         "width": 768
       },
       {
-        "bytes": 92730,
+        "bytes": 91218,
         "height": 724,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-10-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 138578,
+        "bytes": 136224,
         "height": 965,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-10-1448.webp",
         "width": 1448
       },
       {
-        "bytes": 148856,
+        "bytes": 146534,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-10-1536.webp",
@@ -366,31 +506,45 @@
   "assets/gallery/gallery-11.jpeg": {
     "bytes": 152881,
     "height": 1086,
-    "quality": 75,
+    "quality": null,
     "webp": [
       {
-        "bytes": 20692,
+        "bytes": 8052,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-11-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 13944,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-11-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 20696,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-11-480.webp",
         "width": 480
       },
       {
-        "bytes": 40096,
+        "bytes": 40284,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-11-768.webp",
         "width": 768
       },
       {
-        "bytes": 65150,
+        "bytes": 65096,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-11-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 94754,
+        "bytes": 94812,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-11-1448.webp",
@@ -402,31 +556,45 @@
   "assets/gallery/gallery-12.jpeg": {
     "bytes": 153443,
     "height": 1086,
-    "quality": 68,
+    "quality": null,
     "webp": [
       {
-        "bytes": 23394,
+        "bytes": 8516,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-12-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15390,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-12-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 23442,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-12-480.webp",
         "width": 480
       },
       {
-        "bytes": 46370,
+        "bytes": 46352,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-12-768.webp",
         "width": 768
       },
       {
-        "bytes": 75942,
+        "bytes": 75974,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-12-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 108940,
+        "bytes": 109022,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-12-1448.webp",
@@ -438,31 +606,45 @@
   "assets/gallery/gallery-13.jpeg": {
     "bytes": 153322,
     "height": 1086,
-    "quality": 81,
+    "quality": null,
     "webp": [
       {
-        "bytes": 19096,
+        "bytes": 7292,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-13-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 12920,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-13-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 19064,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-13-480.webp",
         "width": 480
       },
       {
-        "bytes": 35250,
+        "bytes": 35298,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-13-768.webp",
         "width": 768
       },
       {
-        "bytes": 54680,
+        "bytes": 54736,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-13-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 77832,
+        "bytes": 77950,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-13-1448.webp",
@@ -474,24 +656,38 @@
   "assets/gallery/gallery-14.jpeg": {
     "bytes": 153500,
     "height": 1448,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 33662,
+        "bytes": 12682,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-14-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 22568,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-14-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 33650,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-14-480.webp",
         "width": 480
       },
       {
-        "bytes": 62034,
+        "bytes": 62004,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-14-768.webp",
         "width": 768
       },
       {
-        "bytes": 96506,
+        "bytes": 96596,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-14-1086.webp",
@@ -503,31 +699,45 @@
   "assets/gallery/gallery-15.jpeg": {
     "bytes": 134571,
     "height": 1086,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 12654,
+        "bytes": 5090,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-15-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 8538,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-15-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 12650,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-15-480.webp",
         "width": 480
       },
       {
-        "bytes": 24260,
+        "bytes": 24240,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-15-768.webp",
         "width": 768
       },
       {
-        "bytes": 39646,
+        "bytes": 39648,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-15-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 59272,
+        "bytes": 59212,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-15-1448.webp",
@@ -539,31 +749,45 @@
   "assets/gallery/gallery-16.jpeg": {
     "bytes": 152477,
     "height": 1086,
-    "quality": 79,
+    "quality": null,
     "webp": [
       {
-        "bytes": 18010,
+        "bytes": 6958,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-16-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 12000,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-16-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 17998,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-16-480.webp",
         "width": 480
       },
       {
-        "bytes": 34032,
+        "bytes": 33996,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-16-768.webp",
         "width": 768
       },
       {
-        "bytes": 55052,
+        "bytes": 55038,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-16-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 80214,
+        "bytes": 80180,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-16-1448.webp",
@@ -575,31 +799,45 @@
   "assets/gallery/gallery-17.jpeg": {
     "bytes": 153432,
     "height": 1086,
-    "quality": 77,
+    "quality": null,
     "webp": [
       {
-        "bytes": 19792,
+        "bytes": 7638,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-17-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 13324,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-17-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 19810,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-17-480.webp",
         "width": 480
       },
       {
-        "bytes": 37692,
+        "bytes": 37708,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-17-768.webp",
         "width": 768
       },
       {
-        "bytes": 60620,
+        "bytes": 60546,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-17-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 86514,
+        "bytes": 86504,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-17-1448.webp",
@@ -611,31 +849,45 @@
   "assets/gallery/gallery-18.jpeg": {
     "bytes": 153461,
     "height": 1086,
-    "quality": 65,
+    "quality": null,
     "webp": [
       {
-        "bytes": 24608,
+        "bytes": 8928,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-18-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16246,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-18-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 24632,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-18-480.webp",
         "width": 480
       },
       {
-        "bytes": 47958,
+        "bytes": 48004,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-18-768.webp",
         "width": 768
       },
       {
-        "bytes": 79212,
+        "bytes": 79230,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-18-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 113058,
+        "bytes": 113060,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-18-1448.webp",
@@ -647,24 +899,38 @@
   "assets/gallery/gallery-19.jpeg": {
     "bytes": 153261,
     "height": 1448,
-    "quality": 76,
+    "quality": null,
     "webp": [
       {
-        "bytes": 28552,
+        "bytes": 10492,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-19-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18870,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-19-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 28612,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-19-480.webp",
         "width": 480
       },
       {
-        "bytes": 54976,
+        "bytes": 55044,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-19-768.webp",
         "width": 768
       },
       {
-        "bytes": 88406,
+        "bytes": 88196,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-19-1086.webp",
@@ -676,31 +942,45 @@
   "assets/gallery/gallery-20.jpeg": {
     "bytes": 150707,
     "height": 1086,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 17242,
+        "bytes": 6708,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-20-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 11632,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-20-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 17304,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-20-480.webp",
         "width": 480
       },
       {
-        "bytes": 32402,
+        "bytes": 32350,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-20-768.webp",
         "width": 768
       },
       {
-        "bytes": 50052,
+        "bytes": 50004,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-20-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 71926,
+        "bytes": 71986,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-20-1448.webp",
@@ -712,24 +992,38 @@
   "assets/gallery/gallery-21.jpeg": {
     "bytes": 153054,
     "height": 1448,
-    "quality": 79,
+    "quality": null,
     "webp": [
       {
-        "bytes": 22764,
+        "bytes": 7698,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-21-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 14516,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-21-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 22760,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-21-480.webp",
         "width": 480
       },
       {
-        "bytes": 49628,
+        "bytes": 49614,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-21-768.webp",
         "width": 768
       },
       {
-        "bytes": 84184,
+        "bytes": 84216,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-21-1086.webp",
@@ -741,10 +1035,24 @@
   "assets/gallery/gallery-22.jpeg": {
     "bytes": 152378,
     "height": 1086,
-    "quality": 79,
+    "quality": null,
     "webp": [
       {
-        "bytes": 14384,
+        "bytes": 5728,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-22-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 9812,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-22-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 14406,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-22-480.webp",
@@ -758,14 +1066,14 @@
         "width": 768
       },
       {
-        "bytes": 52076,
+        "bytes": 52104,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-22-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 81860,
+        "bytes": 81808,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-22-1448.webp",
@@ -777,24 +1085,38 @@
   "assets/gallery/gallery-23.jpeg": {
     "bytes": 152854,
     "height": 1448,
-    "quality": 72,
+    "quality": null,
     "webp": [
       {
-        "bytes": 29964,
+        "bytes": 10518,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-23-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 19578,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-23-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 29938,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-23-480.webp",
         "width": 480
       },
       {
-        "bytes": 60830,
+        "bytes": 60826,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-23-768.webp",
         "width": 768
       },
       {
-        "bytes": 102602,
+        "bytes": 102634,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-23-1086.webp",
@@ -806,31 +1128,45 @@
   "assets/gallery/gallery-24.jpeg": {
     "bytes": 152540,
     "height": 1086,
-    "quality": 77,
+    "quality": null,
     "webp": [
       {
-        "bytes": 14242,
+        "bytes": 5190,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-24-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 9416,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-24-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 14258,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-24-480.webp",
         "width": 480
       },
       {
-        "bytes": 32254,
+        "bytes": 32222,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-24-768.webp",
         "width": 768
       },
       {
-        "bytes": 60030,
+        "bytes": 60034,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-24-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 90908,
+        "bytes": 90922,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-24-1448.webp",
@@ -842,24 +1178,38 @@
   "assets/gallery/gallery-25.jpeg": {
     "bytes": 153499,
     "height": 1448,
-    "quality": 72,
+    "quality": null,
     "webp": [
       {
-        "bytes": 31052,
+        "bytes": 10626,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-25-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 20028,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-25-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 31036,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-25-480.webp",
         "width": 480
       },
       {
-        "bytes": 62996,
+        "bytes": 63080,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-25-768.webp",
         "width": 768
       },
       {
-        "bytes": 102634,
+        "bytes": 102678,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-25-1086.webp",
@@ -871,31 +1221,45 @@
   "assets/gallery/gallery-26.jpeg": {
     "bytes": 153387,
     "height": 1086,
-    "quality": 51,
+    "quality": null,
     "webp": [
       {
-        "bytes": 28744,
+        "bytes": 10016,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-26-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18398,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-26-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 28770,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-26-480.webp",
         "width": 480
       },
       {
-        "bytes": 59990,
+        "bytes": 59974,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-26-768.webp",
         "width": 768
       },
       {
-        "bytes": 100212,
+        "bytes": 100094,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-26-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 150300,
+        "bytes": 150362,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-26-1448.webp",
@@ -907,38 +1271,52 @@
   "assets/gallery/gallery-27.jpeg": {
     "bytes": 153343,
     "height": 1024,
-    "quality": 38,
+    "quality": null,
     "webp": [
       {
-        "bytes": 34860,
+        "bytes": 11966,
+        "height": 160,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-27-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 22764,
+        "height": 240,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-27-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 34840,
         "height": 320,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-27-480.webp",
         "width": 480
       },
       {
-        "bytes": 72840,
+        "bytes": 72856,
         "height": 512,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-27-768.webp",
         "width": 768
       },
       {
-        "bytes": 114674,
+        "bytes": 115928,
         "height": 724,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-27-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 150122,
+        "bytes": 150420,
         "height": 965,
         "quality": 60,
         "src": "assets/variants/gallery/gallery-27-1448.webp",
         "width": 1448
       },
       {
-        "bytes": 149398,
+        "bytes": 149560,
         "height": 1024,
         "quality": 54,
         "src": "assets/variants/gallery/gallery-27-1536.webp",
@@ -950,24 +1328,38 @@
   "assets/gallery/gallery-28.jpeg": {
     "bytes": 153530,
     "height": 1448,
-    "quality": 65,
+    "quality": null,
     "webp": [
       {
-        "bytes": 35452,
+        "bytes": 11330,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-28-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 22162,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-28-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 35438,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-28-480.webp",
         "width": 480
       },
       {
-        "bytes": 74168,
+        "bytes": 74138,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-28-768.webp",
         "width": 768
       },
       {
-        "bytes": 121162,
+        "bytes": 121200,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-28-1086.webp",
@@ -979,24 +1371,38 @@
   "assets/gallery/gallery-29.jpeg": {
     "bytes": 144960,
     "height": 1448,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 23196,
+        "bytes": 8700,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-29-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15504,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-29-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 23190,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-29-480.webp",
         "width": 480
       },
       {
-        "bytes": 44134,
+        "bytes": 44066,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-29-768.webp",
         "width": 768
       },
       {
-        "bytes": 70466,
+        "bytes": 70446,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-29-1086.webp",
@@ -1008,24 +1414,38 @@
   "assets/gallery/gallery-30.jpeg": {
     "bytes": 152688,
     "height": 1448,
-    "quality": 82,
+    "quality": null,
     "webp": [
       {
-        "bytes": 26290,
+        "bytes": 9892,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-30-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 17770,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-30-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 26280,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-30-480.webp",
         "width": 480
       },
       {
-        "bytes": 50354,
+        "bytes": 50406,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-30-768.webp",
         "width": 768
       },
       {
-        "bytes": 79728,
+        "bytes": 79516,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-30-1086.webp",
@@ -1037,24 +1457,38 @@
   "assets/gallery/gallery-31.jpeg": {
     "bytes": 141823,
     "height": 1448,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 22898,
+        "bytes": 8508,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-31-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15394,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-31-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 22800,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-31-480.webp",
         "width": 480
       },
       {
-        "bytes": 42500,
+        "bytes": 42494,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-31-768.webp",
         "width": 768
       },
       {
-        "bytes": 66112,
+        "bytes": 66160,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-31-1086.webp",
@@ -1066,24 +1500,38 @@
   "assets/gallery/gallery-32.jpeg": {
     "bytes": 153446,
     "height": 1448,
-    "quality": 79,
+    "quality": null,
     "webp": [
       {
-        "bytes": 25694,
+        "bytes": 8680,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-32-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16332,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-32-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 25626,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-32-480.webp",
         "width": 480
       },
       {
-        "bytes": 52084,
+        "bytes": 52002,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-32-768.webp",
         "width": 768
       },
       {
-        "bytes": 86036,
+        "bytes": 86088,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-32-1086.webp",
@@ -1095,24 +1543,38 @@
   "assets/gallery/gallery-33.jpeg": {
     "bytes": 153442,
     "height": 1448,
-    "quality": 71,
+    "quality": null,
     "webp": [
       {
-        "bytes": 32960,
+        "bytes": 11442,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-33-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 21456,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-33-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 32926,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-33-480.webp",
         "width": 480
       },
       {
-        "bytes": 66706,
+        "bytes": 66978,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-33-768.webp",
         "width": 768
       },
       {
-        "bytes": 107954,
+        "bytes": 107944,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-33-1086.webp",
@@ -1124,24 +1586,38 @@
   "assets/gallery/gallery-34.jpeg": {
     "bytes": 153113,
     "height": 1448,
-    "quality": 73,
+    "quality": null,
     "webp": [
       {
-        "bytes": 29794,
+        "bytes": 9790,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-34-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18882,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-34-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 29762,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-34-480.webp",
         "width": 480
       },
       {
-        "bytes": 62148,
+        "bytes": 62118,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-34-768.webp",
         "width": 768
       },
       {
-        "bytes": 101696,
+        "bytes": 100782,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-34-1086.webp",
@@ -1153,24 +1629,38 @@
   "assets/gallery/gallery-35.jpeg": {
     "bytes": 152801,
     "height": 1448,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 32582,
+        "bytes": 11036,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-35-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 20880,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-35-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 32552,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-35-480.webp",
         "width": 480
       },
       {
-        "bytes": 66228,
+        "bytes": 66032,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-35-768.webp",
         "width": 768
       },
       {
-        "bytes": 108128,
+        "bytes": 108002,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-35-1086.webp",
@@ -1182,31 +1672,45 @@
   "assets/gallery/gallery-36.jpeg": {
     "bytes": 153560,
     "height": 1086,
-    "quality": 73,
+    "quality": null,
     "webp": [
       {
-        "bytes": 21154,
+        "bytes": 8094,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-36-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 13970,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-36-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 21198,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-36-480.webp",
         "width": 480
       },
       {
-        "bytes": 40788,
+        "bytes": 40922,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-36-768.webp",
         "width": 768
       },
       {
-        "bytes": 65816,
+        "bytes": 65788,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-36-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 94294,
+        "bytes": 94306,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-36-1448.webp",
@@ -1218,31 +1722,45 @@
   "assets/gallery/gallery-37.jpeg": {
     "bytes": 153535,
     "height": 1086,
-    "quality": 60,
+    "quality": null,
     "webp": [
       {
-        "bytes": 23724,
+        "bytes": 7938,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-37-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15262,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-37-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 23612,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-37-480.webp",
         "width": 480
       },
       {
-        "bytes": 49778,
+        "bytes": 49780,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-37-768.webp",
         "width": 768
       },
       {
-        "bytes": 86630,
+        "bytes": 86692,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-37-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 130152,
+        "bytes": 130450,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-37-1448.webp",
@@ -1254,24 +1772,38 @@
   "assets/gallery/gallery-38.jpeg": {
     "bytes": 153181,
     "height": 1448,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 34816,
+        "bytes": 11944,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-38-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 22684,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-38-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 34746,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-38-480.webp",
         "width": 480
       },
       {
-        "bytes": 67870,
+        "bytes": 67886,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-38-768.webp",
         "width": 768
       },
       {
-        "bytes": 110874,
+        "bytes": 110848,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-38-1086.webp",
@@ -1283,31 +1815,45 @@
   "assets/gallery/gallery-39.jpeg": {
     "bytes": 152850,
     "height": 1086,
-    "quality": 60,
+    "quality": null,
     "webp": [
       {
-        "bytes": 24704,
+        "bytes": 8230,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-39-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15348,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-39-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 24730,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-39-480.webp",
         "width": 480
       },
       {
-        "bytes": 51974,
+        "bytes": 51640,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-39-768.webp",
         "width": 768
       },
       {
-        "bytes": 89138,
+        "bytes": 89068,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-39-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 129972,
+        "bytes": 129952,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-39-1448.webp",
@@ -1319,24 +1865,38 @@
   "assets/gallery/gallery-40.jpeg": {
     "bytes": 153183,
     "height": 1448,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 33714,
+        "bytes": 12226,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-40-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 22436,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-40-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 33776,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-40-480.webp",
         "width": 480
       },
       {
-        "bytes": 63940,
+        "bytes": 63864,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-40-768.webp",
         "width": 768
       },
       {
-        "bytes": 102804,
+        "bytes": 102840,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-40-1086.webp",
@@ -1348,10 +1908,24 @@
   "assets/gallery/gallery-41.jpeg": {
     "bytes": 153193,
     "height": 1448,
-    "quality": 79,
+    "quality": null,
     "webp": [
       {
-        "bytes": 28072,
+        "bytes": 10250,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-41-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18696,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-41-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 28062,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-41-480.webp",
@@ -1365,7 +1939,7 @@
         "width": 768
       },
       {
-        "bytes": 86306,
+        "bytes": 86230,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-41-1086.webp",
@@ -1377,24 +1951,38 @@
   "assets/gallery/gallery-42.jpeg": {
     "bytes": 153158,
     "height": 1448,
-    "quality": 72,
+    "quality": null,
     "webp": [
       {
-        "bytes": 32458,
+        "bytes": 11358,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-42-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 21130,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-42-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 32490,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-42-480.webp",
         "width": 480
       },
       {
-        "bytes": 63654,
+        "bytes": 63680,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-42-768.webp",
         "width": 768
       },
       {
-        "bytes": 101502,
+        "bytes": 101480,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-42-1086.webp",
@@ -1406,24 +1994,38 @@
   "assets/gallery/gallery-43.jpeg": {
     "bytes": 153393,
     "height": 1448,
-    "quality": 60,
+    "quality": null,
     "webp": [
       {
-        "bytes": 36048,
+        "bytes": 11224,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-43-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 22310,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-43-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 36064,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-43-480.webp",
         "width": 480
       },
       {
-        "bytes": 79750,
+        "bytes": 79778,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-43-768.webp",
         "width": 768
       },
       {
-        "bytes": 135384,
+        "bytes": 135476,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-43-1086.webp",
@@ -1435,31 +2037,45 @@
   "assets/gallery/gallery-44.jpeg": {
     "bytes": 153513,
     "height": 1086,
-    "quality": 56,
+    "quality": null,
     "webp": [
       {
-        "bytes": 26318,
+        "bytes": 8756,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-44-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16634,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-44-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 26292,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-44-480.webp",
         "width": 480
       },
       {
-        "bytes": 54254,
+        "bytes": 54538,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-44-768.webp",
         "width": 768
       },
       {
-        "bytes": 91584,
+        "bytes": 91602,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-44-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 132730,
+        "bytes": 132750,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-44-1448.webp",
@@ -1471,24 +2087,38 @@
   "assets/gallery/gallery-45.jpeg": {
     "bytes": 152359,
     "height": 1448,
-    "quality": 75,
+    "quality": null,
     "webp": [
       {
-        "bytes": 29462,
+        "bytes": 10184,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-45-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 19164,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-45-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 29490,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-45-480.webp",
         "width": 480
       },
       {
-        "bytes": 57000,
+        "bytes": 56948,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-45-768.webp",
         "width": 768
       },
       {
-        "bytes": 90372,
+        "bytes": 90342,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-45-1086.webp",
@@ -1500,24 +2130,38 @@
   "assets/gallery/gallery-46.jpeg": {
     "bytes": 152946,
     "height": 1448,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 32304,
+        "bytes": 10754,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-46-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 20768,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-46-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 32326,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-46-480.webp",
         "width": 480
       },
       {
-        "bytes": 67396,
+        "bytes": 67494,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-46-768.webp",
         "width": 768
       },
       {
-        "bytes": 112126,
+        "bytes": 112106,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-46-1086.webp",
@@ -1529,24 +2173,38 @@
   "assets/gallery/gallery-47.jpeg": {
     "bytes": 153522,
     "height": 1448,
-    "quality": 65,
+    "quality": null,
     "webp": [
       {
-        "bytes": 34792,
+        "bytes": 11330,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-47-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 21948,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-47-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 34688,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-47-480.webp",
         "width": 480
       },
       {
-        "bytes": 71538,
+        "bytes": 71526,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-47-768.webp",
         "width": 768
       },
       {
-        "bytes": 117504,
+        "bytes": 117400,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-47-1086.webp",
@@ -1558,24 +2216,38 @@
   "assets/gallery/gallery-48.jpeg": {
     "bytes": 153270,
     "height": 1448,
-    "quality": 81,
+    "quality": null,
     "webp": [
       {
-        "bytes": 24880,
+        "bytes": 9414,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-48-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 16654,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-48-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 24828,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-48-480.webp",
         "width": 480
       },
       {
-        "bytes": 48918,
+        "bytes": 48802,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-48-768.webp",
         "width": 768
       },
       {
-        "bytes": 79372,
+        "bytes": 79436,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-48-1086.webp",
@@ -1587,24 +2259,38 @@
   "assets/gallery/gallery-49.jpeg": {
     "bytes": 153527,
     "height": 1448,
-    "quality": 70,
+    "quality": null,
     "webp": [
       {
-        "bytes": 33008,
+        "bytes": 11810,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-49-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 21640,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-49-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 32998,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-49-480.webp",
         "width": 480
       },
       {
-        "bytes": 65896,
+        "bytes": 66322,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-49-768.webp",
         "width": 768
       },
       {
-        "bytes": 109798,
+        "bytes": 108950,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-49-1086.webp",
@@ -1616,24 +2302,38 @@
   "assets/gallery/gallery-50.jpeg": {
     "bytes": 152669,
     "height": 1448,
-    "quality": 72,
+    "quality": null,
     "webp": [
       {
-        "bytes": 29864,
+        "bytes": 9880,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-50-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18690,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-50-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 29850,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-50-480.webp",
         "width": 480
       },
       {
-        "bytes": 63776,
+        "bytes": 63782,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-50-768.webp",
         "width": 768
       },
       {
-        "bytes": 105736,
+        "bytes": 105744,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-50-1086.webp",
@@ -1645,31 +2345,45 @@
   "assets/gallery/gallery-51.jpeg": {
     "bytes": 153534,
     "height": 1086,
-    "quality": 71,
+    "quality": null,
     "webp": [
       {
-        "bytes": 20656,
+        "bytes": 6748,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-51-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 13194,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-51-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 20674,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-51-480.webp",
         "width": 480
       },
       {
-        "bytes": 44356,
+        "bytes": 44336,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-51-768.webp",
         "width": 768
       },
       {
-        "bytes": 75636,
+        "bytes": 75642,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-51-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 108348,
+        "bytes": 108310,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-51-1448.webp",
@@ -1681,31 +2395,45 @@
   "assets/gallery/gallery-52.jpeg": {
     "bytes": 153085,
     "height": 1086,
-    "quality": 73,
+    "quality": null,
     "webp": [
       {
-        "bytes": 20022,
+        "bytes": 7698,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-52-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 13492,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-52-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 20012,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-52-480.webp",
         "width": 480
       },
       {
-        "bytes": 39404,
+        "bytes": 39290,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-52-768.webp",
         "width": 768
       },
       {
-        "bytes": 64802,
+        "bytes": 64634,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-52-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 98400,
+        "bytes": 98254,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-52-1448.webp",
@@ -1717,24 +2445,38 @@
   "assets/gallery/gallery-53.jpeg": {
     "bytes": 153579,
     "height": 1448,
-    "quality": 61,
+    "quality": null,
     "webp": [
       {
-        "bytes": 38248,
+        "bytes": 13900,
+        "height": 320,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-53-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 25202,
+        "height": 480,
+        "quality": 72,
+        "src": "assets/variants/gallery/gallery-53-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 38182,
         "height": 640,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-53-480.webp",
         "width": 480
       },
       {
-        "bytes": 74632,
+        "bytes": 74268,
         "height": 1024,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-53-768.webp",
         "width": 768
       },
       {
-        "bytes": 115586,
+        "bytes": 116346,
         "height": 1448,
         "quality": 72,
         "src": "assets/variants/gallery/gallery-53-1086.webp",
@@ -1746,17 +2488,24 @@
   "assets/menu/menu-1.jpeg": {
     "bytes": 153339,
     "height": 1103,
-    "quality": 21,
+    "quality": null,
     "webp": [
       {
-        "bytes": 76044,
+        "bytes": 45748,
+        "height": 371,
+        "quality": 72,
+        "src": "assets/variants/menu/menu-1-480.webp",
+        "width": 480
+      },
+      {
+        "bytes": 75974,
         "height": 495,
         "quality": 72,
         "src": "assets/variants/menu/menu-1-640.webp",
         "width": 640
       },
       {
-        "bytes": 145772,
+        "bytes": 145740,
         "height": 743,
         "quality": 66,
         "src": "assets/variants/menu/menu-1-960.webp",
@@ -1768,17 +2517,24 @@
   "assets/menu/menu-2.jpeg": {
     "bytes": 153346,
     "height": 1103,
-    "quality": 25,
+    "quality": null,
     "webp": [
       {
-        "bytes": 73606,
+        "bytes": 44554,
+        "height": 371,
+        "quality": 72,
+        "src": "assets/variants/menu/menu-2-480.webp",
+        "width": 480
+      },
+      {
+        "bytes": 73054,
         "height": 495,
         "quality": 72,
         "src": "assets/variants/menu/menu-2-640.webp",
         "width": 640
       },
       {
-        "bytes": 144892,
+        "bytes": 142874,
         "height": 743,
         "quality": 72,
         "src": "assets/variants/menu/menu-2-960.webp",
@@ -1790,24 +2546,38 @@
   "assets/restaurant/marjorie-gaboyau.jpeg": {
     "bytes": 110302,
     "height": 1537,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 16282,
+        "bytes": 6866,
+        "height": 361,
+        "quality": 72,
+        "src": "assets/variants/restaurant/marjorie-gaboyau-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 11194,
+        "height": 541,
+        "quality": 72,
+        "src": "assets/variants/restaurant/marjorie-gaboyau-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 16272,
         "height": 721,
         "quality": 72,
         "src": "assets/variants/restaurant/marjorie-gaboyau-480.webp",
         "width": 480
       },
       {
-        "bytes": 29830,
+        "bytes": 29820,
         "height": 1154,
         "quality": 72,
         "src": "assets/variants/restaurant/marjorie-gaboyau-768.webp",
         "width": 768
       },
       {
-        "bytes": 44960,
+        "bytes": 44980,
         "height": 1537,
         "quality": 72,
         "src": "assets/variants/restaurant/marjorie-gaboyau-1023.webp",
@@ -1819,24 +2589,38 @@
   "assets/restaurant/oswald-gaboyau.jpeg": {
     "bytes": 117047,
     "height": 1537,
-    "quality": 84,
+    "quality": null,
     "webp": [
       {
-        "bytes": 16696,
+        "bytes": 6816,
+        "height": 361,
+        "quality": 72,
+        "src": "assets/variants/restaurant/oswald-gaboyau-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 11408,
+        "height": 541,
+        "quality": 72,
+        "src": "assets/variants/restaurant/oswald-gaboyau-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 16688,
         "height": 721,
         "quality": 72,
         "src": "assets/variants/restaurant/oswald-gaboyau-480.webp",
         "width": 480
       },
       {
-        "bytes": 32686,
+        "bytes": 32720,
         "height": 1154,
         "quality": 72,
         "src": "assets/variants/restaurant/oswald-gaboyau-768.webp",
         "width": 768
       },
       {
-        "bytes": 52176,
+        "bytes": 52178,
         "height": 1537,
         "quality": 72,
         "src": "assets/variants/restaurant/oswald-gaboyau-1023.webp",
@@ -1848,31 +2632,45 @@
   "assets/restaurant/seven-wonders-dining-room-art.jpeg": {
     "bytes": 153305,
     "height": 1086,
-    "quality": 54,
+    "quality": null,
     "webp": [
       {
-        "bytes": 24788,
+        "bytes": 8256,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/restaurant/seven-wonders-dining-room-art-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 15632,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/restaurant/seven-wonders-dining-room-art-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 24752,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-art-480.webp",
         "width": 480
       },
       {
-        "bytes": 52874,
+        "bytes": 52844,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-art-768.webp",
         "width": 768
       },
       {
-        "bytes": 91432,
+        "bytes": 91430,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-art-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 133722,
+        "bytes": 133772,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-art-1448.webp",
@@ -1884,31 +2682,45 @@
   "assets/restaurant/seven-wonders-dining-room-front.jpeg": {
     "bytes": 153533,
     "height": 1086,
-    "quality": 51,
+    "quality": null,
     "webp": [
       {
-        "bytes": 29388,
+        "bytes": 10126,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/restaurant/seven-wonders-dining-room-front-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 18940,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/restaurant/seven-wonders-dining-room-front-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 29406,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-front-480.webp",
         "width": 480
       },
       {
-        "bytes": 58908,
+        "bytes": 58796,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-front-768.webp",
         "width": 768
       },
       {
-        "bytes": 97380,
+        "bytes": 97098,
         "height": 814,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-front-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 139706,
+        "bytes": 139520,
         "height": 1086,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-dining-room-front-1448.webp",
@@ -1920,31 +2732,45 @@
   "assets/restaurant/seven-wonders-exterior.jpeg": {
     "bytes": 153393,
     "height": 960,
-    "quality": 37,
+    "quality": null,
     "webp": [
       {
-        "bytes": 42158,
+        "bytes": 13282,
+        "height": 180,
+        "quality": 72,
+        "src": "assets/variants/restaurant/seven-wonders-exterior-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 26390,
+        "height": 270,
+        "quality": 72,
+        "src": "assets/variants/restaurant/seven-wonders-exterior-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 42102,
         "height": 360,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-exterior-480.webp",
         "width": 480
       },
       {
-        "bytes": 89740,
+        "bytes": 89788,
         "height": 576,
         "quality": 72,
         "src": "assets/variants/restaurant/seven-wonders-exterior-768.webp",
         "width": 768
       },
       {
-        "bytes": 145918,
+        "bytes": 145864,
         "height": 814,
         "quality": 66,
         "src": "assets/variants/restaurant/seven-wonders-exterior-1086.webp",
         "width": 1086
       },
       {
-        "bytes": 149070,
+        "bytes": 149122,
         "height": 960,
         "quality": 48,
         "src": "assets/variants/restaurant/seven-wonders-exterior-1280.webp",

@@ -175,9 +175,13 @@ that makes the static site more production-ready.
   and `loading` attributes, including images built in JavaScript.
 - Homepage hero and page hero images are eager/high priority; below-fold images
   are lazy.
-- `scripts/optimize-images.py` re-encodes original JPEGs under the 150 KiB
-  target, creates responsive WebP variants in `assets/variants/`, and writes
-  `js/image-meta.js`.
+- `scripts/optimize-images.py` re-encodes only oversized original JPEGs under
+  the 150 KiB target, creates responsive WebP variants in `assets/variants/`,
+  removes stale generated variants, and writes `js/image-meta.js`.
+- Gallery and restaurant photos include 240px/360px WebP candidates, so mobile
+  gallery tiles and menu thumbnails no longer start at a 480px download.
+- The gallery preloader uses the responsive image metadata and only warms the
+  next page, instead of quietly preloading current/next pages as full JPEGs.
 - Menu scans keep full-size JPEG links for legibility, but inline display uses
   responsive WebP candidates instead of forcing the largest scan.
 - Run the optimizer with:
@@ -187,8 +191,9 @@ C:\Users\Asus\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\py
 ```
 
 The content test now enforces the budget: no raster asset can exceed 153,600
-bytes, the manifest must cover every original raster, and all generated WebP
-variants must exist and remain under budget.
+bytes, the manifest must cover every original raster, all generated WebP
+variants must exist and remain under budget, stale WebP variants are rejected,
+and gallery/restaurant images must include small mobile/thumbnail candidates.
 
 Measured unique rendered image bytes, using the current browser-selected image
 URLs for the after column and `HEAD` JPEG sources for the before column:

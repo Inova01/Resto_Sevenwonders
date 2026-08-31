@@ -165,8 +165,10 @@ console.log("\n=== 1c. Image performance budget ===");
     missingMeta.join(", "));
 
   const badVariants = [];
+  const declaredVariants = new Set();
   Object.keys(META).forEach(src => {
     (META[src].webp || []).forEach(v => {
+      declaredVariants.add(v.src);
       const abs = path.join(ROOT, v.src.replace(/\//g, path.sep));
       if (!fs.existsSync(abs)) badVariants.push(v.src + " missing");
       else if (fs.statSync(abs).size > ASSET_BUDGET) badVariants.push(v.src + " over budget");
@@ -175,6 +177,22 @@ console.log("\n=== 1c. Image performance budget ===");
   check("all generated WebP variants exist and stay under budget",
     badVariants.length === 0,
     badVariants.join(", "));
+
+  const staleVariants = rasterFiles
+    .filter(file => path.relative(assetsDir, file).startsWith("variants" + path.sep))
+    .map(file => path.relative(ROOT, file).replace(/\\/g, "/"))
+    .filter(src => !declaredVariants.has(src));
+  check("no stale WebP variants are left behind",
+    staleVariants.length === 0,
+    staleVariants.join(", "));
+
+  const missingSmallVariants = originals.filter(src => !src.startsWith("assets/menu/")).filter(src => {
+    const widths = ((META[src] || {}).webp || []).map(v => v.width);
+    return Math.max.apply(null, widths.filter(w => w <= 360)) < Math.min(360, META[src].width);
+  });
+  check("images include small mobile/thumbnail WebP candidates",
+    missingSmallVariants.length === 0,
+    missingSmallVariants.join(", "));
 }
 
 console.log("\n=== 2. Helpers ===");

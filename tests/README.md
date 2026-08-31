@@ -9,11 +9,13 @@ any page, so they cost visitors nothing.
 node tests/check-content.js
 ```
 
-78 checks on the content layer. Runs the real `content/*.js` and `js/content.js`
+80 checks on the content layer. Runs the real `content/*.js` and `js/content.js`
 in a minimal fake browser and asserts the things that would actually break the
 site:
 
 - every image path referenced anywhere exists on disk
+- every original/variant image stays under budget, with no stale generated
+  WebP files left behind
 - the Stripe checkout functions use server-side secrets plus shop/menu server catalogs
 - dish ids are unique; `featuredIds` and the pinned daily special resolve
 - every homepage photo is in the gallery list
@@ -34,11 +36,11 @@ npm install jsdom      # once, anywhere on the path
 node tests/check-pages.js
 ```
 
-280 checks. Renders each real page in jsdom, runs every one of the site's
+281 checks. Renders each real page in jsdom, runs every one of the site's
 scripts in document order, and asserts what a guest would see: the right
 address in the footer, prices pulled from the menu, sections that hide
 themselves when empty, the forms admitting they are not connected instead of
-faking success, the shared cart drawer, the menu/shop Stripe checkout fallbacks,
+faking success, responsive image loading, the shared cart drawer, the menu/shop Stripe checkout fallbacks,
 and the dashboard — every screen rendering, and an edit turning into valid
 publishable files.
 

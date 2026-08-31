@@ -110,13 +110,22 @@
       return btn;
     }
 
-    /* Preload current page + next page for snappy paging. */
+    /* Preload the next page for snappy paging without forcing full JPEGs. */
     function preload(p) {
-      const start = p * perPage;
-      const end = Math.min(GALLERY_IMAGES.length, start + perPage * 2);
+      const start = (p + 1) * perPage;
+      const end = Math.min(GALLERY_IMAGES.length, start + perPage);
+      const sizes = "(max-width: 620px) 50vw, (max-width: 992px) 33vw, 25vw";
       for (let i = start; i < end; i++) {
+        const src = GALLERY_IMAGES[i];
         const im = new Image();
-        im.src = GALLERY_IMAGES[i];
+        if (window.SWImage) {
+          const attrs = window.SWImage.attrs(src, { loading: "eager", sizes });
+          if (attrs.srcset) im.srcset = attrs.srcset;
+          if (attrs.sizes) im.sizes = attrs.sizes;
+          im.src = attrs.src;
+        } else {
+          im.src = src;
+        }
       }
     }
 
