@@ -25,7 +25,7 @@ window.SW_CONTENT.home = {
     lead:
       "Fresh patties in the morning, griot and tasso off the grill, " +
       "and Special Menu Night when the fish comes in.",
-    primaryCta: { label: "Book A Table", href: "reservation.html" },
+    primaryCta: { label: "Pay Online", href: "shop.html" },
     secondaryCta: { label: "View Menu", href: "menu.html" },
     /* Hero background. Change from the dashboard's photo picker. */
     image: "assets/gallery/gallery-07.jpeg",
@@ -88,10 +88,10 @@ window.SW_CONTENT.home = {
   },
 
   ctaBanner: {
-    eyebrow: "Reserve Your Table",
+    eyebrow: "Order & Pay Online",
     title: "Come and Eat",
-    lead: "Book a table, or order ahead for pickup and delivery.",
-    cta: { label: "Book A Table", href: "reservation.html" },
+    lead: "Choose your favorites online now. Stripe checkout is wired in and ready for the restaurant account.",
+    cta: { label: "Pay Now", href: "shop.html" },
     image: "assets/gallery/gallery-09.jpeg"
   },
 
@@ -99,7 +99,7 @@ window.SW_CONTENT.home = {
      from content/menu.js → dailySpecial) */
   menuOfDay: {
     badge: "Menu of the Day",
-    ctaLabel: "Book A Table",
-    ctaHref: "reservation.html"
+    ctaLabel: "Pay Now",
+    ctaHref: "shop.html"
   }
 };

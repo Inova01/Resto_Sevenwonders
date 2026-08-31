@@ -330,6 +330,8 @@ console.log("\n=== shop.html ===");
     text(doc.querySelector("#cart-total")) === "$0.00");
   check("blank payment links keep the regular cart flow",
     doc.querySelectorAll("[data-payment-link]").length === 0);
+  check("every available shop product shows a Pay Now button",
+    doc.querySelectorAll(".product-card [data-buy-now]").length === cards.length);
   const firstAdd = doc.querySelector("[data-add-to-cart]");
   firstAdd.dispatchEvent(new doc.defaultView.Event("click", { bubbles: true }));
   check("adding a product creates a real cart line",
@@ -366,9 +368,10 @@ console.log("\n=== shop.html ===");
     text(doc.querySelector("#checkout-status")),
     text(doc.querySelector("#cart-payment-note"))
   ].filter(Boolean).join(" ");
-  check("Pay button is hidden when no payment route is configured",
-    doc.querySelector("#stripe-checkout").hidden === true &&
-    /not connected yet/i.test(paymentFallback),
+  check("Pay button stays visible while Stripe setup is pending",
+    doc.querySelector("#stripe-checkout").hidden === false &&
+    doc.querySelector("#stripe-checkout").disabled === false &&
+    /integrated.+Stripe.+connected/i.test(paymentFallback),
     "hidden=" + doc.querySelector("#stripe-checkout").hidden + " text=" + paymentFallback);
   let postedCart = null;
   doc.defaultView.SWPayment.state.available = true;
@@ -535,9 +538,9 @@ console.log("\n=== menu.html ===");
   check("hidden photos are kept out of the gallery",
     !/oswald-gaboyau|marjorie-gaboyau/.test(doc.querySelector("#mgal").innerHTML));
   check("order builder present", !!doc.querySelector("#order-form"));
-  check("menu Pay button is hidden when checkout is unavailable",
-    doc.querySelector("#order-pay").hidden === true &&
-    /Online payment and order sending are not connected yet/i.test(text(doc.querySelector("#order-pay-note"))));
+  check("menu Pay button stays visible when checkout setup is pending",
+    doc.querySelector("#order-pay").hidden === false &&
+    /integrated.+Stripe.+connected/i.test(text(doc.querySelector("#order-pay-note"))));
   check("menu keeps a secondary order path",
     /Send order without paying/.test(text(doc.querySelector("#order-send"))));
   check("reservation widget also on this page", !!doc.querySelector("#calendar"));
@@ -568,8 +571,9 @@ console.log("\n=== menu.html ===");
   d.querySelector("#o-time").value = "Today 7:00 PM";
   w.SWPayment.state.available = true;
   d.dispatchEvent(new w.CustomEvent("sw:payment-capability", { detail: w.SWPayment.state }));
-  check("menu Pay button appears only when checkout is available",
-    d.querySelector("#order-pay").hidden === false);
+  check("menu Pay button is ready when checkout is available",
+    d.querySelector("#order-pay").hidden === false &&
+    d.querySelector("#order-pay").disabled === false);
   d.querySelector("#order-pay").dispatchEvent(new w.Event("click", { bubbles: true }));
   check("menu Pay posts ids, quantities and customer details only",
     postedOrder &&
@@ -623,7 +627,8 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
   });
   check("non-Stripe payment links are ignored",
     !invalid.doc.querySelector("[data-payment-link]") &&
-    !!invalid.doc.querySelector("[data-add-to-cart]"));
+    !!invalid.doc.querySelector("[data-add-to-cart]") &&
+    !!invalid.doc.querySelector("[data-buy-now]"));
 
   /* The two spoofs that defeat a naive host check: a lookalike suffix
      domain, and a host smuggled into the userinfo position. Both must
@@ -640,7 +645,8 @@ console.log("\n=== preview mode (?preview=1 with a draft) ===");
     });
     check("payment link rejected: " + label,
       !spoof.doc.querySelector("[data-payment-link]") &&
-      !!spoof.doc.querySelector("[data-add-to-cart]"), url);
+      !!spoof.doc.querySelector("[data-add-to-cart]") &&
+      !!spoof.doc.querySelector("[data-buy-now]"), url);
   });
 
   const mixed = loadPage("shop.html", {

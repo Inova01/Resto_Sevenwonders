@@ -181,7 +181,7 @@
       "<div class=\"cart-items\" id=\"cart-items\"></div>" +
       "<div class=\"cart-total\"><span>Total before tax</span><strong id=\"cart-total\">$0.00</strong></div>" +
       "<p class=\"cart-note\" id=\"cart-payment-note\"></p>" +
-      "<button class=\"btn btn--primary btn--block\" type=\"button\" id=\"stripe-checkout\" hidden>Pay Now</button>" +
+      "<button class=\"btn btn--primary btn--block\" type=\"button\" id=\"stripe-checkout\">Pay Now</button>" +
       "<button class=\"btn btn--ghost btn--block\" type=\"button\" data-cart-clear>Clear cart</button>" +
       "<p class=\"form-status\" id=\"checkout-status\"></p>";
 
@@ -242,14 +242,14 @@
     if (clear) clear.disabled = !hasRows;
     if (!checkout) return;
 
-    checkout.hidden = !hasRows || !available;
-    checkout.disabled = !hasRows || !available;
+    checkout.hidden = !hasRows;
+    checkout.disabled = !hasRows;
     if (note) {
       note.textContent = !hasRows
         ? "Add items from the Shop page, then open this cart from anywhere on the site."
         : available
           ? "Pay Now opens Stripe. Final tax, pickup details and card information are handled securely there."
-          : ((window.SWPayment && SWPayment.fallbackMessage()) || "Online payment is not connected yet.");
+          : "Pay Now is integrated and will open Stripe as soon as the restaurant account is connected.";
     }
     if (status && hasRows && !available) {
       status.className = "form-status show warn";
@@ -316,6 +316,14 @@
     if (!productById(id)) return;
     changeQty(id, 1);
   }
+  function buyNow(id) {
+    if (!productById(id)) return;
+    addToCart(id);
+    renderBadge(true);
+    openCartDrawer();
+    const checkout = $("#stripe-checkout");
+    if (checkout && !checkout.disabled) checkout.focus();
+  }
   async function startStripeCheckout() {
     const btn = $("#stripe-checkout");
     if (!btn) return;
@@ -367,16 +375,23 @@
         openCartDrawer();
       });
     });
-    $$("[data-add-to-cart]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = btn.getAttribute("data-add-to-cart");
-        addToCart(id);
-        renderBadge(true);
-        const original = btn.dataset.label || btn.innerHTML;
-        btn.dataset.label = original;
-        btn.textContent = "Added";
-        setTimeout(() => { btn.innerHTML = original; }, 1200);
-      });
+    document.addEventListener("click", (e) => {
+      const buy = e.target.closest ? e.target.closest("[data-buy-now]") : null;
+      if (buy) {
+        e.preventDefault();
+        buyNow(buy.getAttribute("data-buy-now"));
+        return;
+      }
+
+      const btn = e.target.closest ? e.target.closest("[data-add-to-cart]") : null;
+      if (!btn) return;
+      const id = btn.getAttribute("data-add-to-cart");
+      addToCart(id);
+      renderBadge(true);
+      const original = btn.dataset.label || btn.innerHTML;
+      btn.dataset.label = original;
+      btn.textContent = "Added";
+      setTimeout(() => { btn.innerHTML = original; }, 1200);
     });
     document.addEventListener("keydown", (e) => {
       const drawer = $("#cart-drawer");

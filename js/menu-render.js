@@ -445,7 +445,7 @@
         "</div>" +
         '<div class="field field--full">' +
           '<div class="order-actions">' +
-            '<button type="button" class="btn btn--primary btn--block" id="order-pay" hidden>Pay Now</button>' +
+            '<button type="button" class="btn btn--primary btn--block" id="order-pay">Pay Now</button>' +
             '<button type="submit" class="btn btn--ghost btn--block" id="order-send">Send order without paying</button>' +
           "</div>" +
           '<p class="order-note" id="order-pay-note"></p>' +
@@ -560,18 +560,16 @@
     var hasVariable = lines.some(function (ln) { return typeof ln.price !== "number"; });
     var paymentReady = !!(window.SWPayment && SWPayment.state.available);
 
-    pay.hidden = !paymentReady;
     pay.disabled = !hasLines || hasVariable;
     if (paymentReady) {
       note.textContent = hasVariable
         ? "Items with variable prices must be confirmed by staff before payment."
         : "Pay Now opens Stripe for this full order. Use the second button if you want staff to confirm by phone first.";
     } else if (!formsReady()) {
-      note.textContent = "Online payment and order sending are not connected yet. Please call " +
+      note.textContent = "Pay Now is integrated and will open Stripe after the restaurant account is connected. Please call " +
         ((SETTINGS.contact || {}).phone || "904 402 9212") + " to place the order.";
     } else {
-      note.textContent = (window.SWPayment && SWPayment.fallbackMessage())
-        || "Online payment is not connected yet. You can still send the order request below.";
+      note.textContent = "Pay Now is integrated and will open Stripe after the restaurant account is connected. You can still send the order request below.";
     }
   }
 

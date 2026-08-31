@@ -186,7 +186,7 @@
         document.createTextNode("© " + new Date().getFullYear() + " " +
           (b.legalName || b.shortName || "") + (city ? " · " + city : "") + " · ")
       ]);
-      bottom.appendChild(h("a", { href: "reservation.html", text: "Book a table" }));
+      bottom.appendChild(h("a", { href: "shop.html", text: "Pay online" }));
     }
   }
 
@@ -299,17 +299,22 @@
       var actions = [];
       var cartButton = p.inStock === false
         ? h("button", { class: "btn btn--ghost btn--block", type: "button", disabled: true, text: "Sold out" })
-        : h("button", { class: "btn btn--primary btn--block", type: "button", "data-add-to-cart": p.id },
+        : h("button", { class: "btn btn--ghost btn--block", type: "button", "data-add-to-cart": p.id },
             [h("span", { svg: CART_SVG }), document.createTextNode(" Add to cart")]);
       actions.push(cartButton);
-      if (paymentLink && p.inStock !== false) {
-        actions.push(h("a", {
-          class: "btn btn--ghost btn--block btn--express",
-          href: paymentLink,
-          "data-payment-link": "",
-          rel: "noopener",
+      if (p.inStock !== false) {
+        var payAttrs = {
+          class: "btn btn--primary btn--block btn--express",
+          href: paymentLink || "#",
           "aria-label": "Pay for " + p.name + " with Stripe"
-        }, [document.createTextNode("Pay for this item")]));
+        };
+        if (paymentLink) {
+          payAttrs["data-payment-link"] = "";
+          payAttrs.rel = "noopener";
+        } else {
+          payAttrs["data-buy-now"] = p.id;
+        }
+        actions.push(h("a", payAttrs, [document.createTextNode("Pay Now")]));
       }
 
       return h("article", { class: "product-card reveal" + (p.inStock === false ? " is-sold-out" : "") }, [
@@ -326,18 +331,15 @@
 
     function paint() {
       var list = sorted();
-      var hasPaymentLinks = list.some(function (p) {
-        return p.inStock !== false && !!stripePaymentLink(p.paymentLink);
-      });
       var note = $(".shop-pay-note");
-      if (hasPaymentLinks && !note) {
+      if (!note) {
         note = h("p", {
           class: "shop-pay-note",
-          text: "Use Add to cart to combine items. Pay for this item opens Stripe for one product."
+          text: "Use Add to cart to combine items. Pay Now opens checkout for that item and will connect to Stripe when the restaurant account is ready."
         });
         if (grid.parentNode) grid.parentNode.insertBefore(note, grid);
       }
-      if (note) note.hidden = !hasPaymentLinks;
+      if (note) note.hidden = false;
       fill(grid, list.map(card));
       var results = $(".shop-bar .results");
       if (results) {
@@ -528,7 +530,7 @@
           h("span", { class: "event-when", text: SW.formatEventDate(e.date, e.time) }),
           h("h3", { text: e.title }),
           e.genre ? h("p", { class: "event-genre", text: e.genre }) : null,
-          h("a", { class: "btn btn--primary", href: "reservation.html", text: "Reserve this night" })
+          h("a", { class: "btn btn--primary", href: "shop.html", text: "Pay Online" })
         ])
       ]);
     }));

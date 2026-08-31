@@ -93,7 +93,7 @@ window.SW_CONTENT.about = {
   visit: {
     eyebrow: "Visit Us",
     title: "Seven Wonders Restaurant & Bakery",
-    primaryCta: { label: "Book A Table", href: "reservation.html" },
+    primaryCta: { label: "Pay Online", href: "shop.html" },
     secondaryCta: { label: "View Menu", href: "menu.html" }
   }
 };
