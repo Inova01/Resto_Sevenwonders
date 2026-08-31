@@ -258,6 +258,76 @@
     return found;
   };
 
+  function dailySeed(d) {
+    return d.getFullYear() +
+      "-" + String(d.getMonth() + 1).padStart(2, "0") +
+      "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function dailyHash(str) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
+    return h >>> 0;
+  }
+  function dailyPool() {
+    var pool = [];
+    (SW.menu.categories || []).forEach(function (cat) {
+      var subcats = null;
+      if (cat.id === "lunch" || cat.id === "dinner") {
+        subcats = (cat.subcats || []).filter(function (sc) {
+          return /main dish/i.test(sc.label || "");
+        });
+      } else if (cat.id === "special") {
+        subcats = cat.subcats || [];
+      }
+      if (!subcats) return;
+      subcats.forEach(function (sub) {
+        (sub.items || []).forEach(function (it) {
+          if (it.soldOut || typeof it.price !== "number") return;
+          if (/^side\b/i.test(it.name || "")) return;
+          pool.push({ item: it, sub: sub, cat: cat });
+        });
+      });
+    });
+    return pool;
+  }
+  function guardedDailyIndex(pool, target) {
+    var d = new Date(2020, 0, 1);
+    var end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+    var idx = 0, prev = -1;
+    while (d <= end) {
+      idx = dailyHash(dailySeed(d)) % pool.length;
+      if (pool.length > 1 && idx === prev) idx = (idx + 1) % pool.length;
+      prev = idx;
+      d.setDate(d.getDate() + 1);
+    }
+    return idx;
+  }
+  SW.dailySpecialForDate = function (date) {
+    var pool = dailyPool();
+    if (!pool.length) return null;
+    var cfg = SW.menu.dailySpecial || {};
+    if (cfg.mode === "manual" && cfg.itemId) {
+      var pinned = pool.filter(function (row) { return row.item.id === cfg.itemId; })[0];
+      if (pinned) return pinned;
+    }
+    var target = date || new Date();
+    return pool[guardedDailyIndex(pool, target)];
+  };
+  SW.dailySpecialPrice = function (item, date) {
+    if (!item || typeof item.price !== "number") return null;
+    var chosen = SW.dailySpecialForDate(date);
+    var cfg = SW.menu.dailySpecial || {};
+    var pct = Math.max(0, Math.min(90, Number(cfg.discountPercent) || 0));
+    if (chosen && chosen.item && chosen.item.id === item.id && pct > 0) {
+      return Math.round(item.price * (1 - pct / 100) * 2) / 2;
+    }
+    return item.price;
+  };
+
   window.SW = SW;
 
   /* A quiet banner so nobody mistakes a draft for the live site */

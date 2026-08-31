@@ -101,27 +101,43 @@ console.log("\n=== 1d. Stripe payment architecture ===");
 {
   const checkout = read("functions/api/checkout.js");
   const webhook = read("functions/api/stripe-webhook.js");
-  /* Normalise line endings before any text comparison. git checks these
-     files out as CRLF on Windows (core.autocrlf), while the Serializer
-     always emits LF, so a raw comparison passes on Linux and fails on
-     Windows for reasons that have nothing to do with the code. */
-  const lf = (t) => t.replace(/\r\n/g, "\n");
-  const catalogText = lf(read("functions/_shared/shop-catalog.js"));
+  const catalogText = lfAll(read("functions/_shared/shop-catalog.js"));
+  const menuCatalogText = lfAll(read("functions/_shared/menu-catalog.js"));
   const match = /export const SHOP_CATALOG = ([\s\S]*?);\s*\n\nexport function/.exec(catalogText);
   const catalog = match ? JSON.parse(match[1]) : [];
-  check("Stripe checkout function exists and uses a server secret",
-    /STRIPE_SECRET_KEY/.test(checkout) && /api\.stripe\.com\/v1\/checkout\/sessions/.test(checkout));
+  const menuMatch = /export const MENU_CATALOG = ([\s\S]*?);\s*\n\nexport const MENU_DAILY_SPECIAL/.exec(menuCatalogText);
+  const menuCatalog = menuMatch ? JSON.parse(menuMatch[1]) : [];
+  const menuIds = [];
+  SW.eachMenuItem(item => menuIds.push(item.id));
+  SW.menu.drinks.concat(SW.menu.desserts).forEach(item => menuIds.push(item.id));
+  check("Stripe checkout function exists and uses server secrets",
+    /STRIPE_SECRET_KEY/.test(checkout) &&
+    /STRIPE_WEBHOOK_SECRET/.test(checkout) &&
+    /api\.stripe\.com\/v1\/checkout\/sessions/.test(checkout));
   check("Stripe checkout re-prices from the server catalog",
-    /SHOP_CATALOG/.test(checkout) && !/payload\.[a-zA-Z0-9_]*price/.test(checkout));
+    /SHOP_CATALOG/.test(checkout) &&
+    /effectiveMenuPrice/.test(checkout) &&
+    !/payload\.[a-zA-Z0-9_]*price/.test(checkout));
+  check("Stripe checkout rejects tampered posted totals",
+    /clientTotalCents/.test(checkout) && /The order total changed/.test(checkout));
+  check("Stripe checkout rejects unknown or sold-out menu dishes",
+    /findMenuProduct/.test(checkout) && /soldOut === true/.test(checkout));
   check("Stripe webhook verifies signed raw payloads",
     /STRIPE_WEBHOOK_SECRET/.test(webhook) &&
     /stripe-signature/i.test(webhook) &&
     /crypto\.subtle/.test(webhook));
+  check("Stripe webhook surfaces kitchen order metadata",
+    /customer_name/.test(webhook) && /order_summary/.test(webhook) && /pickup_time/.test(webhook));
   check("server Stripe catalog matches the public shop ids",
     JSON.stringify(catalog.map(p => p.id)) === JSON.stringify(SW.shop.products.map(p => p.id)),
     JSON.stringify(catalog.map(p => p.id)));
   check("server Stripe catalog keeps prices but not Payment Links",
     catalog.every(p => typeof p.price === "number" && p.paymentLink === undefined));
+  check("server menu catalog matches the public menu order ids",
+    JSON.stringify(menuCatalog.map(p => p.id)) === JSON.stringify(menuIds),
+    JSON.stringify(menuCatalog.map(p => p.id)));
+  check("server menu catalog can recompute the daily special discount",
+    /MENU_SPECIAL_POOL_IDS/.test(menuCatalogText) && /effectiveMenuPrice/.test(menuCatalogText));
 }
 
 console.log("\n=== 1c. Image performance budget ===");
@@ -286,9 +302,12 @@ check("Serializer path is content/<section>.js",
   Store.Serializer.path("menu") === "content/menu.js");
 check("Serializer writes the server Stripe catalog beside shop.js",
   Store.Serializer.shopCatalogPath() === "functions/_shared/shop-catalog.js" &&
-  /export const SHOP_CATALOG/.test(Store.Serializer.renderShopCatalog(SW.shop)));
+  /export const SHOP_CATALOG/.test(Store.Serializer.renderShopCatalog(SW.shop)) &&
+  Store.Serializer.menuCatalogPath() === "functions/_shared/menu-catalog.js" &&
+  /export const MENU_CATALOG/.test(Store.Serializer.renderMenuCatalog(SW.menu)));
 check("checked-in server Stripe catalog matches dashboard serialization",
-  lfAll(Store.Serializer.renderShopCatalog(SW.shop)) === lfAll(read("functions/_shared/shop-catalog.js")));
+  lfAll(Store.Serializer.renderShopCatalog(SW.shop)) === lfAll(read("functions/_shared/shop-catalog.js")) &&
+  lfAll(Store.Serializer.renderMenuCatalog(SW.menu)) === lfAll(read("functions/_shared/menu-catalog.js")));
 
 console.log("\n=== 7. Change detection ===");
 const base = Store.clone(SW.published);
@@ -299,8 +318,10 @@ const ch = Store.Draft.changedSections(base, SW.published);
 check("editing the menu reports exactly one changed section",
   ch.length === 1 && ch[0] === "menu", JSON.stringify(ch));
 const files = Store.Serializer.filesFor(base, SW.published);
-check("only the changed file is queued for publishing",
-  files.length === 1 && files[0].path === "content/menu.js",
+check("menu edits queue public content and the server menu catalog",
+  files.length === 2 &&
+  files[0].path === "content/menu.js" &&
+  files[1].path === "functions/_shared/menu-catalog.js",
   JSON.stringify(files.map(f => f.path)));
 const shopDraft = Store.clone(SW.published);
 shopDraft.shop.products[0].price = 15;

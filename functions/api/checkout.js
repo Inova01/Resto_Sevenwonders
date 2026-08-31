@@ -1,4 +1,5 @@
-import { SHOP_CATALOG, effectivePrice } from "../_shared/shop-catalog.js";
+import { SHOP_CATALOG, effectivePrice as effectiveShopPrice } from "../_shared/shop-catalog.js";
+import { effectiveMenuPrice, findMenuProduct, pickDailySpecial } from "../_shared/menu-catalog.js";
 
 const MAX_DISTINCT_ITEMS = 40;
 const MAX_QTY_PER_ITEM = 20;
@@ -42,35 +43,53 @@ function normalizeCart(payload) {
   return Array.from(quantities, ([id, qty]) => ({ id, qty }));
 }
 
-function appendLineItem(params, index, product, qty, currency, origin) {
-  const amount = moneyToCents(effectivePrice(product));
+function clientTotalCents(payload) {
+  const raw = payload && (payload.clientTotal ?? payload.total);
+  if (raw === undefined || raw === null || raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? moneyToCents(n) : NaN;
+}
+
+function cleanMetadata(value, max = 500) {
+  return cleanText(value, max) || "Not provided";
+}
+
+function orderSummary(lineItems) {
+  return lineItems.map((row) => {
+    return `${row.qty} x ${row.product.name} @ $${row.amount.toFixed(2)}`;
+  }).join("; ").slice(0, 500);
+}
+
+function appendLineItem(params, index, product, qty, amount, currency, origin) {
   params.set(`line_items[${index}][quantity]`, String(qty));
   params.set(`line_items[${index}][price_data][currency]`, currency);
-  params.set(`line_items[${index}][price_data][unit_amount]`, String(amount));
+  params.set(`line_items[${index}][price_data][unit_amount]`, String(moneyToCents(amount)));
   params.set(`line_items[${index}][price_data][product_data][name]`, cleanText(product.name, 120));
   params.set(`line_items[${index}][price_data][product_data][metadata][product_id]`, product.id);
-  if (product.note) {
-    params.set(`line_items[${index}][price_data][product_data][description]`, cleanText(product.note, 500));
+  const description = product.note || product.desc || product.subcatLabel || "";
+  if (description) {
+    params.set(`line_items[${index}][price_data][product_data][description]`, cleanText(description, 500));
   }
   if (product.img) {
     params.append(`line_items[${index}][price_data][product_data][images][]`, new URL(product.img, origin).href);
   }
 }
 
-function checkoutUrls(request, env) {
+function checkoutUrls(request, env, source) {
   const url = new URL(request.url);
   const origin = url.origin;
+  const page = source === "menu" ? "menu.html" : "shop.html";
   return {
-    success: env.STRIPE_SUCCESS_URL || `${origin}/shop.html?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel: env.STRIPE_CANCEL_URL || `${origin}/shop.html?checkout=cancel`
+    success: env.STRIPE_SUCCESS_URL || `${origin}/${page}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel: env.STRIPE_CANCEL_URL || `${origin}/${page}?checkout=cancel`
   };
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.STRIPE_SECRET_KEY) {
+  if (!env.STRIPE_SECRET_KEY || !env.STRIPE_WEBHOOK_SECRET) {
     return json({
       error: "Stripe is not connected yet.",
-      detail: "Add STRIPE_SECRET_KEY in Cloudflare Pages Variables and Secrets."
+      detail: "Add STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in Cloudflare Pages Variables and Secrets."
     }, 503);
   }
 
@@ -82,26 +101,41 @@ export async function onRequestPost({ request, env }) {
   }
 
   const catalog = productMap();
+  const source = cleanText(payload.source || payload.checkoutSource || "shop", 20) === "menu" ? "menu" : "shop";
   const requested = normalizeCart(payload);
   const lineItems = [];
   const rejected = [];
+  const now = new Date();
 
   requested.forEach(({ id, qty }) => {
-    const product = catalog.get(id);
-    if (!product || product.inStock === false || !(Number(product.price) > 0)) {
+    const product = source === "menu" ? findMenuProduct(id) : catalog.get(id);
+    const amount = source === "menu" ? effectiveMenuPrice(product, now) : (product ? effectiveShopPrice(product) : null);
+    const unavailable = source === "menu"
+      ? !product || product.soldOut === true || !(Number(amount) > 0)
+      : !product || product.inStock === false || !(Number(amount) > 0);
+    if (unavailable) {
       rejected.push(id);
       return;
     }
-    lineItems.push({ product, qty });
+    lineItems.push({ product, qty, amount });
   });
 
   if (!lineItems.length) {
     return json({ error: "No available products were found in the cart.", rejected }, 400);
   }
 
+  const serverTotalCents = lineItems.reduce((sum, row) => sum + moneyToCents(row.amount) * row.qty, 0);
+  const postedTotalCents = clientTotalCents(payload);
+  if (postedTotalCents !== null && (!Number.isFinite(postedTotalCents) || postedTotalCents !== serverTotalCents)) {
+    return json({
+      error: "The order total changed.",
+      detail: "Please refresh the page and try again. Prices are confirmed by the restaurant before payment."
+    }, 409);
+  }
+
   const url = new URL(request.url);
   const currency = cleanText(env.STRIPE_CURRENCY || "usd", 12).toLowerCase();
-  const returnUrls = checkoutUrls(request, env);
+  const returnUrls = checkoutUrls(request, env, source);
   const params = new URLSearchParams();
   params.set("mode", "payment");
   params.set("success_url", returnUrls.success);
@@ -110,13 +144,31 @@ export async function onRequestPost({ request, env }) {
   params.set("phone_number_collection[enabled]", "true");
   params.set("allow_promotion_codes", "true");
   params.set("metadata[source]", "seven-wonders-website");
-  params.set("metadata[order_type]", cleanText(payload.orderType || "pickup", 40));
+  params.set("metadata[checkout_source]", source);
+  params.set("metadata[order_type]", cleanText(payload.orderType || (payload.customer && payload.customer.fulfillment) || "pickup", 40));
   params.set("metadata[item_count]", String(lineItems.reduce((sum, row) => sum + row.qty, 0)));
+  params.set("metadata[order_summary]", orderSummary(lineItems));
+
+  if (source === "menu") {
+    const customer = payload.customer || {};
+    const special = pickDailySpecial(now);
+    params.set("metadata[customer_name]", cleanMetadata(customer.name, 120));
+    params.set("metadata[customer_phone]", cleanMetadata(customer.phone, 80));
+    params.set("metadata[customer_email]", cleanMetadata(customer.email, 120));
+    params.set("metadata[fulfillment]", cleanMetadata(customer.fulfillment || payload.orderType || "Pickup", 40));
+    params.set("metadata[pickup_time]", cleanMetadata(customer.time, 120));
+    params.set("metadata[delivery_address]", cleanMetadata(customer.address, 200));
+    params.set("metadata[notes]", cleanMetadata(customer.notes, 500));
+    params.set("metadata[daily_special_id]", special ? special.id : "none");
+    const email = cleanText(customer.email, 800);
+    if (email) params.set("customer_email", email);
+  }
+
   if (env.STRIPE_TAX_RATE_ID) {
     lineItems.forEach((_, i) => params.append(`line_items[${i}][tax_rates][]`, env.STRIPE_TAX_RATE_ID));
   }
 
-  lineItems.forEach((row, index) => appendLineItem(params, index, row.product, row.qty, currency, url.origin));
+  lineItems.forEach((row, index) => appendLineItem(params, index, row.product, row.qty, row.amount, currency, url.origin));
 
   const stripeRes = await fetch(STRIPE_CHECKOUT_URL, {
     method: "POST",
@@ -141,7 +193,13 @@ export async function onRequestPost({ request, env }) {
   return json({ id: stripeJson.id, url: stripeJson.url, rejected });
 }
 
-export async function onRequestGet() {
-  return json({ ok: true, message: "Stripe checkout endpoint is ready. Send a POST cart to start payment." });
+export async function onRequestGet({ env }) {
+  const ready = !!(env && env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET);
+  return json({
+    ok: true,
+    paymentsAvailable: ready,
+    message: ready
+      ? "Stripe checkout endpoint is ready."
+      : "Stripe checkout endpoint is ready. Add STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET to accept payments."
+  });
 }
-

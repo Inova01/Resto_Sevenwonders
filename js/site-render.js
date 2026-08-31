@@ -308,8 +308,8 @@
           href: paymentLink,
           "data-payment-link": "",
           rel: "noopener",
-          "aria-label": "Express checkout for " + p.name + " with Stripe"
-        }, [document.createTextNode("Express checkout")]));
+          "aria-label": "Pay for " + p.name + " with Stripe"
+        }, [document.createTextNode("Pay for this item")]));
       }
 
       return h("article", { class: "product-card reveal" + (p.inStock === false ? " is-sold-out" : "") }, [
@@ -333,7 +333,7 @@
       if (hasPaymentLinks && !note) {
         note = h("p", {
           class: "shop-pay-note",
-          text: "Use Add to cart to combine items. Express checkout buys one item through Stripe."
+          text: "Use Add to cart to combine items. Pay for this item opens Stripe for one product."
         });
         if (grid.parentNode) grid.parentNode.insertBefore(note, grid);
       }

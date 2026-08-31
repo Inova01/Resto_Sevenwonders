@@ -39,7 +39,10 @@ function loadPage(file, opts = {}) {
         return null;
       };
       win.scrollTo = () => {};
-      win.fetch = () => Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) });
+      win.fetch = opts.fetch || (() => Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) }));
+      if (opts.storage) {
+        Object.entries(opts.storage).forEach(([key, value]) => win.localStorage.setItem(key, value));
+      }
       if (opts.themeChoice) win.localStorage.setItem("sw_theme", opts.themeChoice);
       if (opts.draft) win.localStorage.setItem("sw_admin_draft_v1", JSON.stringify(opts.draft));
     }
@@ -152,7 +155,7 @@ console.log("\n=== theme and portable links ===");
   allPages.forEach(file => {
     const html = fs.readFileSync(path.join(ROOT, file), "utf8");
     check(file + " uses the bumped stylesheet",
-      /css\/style\.css\?v=stripe-checkout/.test(html));
+      /css\/style\.css\?v=cart-pay-flow/.test(html));
     check(file + " sets the theme before CSS loads",
       html.indexOf("sw_theme") !== -1 && html.indexOf("sw_theme") < html.indexOf("css/style.css"));
     check(file + " has no github.io absolute links",
@@ -162,6 +165,9 @@ console.log("\n=== theme and portable links ===");
     const html = fs.readFileSync(path.join(ROOT, file), "utf8");
     check(file + " has the day/night toggle", /data-theme-toggle/.test(html));
     check(file + " loads theme.js", /<script src="js\/theme\.js"><\/script>/.test(html));
+    check(file + " loads payment.js", /<script src="js\/payment\.js"><\/script>/.test(html));
+    check(file + " cart icon opens the drawer",
+      /<button class="cart-btn" type="button"/.test(html) && !/<a class="cart-btn"/.test(html));
   });
 
   const dark = loadPage("index.html", { prefersDark: true });
@@ -318,9 +324,9 @@ console.log("\n=== shop.html ===");
   check("add-to-cart buttons are wired", cards.every(c => c.querySelector("[data-add-to-cart]")));
   check("add-to-cart buttons carry product ids",
     Array.from(doc.querySelectorAll("[data-add-to-cart]")).every(b => !!b.getAttribute("data-add-to-cart")));
-  check("combined Stripe cart panel is present",
-    !!doc.querySelector("#cart-panel") &&
-    !!doc.querySelector("#stripe-checkout") &&
+  check("cart drawer is the single cart surface",
+    !!doc.querySelector("#cart-drawer") &&
+    !doc.querySelector("#cart-panel") &&
     text(doc.querySelector("#cart-total")) === "$0.00");
   check("blank payment links keep the regular cart flow",
     doc.querySelectorAll("[data-payment-link]").length === 0);
@@ -331,10 +337,45 @@ console.log("\n=== shop.html ===");
     text(doc.querySelector("#cart-badge")) === "1" &&
     text(doc.querySelector("#cart-total")) === "$14.00",
     text(doc.querySelector("#cart-items")));
+  const cartBtn = doc.querySelector(".cart-btn");
+  cartBtn.focus();
+  cartBtn.dispatchEvent(new doc.defaultView.Event("click", { bubbles: true }));
+  check("header cart opens a modal drawer",
+    doc.querySelector("#cart-drawer").classList.contains("open") &&
+    doc.querySelector("#cart-drawer").getAttribute("role") === "dialog" &&
+    doc.body.style.overflow === "hidden");
+  check("cart drawer moves focus inside",
+    doc.activeElement === doc.querySelector(".cart-drawer [data-cart-close]"));
+  doc.querySelector("[data-cart-inc]").dispatchEvent(new doc.defaultView.Event("click", { bubbles: true }));
+  check("cart drawer quantity controls update the line and badge",
+    /2/.test(text(doc.querySelector(".cart-qty"))) &&
+    text(doc.querySelector("#cart-badge")) === "2" &&
+    text(doc.querySelector("#cart-total")) === "$28.00");
+  doc.dispatchEvent(new doc.defaultView.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  check("cart drawer Escape closes and returns focus",
+    !doc.querySelector("#cart-drawer").classList.contains("open") &&
+    doc.activeElement === cartBtn &&
+    doc.body.style.overflow === "");
+  const storedCart = doc.defaultView.localStorage.getItem("sw_cart_items_v1");
+  const otherPage = loadPage("index.html", { storage: { sw_cart_items_v1: storedCart } });
+  otherPage.doc.querySelector(".cart-btn").dispatchEvent(new otherPage.win.Event("click", { bubbles: true }));
+  check("cart contents persist across pages",
+    /Pate F/.test(text(otherPage.doc.querySelector("#cart-items"))) &&
+    text(otherPage.doc.querySelector("#cart-badge")) === "2");
+  const paymentFallback = [
+    text(doc.querySelector("#checkout-status")),
+    text(doc.querySelector("#cart-payment-note"))
+  ].filter(Boolean).join(" ");
+  check("Pay button is hidden when no payment route is configured",
+    doc.querySelector("#stripe-checkout").hidden === true &&
+    /not connected yet/i.test(paymentFallback),
+    "hidden=" + doc.querySelector("#stripe-checkout").hidden + " text=" + paymentFallback);
   let postedCart = null;
+  doc.defaultView.SWPayment.state.available = true;
+  doc.dispatchEvent(new doc.defaultView.CustomEvent("sw:payment-capability", { detail: doc.defaultView.SWPayment.state }));
   doc.defaultView.fetch = (url, opts) => {
     postedCart = { url, body: JSON.parse(opts.body) };
-    return Promise.resolve({ ok: false, json: () => Promise.resolve({ error: "Stripe is not connected yet." }) });
+    return Promise.resolve({ ok: false, json: () => Promise.resolve({ error: "Stripe test stop" }) });
   };
   doc.querySelector("#stripe-checkout").dispatchEvent(new doc.defaultView.Event("click", { bubbles: true }));
   check("checkout posts product ids and quantities to the server endpoint",
@@ -342,7 +383,9 @@ console.log("\n=== shop.html ===");
     postedCart.url === "/api/checkout" &&
     postedCart.body.items.length === 1 &&
     postedCart.body.items[0].id === "pate-fete-box" &&
-    postedCart.body.items[0].qty === 1,
+    postedCart.body.items[0].qty === 2 &&
+    postedCart.body.source === "shop" &&
+    !("price" in postedCart.body.items[0]),
     JSON.stringify(postedCart));
   const sortOpts = Array.from(doc.querySelectorAll("#sort option")).map(o => o.textContent);
   check("sort dropdown only offers implemented options",
@@ -492,12 +535,54 @@ console.log("\n=== menu.html ===");
   check("hidden photos are kept out of the gallery",
     !/oswald-gaboyau|marjorie-gaboyau/.test(doc.querySelector("#mgal").innerHTML));
   check("order builder present", !!doc.querySelector("#order-form"));
+  check("menu Pay button is hidden when checkout is unavailable",
+    doc.querySelector("#order-pay").hidden === true &&
+    /Online payment and order sending are not connected yet/i.test(text(doc.querySelector("#order-pay-note"))));
+  check("menu keeps a secondary order path",
+    /Send order without paying/.test(text(doc.querySelector("#order-send"))));
   check("reservation widget also on this page", !!doc.querySelector("#calendar"));
   const board = Array.from(doc.querySelectorAll(".menu-board-card img"));
   check("printed menu board shows both photos", board.length === 2, "got " + board.length);
   check("menu board photos are the real scans",
     board.every(i => /^assets\/menu\/menu-[12]\.jpeg$/.test(i.getAttribute("src"))),
     board.map(i => i.getAttribute("src")).join(", "));
+
+  let postedOrder = null;
+  const payPage = loadPage("menu.html", {
+    fetch: (url, opts = {}) => {
+      if (url === "/api/checkout" && opts.method === "POST") {
+        postedOrder = { url, body: JSON.parse(opts.body) };
+        return Promise.resolve({ ok: false, json: () => Promise.resolve({ error: "Stripe test stop" }) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ paymentsAvailable: true }) });
+    }
+  });
+  const w = payPage.win;
+  const d = payPage.doc;
+  const firstOrderRadio = d.querySelector("#order-dishes input[type='radio']");
+  firstOrderRadio.checked = true;
+  firstOrderRadio.dispatchEvent(new w.Event("change", { bubbles: true }));
+  d.querySelector("#o-name").value = "Guest Test";
+  d.querySelector("#o-phone").value = "904 555 1111";
+  d.querySelector("#o-email").value = "guest@example.com";
+  d.querySelector("#o-time").value = "Today 7:00 PM";
+  w.SWPayment.state.available = true;
+  d.dispatchEvent(new w.CustomEvent("sw:payment-capability", { detail: w.SWPayment.state }));
+  check("menu Pay button appears only when checkout is available",
+    d.querySelector("#order-pay").hidden === false);
+  d.querySelector("#order-pay").dispatchEvent(new w.Event("click", { bubbles: true }));
+  check("menu Pay posts ids, quantities and customer details only",
+    postedOrder &&
+    postedOrder.url === "/api/checkout" &&
+    postedOrder.body.source === "menu" &&
+    postedOrder.body.items.length === 1 &&
+    postedOrder.body.items[0].id &&
+    postedOrder.body.items[0].qty === 1 &&
+    postedOrder.body.customer.name === "Guest Test" &&
+    postedOrder.body.customer.time === "Today 7:00 PM" &&
+    !("price" in postedOrder.body.items[0]) &&
+    !("discount" in postedOrder.body.items[0]),
+    JSON.stringify(postedOrder));
 }
 
 /* ============ draft preview ============ */
@@ -749,11 +834,14 @@ console.log("\n=== dashboard: an edit becomes a publishable file ===");
     changed.length === 1 && changed[0] === "menu", JSON.stringify(changed));
 
   const files = win.SWStore.Serializer.filesFor(draft, win.SW.published);
-  check("one file queued: content/menu.js",
-    files.length === 1 && files[0].path === "content/menu.js");
-  check("the new price is in the generated file", /19\.99/.test(files[0].text));
+  const filePaths = files.map(f => f.path);
+  const menuFile = files.find(f => f.path === "content/menu.js");
+  check("two menu files queued: content/menu.js and the server menu catalog",
+    JSON.stringify(filePaths) === JSON.stringify(["content/menu.js", "functions/_shared/menu-catalog.js"]),
+    JSON.stringify(filePaths));
+  check("the new price is in the generated file", menuFile && /19\.99/.test(menuFile.text));
   check("the generated file is valid JavaScript", (() => {
-    try { new win.Function(files[0].text); return true; } catch (e) { return false; }
+    try { new win.Function(menuFile.text); return true; } catch (e) { return false; }
   })());
 
   // Publish screen should now offer it
@@ -763,6 +851,7 @@ console.log("\n=== dashboard: an edit becomes a publishable file ===");
   const pub = doc.querySelector("#view").textContent;
   check("publish screen lists the change", /Menu, prices and the daily special/.test(pub));
   check("publish screen shows the file path", /content\/menu\.js/.test(pub));
+  check("publish screen shows the server menu catalog path", /functions\/_shared\/menu-catalog\.js/.test(pub));
   check("publish is blocked until a method is connected",
     Array.from(doc.querySelectorAll("#view button")).some(b => /Publish now/.test(b.textContent) && b.disabled));
   check("no script errors while editing", errors.length === 0, errors.join("\n         "));

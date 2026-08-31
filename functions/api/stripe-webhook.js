@@ -74,11 +74,20 @@ export async function onRequestPost({ request, env }) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data && event.data.object;
+    const metadata = (session && session.metadata) || {};
     console.log("[Seven Wonders] paid checkout", {
       id: session && session.id,
       amount_total: session && session.amount_total,
       customer_email: session && session.customer_details && session.customer_details.email,
-      metadata: session && session.metadata
+      checkout_source: metadata.checkout_source,
+      order_type: metadata.order_type,
+      customer_name: metadata.customer_name,
+      customer_phone: metadata.customer_phone,
+      pickup_time: metadata.pickup_time,
+      delivery_address: metadata.delivery_address,
+      notes: metadata.notes,
+      order_summary: metadata.order_summary,
+      metadata
     });
   }
 
@@ -88,4 +97,3 @@ export async function onRequestPost({ request, env }) {
 export async function onRequestGet() {
   return json({ ok: true, message: "Stripe webhook endpoint is ready for signed POST events." });
 }
-

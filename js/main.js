@@ -85,6 +85,7 @@
   ----------------------------------------------------- */
   const CART_COUNT_KEY = "sw_cart_count";
   const CART_ITEMS_KEY = "sw_cart_items_v1";
+  let lastCartFocus = null;
 
   function shopProducts() {
     return ((window.SW && SW.shop && SW.shop.products) || []).filter((p) => p && p.id);
@@ -119,6 +120,17 @@
   function getCartCount() {
     return readCart().reduce((sum, row) => sum + row.qty, 0);
   }
+  function cartRows() {
+    const cart = readCart();
+    const rows = cart
+      .map((row) => ({ cart: row, product: productById(row.id) }))
+      .filter((row) => row.product && row.product.inStock !== false);
+    if (rows.length !== cart.length) writeCart(rows.map((row) => row.cart));
+    return rows;
+  }
+  function cartTotal(rows) {
+    return (rows || cartRows()).reduce((sum, row) => sum + effectivePrice(row.product) * row.cart.qty, 0);
+  }
   function setCheckoutStatus(type, msg) {
     const status = $("#checkout-status");
     if (!status) return;
@@ -146,53 +158,149 @@
       badge.classList.add("pop");
     }
   }
+  function ensureCartDrawer() {
+    if ($("#cart-drawer")) return;
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "cart-drawer-backdrop";
+    backdrop.setAttribute("data-cart-close", "");
+
+    const drawer = document.createElement("aside");
+    drawer.className = "cart-drawer";
+    drawer.id = "cart-drawer";
+    drawer.setAttribute("role", "dialog");
+    drawer.setAttribute("aria-modal", "true");
+    drawer.setAttribute("aria-labelledby", "cart-drawer-title");
+    drawer.setAttribute("aria-hidden", "true");
+    drawer.tabIndex = -1;
+    drawer.innerHTML =
+      "<div class=\"cart-drawer__head\">" +
+        "<div><p class=\"eyebrow\">Secure Checkout</p><h2 id=\"cart-drawer-title\">Your order</h2></div>" +
+        "<button class=\"cart-drawer__close\" type=\"button\" data-cart-close aria-label=\"Close cart\">×</button>" +
+      "</div>" +
+      "<div class=\"cart-items\" id=\"cart-items\"></div>" +
+      "<div class=\"cart-total\"><span>Total before tax</span><strong id=\"cart-total\">$0.00</strong></div>" +
+      "<p class=\"cart-note\" id=\"cart-payment-note\"></p>" +
+      "<button class=\"btn btn--primary btn--block\" type=\"button\" id=\"stripe-checkout\" hidden>Pay Now</button>" +
+      "<button class=\"btn btn--ghost btn--block\" type=\"button\" data-cart-clear>Clear cart</button>" +
+      "<p class=\"form-status\" id=\"checkout-status\"></p>";
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(drawer);
+
+    $$("[data-cart-close]").forEach((btn) => btn.addEventListener("click", closeCartDrawer));
+    const clear = $("[data-cart-clear]", drawer);
+    if (clear) clear.addEventListener("click", () => {
+      writeCart([]);
+      clearCheckoutStatus();
+      renderCartPanel();
+    });
+    const checkout = $("#stripe-checkout", drawer);
+    if (checkout) checkout.addEventListener("click", startStripeCheckout);
+  }
+  function cartDrawerFocusables() {
+    const drawer = $("#cart-drawer");
+    if (!drawer) return [];
+    return $$("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])", drawer)
+      .filter((el) => !el.disabled && !el.hidden);
+  }
+  function openCartDrawer() {
+    ensureCartDrawer();
+    const drawer = $("#cart-drawer");
+    const backdrop = $(".cart-drawer-backdrop");
+    if (!drawer) return;
+    lastCartFocus = document.activeElement;
+    renderCartPanel();
+    drawer.classList.add("open");
+    drawer.setAttribute("aria-hidden", "false");
+    if (backdrop) backdrop.classList.add("open");
+    document.body.classList.add("cart-drawer-open");
+    document.body.style.overflow = "hidden";
+    const focusables = cartDrawerFocusables();
+    (focusables[0] || drawer).focus();
+  }
+  function closeCartDrawer() {
+    const drawer = $("#cart-drawer");
+    const backdrop = $(".cart-drawer-backdrop");
+    if (!drawer || !drawer.classList.contains("open")) return;
+    drawer.classList.remove("open");
+    drawer.setAttribute("aria-hidden", "true");
+    if (backdrop) backdrop.classList.remove("open");
+    document.body.classList.remove("cart-drawer-open");
+    document.body.style.overflow = "";
+    if (lastCartFocus && lastCartFocus.focus) lastCartFocus.focus();
+  }
+  function renderPaymentCapability(rows) {
+    const checkout = $("#stripe-checkout");
+    const note = $("#cart-payment-note");
+    const status = $("#checkout-status");
+    const clear = $("[data-cart-clear]");
+    const hasRows = rows && rows.length > 0;
+    const payment = window.SWPayment && SWPayment.state;
+    const available = !!(payment && payment.available);
+
+    if (clear) clear.disabled = !hasRows;
+    if (!checkout) return;
+
+    checkout.hidden = !hasRows || !available;
+    checkout.disabled = !hasRows || !available;
+    if (note) {
+      note.textContent = !hasRows
+        ? "Add items from the Shop page, then open this cart from anywhere on the site."
+        : available
+          ? "Pay Now opens Stripe. Final tax, pickup details and card information are handled securely there."
+          : ((window.SWPayment && SWPayment.fallbackMessage()) || "Online payment is not connected yet.");
+    }
+    if (status && hasRows && !available) {
+      status.className = "form-status show warn";
+      status.textContent = (payment && payment.message) || ((window.SWPayment && SWPayment.fallbackMessage()) || "Online payment is not connected yet.");
+    } else if (status && status.className.indexOf("warn") !== -1) {
+      clearCheckoutStatus();
+    }
+  }
   function renderCartPanel() {
     const wrap = $("#cart-items");
     const totalEl = $("#cart-total");
-    const checkout = $("#stripe-checkout");
-    const clear = $("[data-cart-clear]");
-    if (!wrap || !totalEl || !checkout) return;
+    if (!wrap || !totalEl) return;
 
-    const cart = readCart();
-    const rows = cart
-      .map((row) => ({ cart: row, product: productById(row.id) }))
-      .filter((row) => row.product && row.product.inStock !== false);
-    if (rows.length !== cart.length) writeCart(rows.map((row) => row.cart));
+    const rows = cartRows();
 
     wrap.innerHTML = "";
     if (!rows.length) {
       wrap.appendChild(Object.assign(document.createElement("p"), {
         className: "cart-empty",
-        textContent: "Your cart is empty. Add a dish above to start a secure Stripe checkout."
+        textContent: "Your cart is empty."
       }));
     } else {
       rows.forEach(({ cart: row, product }) => {
         const line = document.createElement("article");
         line.className = "cart-line";
         line.innerHTML =
-          "<div><h3></h3><p></p></div>" +
+          "<div class=\"cart-line__main\"><h3></h3><p></p></div>" +
           "<div class=\"cart-qty\">" +
           "<button type=\"button\" data-cart-dec=\"\">−</button>" +
           "<span></span>" +
           "<button type=\"button\" data-cart-inc=\"\">+</button>" +
           "</div>" +
-          "<div class=\"cart-line__price\"></div>";
+          "<div class=\"cart-line__price\"></div>" +
+          "<button class=\"cart-line__remove\" type=\"button\" data-cart-remove>Remove</button>";
         line.querySelector("h3").textContent = product.name;
         line.querySelector("p").textContent = product.note || "Seven Wonders favorite";
         line.querySelector(".cart-qty span").textContent = row.qty;
-        line.querySelector(".cart-line__price").textContent = money(effectivePrice(product) * row.qty);
+        line.querySelector(".cart-line__price").textContent =
+          money(effectivePrice(product)) + " each · " + money(effectivePrice(product) * row.qty);
         line.querySelector("[data-cart-dec]").setAttribute("aria-label", "Remove one " + product.name);
         line.querySelector("[data-cart-inc]").setAttribute("aria-label", "Add one more " + product.name);
+        line.querySelector("[data-cart-remove]").setAttribute("aria-label", "Remove " + product.name + " from cart");
         line.querySelector("[data-cart-dec]").addEventListener("click", () => changeQty(product.id, -1));
         line.querySelector("[data-cart-inc]").addEventListener("click", () => changeQty(product.id, 1));
+        line.querySelector("[data-cart-remove]").addEventListener("click", () => changeQty(product.id, -row.qty));
         wrap.appendChild(line);
       });
     }
 
-    const total = rows.reduce((sum, row) => sum + effectivePrice(row.product) * row.cart.qty, 0);
-    totalEl.textContent = money(total);
-    checkout.disabled = rows.length === 0;
-    if (clear) clear.disabled = rows.length === 0;
+    totalEl.textContent = money(cartTotal(rows));
+    renderPaymentCapability(rows);
     renderBadge(false);
   }
   function changeQty(id, delta) {
@@ -213,6 +321,10 @@
     if (!btn) return;
     const cart = readCart();
     if (!cart.length) return;
+    if (!window.SWPayment || !SWPayment.state.available) {
+      setCheckoutStatus("warn", (window.SWPayment && SWPayment.fallbackMessage()) || "Online payment is not connected yet.");
+      return;
+    }
     const label = btn.textContent;
     btn.disabled = true;
     btn.textContent = "Opening Stripe...";
@@ -221,7 +333,7 @@
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart, orderType: "pickup" })
+        body: JSON.stringify({ source: "shop", items: cart, orderType: "pickup", clientTotal: cartTotal() })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.url) {
@@ -247,7 +359,14 @@
     }
   }
   function initCart() {
+    ensureCartDrawer();
     renderBadge(false);
+    $$(".cart-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openCartDrawer();
+      });
+    });
     $$("[data-add-to-cart]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-add-to-cart");
@@ -259,10 +378,30 @@
         setTimeout(() => { btn.innerHTML = original; }, 1200);
       });
     });
-    const checkout = $("#stripe-checkout");
-    if (checkout) checkout.addEventListener("click", startStripeCheckout);
-    const clear = $("[data-cart-clear]");
-    if (clear) clear.addEventListener("click", () => { writeCart([]); clearCheckoutStatus(); renderCartPanel(); });
+    document.addEventListener("keydown", (e) => {
+      const drawer = $("#cart-drawer");
+      if (!drawer || !drawer.classList.contains("open")) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeCartDrawer();
+      } else if (e.key === "Tab") {
+        const nodes = cartDrawerFocusables();
+        if (!nodes.length) return;
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+    if (window.SWPayment) {
+      document.addEventListener("sw:payment-capability", () => renderCartPanel());
+      SWPayment.check().then(() => renderCartPanel());
+    }
     renderCartPanel();
     handleCheckoutReturn();
   }
@@ -573,84 +712,20 @@
 
     const menu = window.SW_MENU;
     if (!menu || !Array.isArray(menu.categories)) return;
-
-    // --- Build the eligible pool from the real menu data ---
-    const isSide = (name) => /^side\b/i.test(name || "");
-    const pool = [];
-    menu.categories.forEach((cat) => {
-      let subcats = null;
-      if (cat.id === "lunch" || cat.id === "dinner") {
-        // only the "Main Dishes" sub-category of lunch & dinner
-        subcats = (cat.subcats || []).filter((sc) => /main dish/i.test(sc.label || ""));
-      } else if (cat.id === "special") {
-        subcats = cat.subcats || []; // everything on Special Menu Night
-      }
-      if (!subcats) return;
-      subcats.forEach((sc) => {
-        (sc.items || []).forEach((it) => {
-          if (typeof it.price !== "number") return; // skip "price varies" / TBD
-          if (isSide(it.name)) return;              // skip side portions
-          pool.push({ item: it, catPhoto: cat.photo });
-        });
-      });
-    });
-    if (!pool.length) return;
-
-    // --- Deterministic date-seeded index (identical for all visitors) ---
-    const seedOf = (d) =>
-      d.getFullYear() +
-      "-" + String(d.getMonth() + 1).padStart(2, "0") +
-      "-" + String(d.getDate()).padStart(2, "0");
-    // Small integer hash (FNV-1a + an avalanche mix) so that dates one day
-    // apart scatter across the pool instead of stepping through it in order.
-    const hash = (str) => {
-      let h = 2166136261 >>> 0;
-      for (let i = 0; i < str.length; i++) {
-        h ^= str.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-      }
-      h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;
-      return h >>> 0;
-    };
     const today = new Date();
 
-    // Walk day-by-day from a fixed epoch applying the guard "hash % len, and
-    // if it equals YESTERDAY'S (already-guarded) pick, shift by 1". Because
-    // each day is compared against the prior day's real displayed pick, the
-    // same dish can never land on two consecutive days. It's still pure date
-    // math: no storage, identical for every visitor, stable across refreshes.
-    const seededIndex = (target) => {
-      const d = new Date(2020, 0, 1); // fixed anchor (local midnight)
-      const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
-      let idx = 0, prev = -1;
-      while (d <= end) {
-        idx = hash(seedOf(d)) % pool.length;
-        if (pool.length > 1 && idx === prev) idx = (idx + 1) % pool.length;
-        prev = idx;
-        d.setDate(d.getDate() + 1); // calendar-safe step (DST-proof)
-      }
-      return idx;
-    };
-
     // --- Which dish? --------------------------------------------------
-    // "manual" = the dashboard pinned a specific dish. Fall back to the
-    // date-seeded pick if that dish has since been deleted or sold out.
-    const cfg = menu.dailySpecial || { mode: "auto", discountPercent: 15 };
-    let chosen = null;
-    if (cfg.mode === "manual" && cfg.itemId) {
-      chosen = pool.filter((p) => p.item.id === cfg.itemId)[0] || null;
-    }
-    if (!chosen) chosen = pool[seededIndex(today)];
+    const chosen = window.SW && SW.dailySpecialForDate ? SW.dailySpecialForDate(today) : null;
+    if (!chosen) return;
     const dish = chosen.item;
 
     // --- Pricing: the dashboard's discount, rounded to the nearest .50.
     // A discount of 0 shows the normal price with no strike-through. ---
     const money = (n) => "$" + n.toFixed(2);
-    const pct = Math.max(0, Math.min(90, Number(cfg.discountPercent) || 0));
-    const promo = pct > 0 ? Math.round(dish.price * (1 - pct / 100) * 2) / 2 : dish.price;
+    const promo = window.SW && SW.dailySpecialPrice ? SW.dailySpecialPrice(dish, today) : dish.price;
 
     // --- Photo: the dish's own photo, else its category's ---
-    const photo = dish.img || chosen.catPhoto || "assets/gallery/gallery-07.jpeg";
+    const photo = dish.img || (chosen.cat && chosen.cat.photo) || "assets/gallery/gallery-07.jpeg";
 
     // --- Current weekday, straight from the visitor's device ---
     const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

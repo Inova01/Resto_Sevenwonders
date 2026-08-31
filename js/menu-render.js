@@ -98,6 +98,23 @@
     }
     return found;
   }
+  function priceForItem(item) {
+    if (!item || typeof item.price !== "number") return null;
+    if (window.SW && SW.dailySpecialPrice) return SW.dailySpecialPrice(item, new Date());
+    return item.price;
+  }
+  function formsReady() {
+    return !!WEB3_KEY && WEB3_KEY.indexOf("PLACEHOLDER") === -1;
+  }
+  function offlineOrderMessage() {
+    var phone = (SETTINGS.contact || {}).phone || "";
+    if (!formsReady() && (!window.SWPayment || !SWPayment.state.available)) {
+      return "Online payment and order sending are not connected yet." +
+        (phone ? " Please call " + phone + " and read your order below." : "");
+    }
+    return "Online ordering is not switched on yet, so this order was NOT sent." +
+      (phone ? " Please call " + phone + " and read your order below." : "");
+  }
 
   /* =====================================================
      MENU TABS (browsing)
@@ -346,11 +363,11 @@
     Object.keys(state.selections).forEach(function (subId) {
       var sel = state.selections[subId];
       var it = findItem(sel.itemId);
-      if (it) lines.push({ kind: "dish", subId: subId, id: it.id, name: it.name, desc: it.desc, qty: sel.qty, price: it.price });
+      if (it) lines.push({ kind: "dish", subId: subId, id: it.id, name: it.name, desc: it.desc, qty: sel.qty, price: priceForItem(it), originalPrice: it.price });
     });
     Object.keys(state.addons).forEach(function (id) {
       var it = findItem(id);
-      if (it) lines.push({ kind: "addon", id: id, name: it.name, qty: 1, price: it.price });
+      if (it) lines.push({ kind: "addon", id: id, name: it.name, qty: 1, price: priceForItem(it), originalPrice: it.price });
     });
     return lines;
   }
@@ -393,6 +410,7 @@
       host.appendChild(row);
     });
     $("#order-total").textContent = money(total);
+    renderPaymentActions();
     return total;
   }
 
@@ -426,7 +444,11 @@
           '<textarea id="o-notes" placeholder="Allergies, spice level, special requests…">' + (c.notes || "") + "</textarea>" +
         "</div>" +
         '<div class="field field--full">' +
-          '<button type="submit" class="btn btn--primary btn--block">Send Order</button>' +
+          '<div class="order-actions">' +
+            '<button type="button" class="btn btn--primary btn--block" id="order-pay" hidden>Pay Now</button>' +
+            '<button type="submit" class="btn btn--ghost btn--block" id="order-send">Send order without paying</button>' +
+          "</div>" +
+          '<p class="order-note" id="order-pay-note"></p>' +
         "</div>" +
       "</div>" +
       '<div class="order-recap" id="order-recap"></div>';
@@ -442,6 +464,13 @@
     // remember on input
     host.addEventListener("input", rememberCustomer);
     host.addEventListener("submit", onSubmit);
+    var pay = $("#order-pay", host);
+    if (pay) pay.addEventListener("click", startMenuCheckout);
+    if (window.SWPayment) {
+      document.addEventListener("sw:payment-capability", renderPaymentActions);
+      SWPayment.check().then(renderPaymentActions);
+    }
+    renderPaymentActions();
   }
 
   function field(label, id, type, ph, val, req) {
@@ -522,6 +551,89 @@
     el.textContent = msg;
   }
 
+  function renderPaymentActions() {
+    var pay = $("#order-pay");
+    var note = $("#order-pay-note");
+    if (!pay || !note) return;
+    var lines = orderLines();
+    var hasLines = lines.length > 0;
+    var hasVariable = lines.some(function (ln) { return typeof ln.price !== "number"; });
+    var paymentReady = !!(window.SWPayment && SWPayment.state.available);
+
+    pay.hidden = !paymentReady;
+    pay.disabled = !hasLines || hasVariable;
+    if (paymentReady) {
+      note.textContent = hasVariable
+        ? "Items with variable prices must be confirmed by staff before payment."
+        : "Pay Now opens Stripe for this full order. Use the second button if you want staff to confirm by phone first.";
+    } else if (!formsReady()) {
+      note.textContent = "Online payment and order sending are not connected yet. Please call " +
+        ((SETTINGS.contact || {}).phone || "904 402 9212") + " to place the order.";
+    } else {
+      note.textContent = (window.SWPayment && SWPayment.fallbackMessage())
+        || "Online payment is not connected yet. You can still send the order request below.";
+    }
+  }
+
+  function menuCheckoutPayload() {
+    var f = $("#order-form");
+    return {
+      source: "menu",
+      items: orderLines().map(function (ln) {
+        return { id: ln.id, qty: ln.qty };
+      }),
+      clientTotal: renderSummary(),
+      customer: {
+        name: val("#o-name"),
+        phone: val("#o-phone"),
+        email: val("#o-email"),
+        fulfillment: ((f && f.querySelector('input[name="fulfil"]:checked')) || {}).value || "Pickup",
+        address: val("#o-address"),
+        time: val("#o-time"),
+        notes: val("#o-notes")
+      }
+    };
+  }
+
+  function startMenuCheckout() {
+    rememberCustomer();
+    if (!orderLines().length) { showStatus("error", "Your order is empty — please select at least one item."); return; }
+    if (!validate()) { showStatus("error", "Please complete the highlighted fields."); return; }
+    if (!window.SWPayment || !SWPayment.state.available) {
+      var recap = $("#order-recap");
+      showStatus("warn", offlineOrderMessage());
+      if (recap) {
+        recap.textContent = buildMessage();
+        recap.classList.add("show");
+      }
+      return;
+    }
+
+    var btn = $("#order-pay");
+    var label = btn ? btn.textContent : "";
+    if (btn) { btn.disabled = true; btn.textContent = "Opening Stripe..."; }
+
+    fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(menuCheckoutPayload())
+    })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok || !data.url) throw new Error(data.detail || data.error || "Stripe checkout is not connected yet.");
+          return data;
+        });
+      })
+      .then(function (data) { window.location.assign(data.url); })
+      .catch(function (err) {
+        showStatus("warn", (err && err.message ? err.message : "Stripe checkout is not connected yet.") +
+          " Please call " + ((SETTINGS.contact || {}).phone || "904 402 9212") + " to place the order.");
+      })
+      .finally(function () {
+        if (btn) { btn.disabled = false; btn.textContent = label || "Pay Now"; }
+      });
+  }
+
   function onSubmit(e) {
     e.preventDefault();
     rememberCustomer();
@@ -544,11 +656,8 @@
 
     /* No key configured: do NOT show a fake confirmation. Show the
        order back to the guest so they can read it down the phone. */
-    if (!WEB3_KEY || WEB3_KEY.indexOf("PLACEHOLDER") !== -1) {
-      var phone = (SETTINGS.contact || {}).phone || "";
-      showStatus("warn",
-        "Online ordering is not switched on yet, so this order was NOT sent." +
-        (phone ? " Please call " + phone + " and read your order below." : ""));
+    if (!formsReady()) {
+      showStatus("warn", offlineOrderMessage());
       recapEl.textContent = message;
       recapEl.classList.add("show");
       recapEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
@@ -568,7 +677,7 @@
       .then(function (r) { return r.json(); })
       .then(function (d) { if (d.success) succeed(); else showStatus("error", d.message || "Something went wrong. Please call us."); })
       .catch(function () { showStatus("error", "Network error. Please try again or call us."); })
-      .finally(function () { if (btn) { btn.disabled = false; btn.textContent = "Send Order"; } });
+      .finally(function () { if (btn) { btn.disabled = false; btn.textContent = "Send order without paying"; } });
   }
 
   /* =====================================================

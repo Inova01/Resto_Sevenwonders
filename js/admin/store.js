@@ -117,6 +117,7 @@
     path: function (section) { return "content/" + section + ".js"; },
 
     shopCatalogPath: function () { return "functions/_shared/shop-catalog.js"; },
+    menuCatalogPath: function () { return "functions/_shared/menu-catalog.js"; },
 
     render: function (section, data) {
       var header =
@@ -165,6 +166,109 @@
         "}\n";
     },
 
+    renderMenuCatalog: function (menu) {
+      var products = [];
+      var specialPoolIds = [];
+      (menu.categories || []).forEach(function (cat) {
+        (cat.subcats || []).forEach(function (sub) {
+          var eligibleSpecial = (cat.id === "lunch" || cat.id === "dinner")
+            ? /main dish/i.test(sub.label || "")
+            : cat.id === "special";
+          (sub.items || []).forEach(function (it) {
+            products.push({
+              id: it.id,
+              name: it.name,
+              desc: it.desc || "",
+              price: it.price,
+              soldOut: it.soldOut === true,
+              img: it.img || "",
+              kind: "dish",
+              categoryId: cat.id,
+              categoryLabel: cat.label,
+              subcatId: sub.id,
+              subcatLabel: sub.label
+            });
+            if (eligibleSpecial && typeof it.price === "number" && !/^side\b/i.test(it.name || "")) {
+              specialPoolIds.push(it.id);
+            }
+          });
+        });
+      });
+      (menu.drinks || []).forEach(function (it) {
+        products.push({
+          id: it.id, name: it.name, desc: "", price: it.price,
+          soldOut: it.soldOut === true, img: "", kind: "drink",
+          categoryId: "drinks", categoryLabel: "Drinks",
+          subcatId: "drinks", subcatLabel: "Drinks"
+        });
+      });
+      (menu.desserts || []).forEach(function (it) {
+        products.push({
+          id: it.id, name: it.name, desc: "", price: it.price,
+          soldOut: it.soldOut === true, img: it.img || "", kind: "dessert",
+          categoryId: "desserts", categoryLabel: "Desserts",
+          subcatId: "desserts", subcatLabel: "Desserts"
+        });
+      });
+
+      return "/* =========================================================\n" +
+        "   SEVEN WONDERS — functions/_shared/menu-catalog.js\n" +
+        "   ---------------------------------------------------------\n" +
+        "   Server-side menu catalog for Stripe Checkout. Managed\n" +
+        "   from admin.html whenever Menu & prices is published.\n" +
+        "\n" +
+        "   Never trust prices, totals or discounts sent from the\n" +
+        "   browser. Checkout imports this file and prices menu\n" +
+        "   orders from here.\n" +
+        "   ========================================================= */\n\n" +
+        "export const MENU_CATALOG = " + JSON.stringify(products, null, 2) + ";\n\n" +
+        "export const MENU_DAILY_SPECIAL = " + JSON.stringify(menu.dailySpecial || { mode: "auto", itemId: null, discountPercent: 15 }, null, 2) + ";\n\n" +
+        "export const MENU_SPECIAL_POOL_IDS = " + JSON.stringify(specialPoolIds, null, 2) + ";\n\n" +
+        "function seedOf(d) {\n" +
+        "  return d.getFullYear() + \"-\" + String(d.getMonth() + 1).padStart(2, \"0\") + \"-\" + String(d.getDate()).padStart(2, \"0\");\n" +
+        "}\n\n" +
+        "function hash(str) {\n" +
+        "  let h = 2166136261 >>> 0;\n" +
+        "  for (let i = 0; i < str.length; i++) {\n" +
+        "    h ^= str.charCodeAt(i);\n" +
+        "    h = Math.imul(h, 16777619);\n" +
+        "  }\n" +
+        "  h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15;\n" +
+        "  return h >>> 0;\n" +
+        "}\n\n" +
+        "export function findMenuProduct(id) {\n" +
+        "  return MENU_CATALOG.find((item) => item.id === id) || null;\n" +
+        "}\n\n" +
+        "export function pickDailySpecial(date = new Date()) {\n" +
+        "  const pool = MENU_SPECIAL_POOL_IDS.map(findMenuProduct)\n" +
+        "    .filter((item) => item && item.soldOut !== true && typeof item.price === \"number\" && item.price > 0);\n" +
+        "  if (!pool.length) return null;\n" +
+        "  if (MENU_DAILY_SPECIAL.mode === \"manual\" && MENU_DAILY_SPECIAL.itemId) {\n" +
+        "    const pinned = pool.find((item) => item.id === MENU_DAILY_SPECIAL.itemId);\n" +
+        "    if (pinned) return pinned;\n" +
+        "  }\n" +
+        "  const d = new Date(2020, 0, 1);\n" +
+        "  const end = new Date(date.getFullYear(), date.getMonth(), date.getDate());\n" +
+        "  let idx = 0, prev = -1;\n" +
+        "  while (d <= end) {\n" +
+        "    idx = hash(seedOf(d)) % pool.length;\n" +
+        "    if (pool.length > 1 && idx === prev) idx = (idx + 1) % pool.length;\n" +
+        "    prev = idx;\n" +
+        "    d.setDate(d.getDate() + 1);\n" +
+        "  }\n" +
+        "  return pool[idx];\n" +
+        "}\n\n" +
+        "export function effectiveMenuPrice(item, date = new Date()) {\n" +
+        "  if (!item || typeof item.price !== \"number\" || !(item.price > 0)) return null;\n" +
+        "  const special = pickDailySpecial(date);\n" +
+        "  const pct = Math.max(0, Math.min(90, Number(MENU_DAILY_SPECIAL.discountPercent) || 0));\n" +
+        "  if (special && special.id === item.id && pct > 0) {\n" +
+        "    return Math.round(item.price * (1 - pct / 100) * 2) / 2;\n" +
+        "  }\n" +
+        "  return item.price;\n" +
+        "}\n";
+    },
+
     /* Every changed section as { path, text } */
     filesFor: function (draft, published) {
       var files = [];
@@ -179,6 +283,12 @@
             section: section,
             path: Serializer.shopCatalogPath(),
             text: Serializer.renderShopCatalog(draft[section])
+          });
+        } else if (section === "menu") {
+          files.push({
+            section: section,
+            path: Serializer.menuCatalogPath(),
+            text: Serializer.renderMenuCatalog(draft[section])
           });
         }
       });

@@ -31,7 +31,7 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="css/style.css?v=stripe-checkout" />
+  <link rel="stylesheet" href="css/style.css?v=cart-pay-flow" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -51,10 +51,10 @@
         </ul>
       </nav>
       <div class="nav-actions">
-        <a class="cart-btn" href="shop.html" aria-label="View cart">
+        <button class="cart-btn" type="button" aria-label="Open cart" aria-haspopup="dialog" aria-controls="cart-drawer">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span class="cart-badge" id="cart-badge">0</span>
-        </a>
+        </button>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" aria-pressed="false">
           <svg class="theme-sun" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
           <svg class="theme-moon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -178,6 +178,7 @@
   <script src="content/about.js"></script>
   <script src="js/content.js"></script>
   <script src="js/image-meta.js"></script>
+  <script src="js/payment.js"></script>
   <!-- ===== BEHAVIOUR (site-render must come before main.js) ===== -->
   <script src="js/reservation.js"></script>
   <script src="js/gallery.js"></script>
