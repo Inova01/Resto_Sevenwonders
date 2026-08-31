@@ -46,13 +46,13 @@ window.SW_CONTENT.settings = {
   /* Opening hours, Monday first. Set closed:true to show "Closed".
      The reservation calendar disables any day marked closed. */
   hours: [
-    { day: "Monday",    open: "8:00 AM", close: "9:00 PM", closed: false },
-    { day: "Tuesday",   open: "8:00 AM", close: "9:00 PM", closed: false },
-    { day: "Wednesday", open: "8:00 AM", close: "9:00 PM", closed: false },
-    { day: "Thursday",  open: "8:00 AM", close: "9:00 PM", closed: false },
-    { day: "Friday",    open: "8:00 AM", close: "10:00 PM", closed: false },
-    { day: "Saturday",  open: "8:00 AM", close: "10:00 PM", closed: false },
-    { day: "Sunday",    open: "8:00 AM", close: "6:00 PM", closed: false }
+    { day: "Monday",    open: "9:00 AM", close: "8:30 PM", closed: false },
+    { day: "Tuesday",   open: "9:00 AM", close: "8:30 PM", closed: false },
+    { day: "Wednesday", open: "9:00 AM", close: "8:30 PM", closed: false },
+    { day: "Thursday",  open: "9:00 AM", close: "8:30 PM", closed: false },
+    { day: "Friday",    open: "9:00 AM", close: "9:00 PM", closed: false },
+    { day: "Saturday",  open: "8:00 AM", close: "9:00 PM", closed: false },
+    { day: "Sunday",    open: "", close: "", closed: true }
   ],
   hoursNote: "Special Menu Night — call ahead, fish and kabrit sell out.",
 
@@ -81,7 +81,7 @@ window.SW_CONTENT.settings = {
     address: true,
     phone: true,
     email: false,
-    hours: false,
+    hours: true,
     socials: false
   }
 };

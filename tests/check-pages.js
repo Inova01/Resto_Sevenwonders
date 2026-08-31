@@ -256,7 +256,11 @@ console.log("\n=== index.html ===");
   check("footer no longer shows the invented address",
     !footerVisit.some(t => /Riverside|555-0199/.test(t)));
   check("hours are collapsed into ranges",
-    footerVisit.some(t => /Mon – Thu · 8 AM – 9 PM/.test(t)), footerVisit.join(" | "));
+    footerVisit.some(t => /Mon – Thu · 9 AM – 8:30 PM/.test(t)) &&
+    footerVisit.some(t => /Fri · 9 AM – 9 PM/.test(t)) &&
+    footerVisit.some(t => /Sat · 8 AM – 9 PM/.test(t)) &&
+    footerVisit.some(t => /Sun · Closed/.test(t)),
+    footerVisit.join(" | "));
   check("no dead social links",
     doc.querySelectorAll('.site-footer .socials a[href="#"]').length === 0);
   check("footer socials hidden entirely while no links are set",
@@ -520,10 +524,10 @@ console.log("\n=== reservation.html ===");
   check("no invented phone anywhere", !/555-0199/.test(visible(doc)));
   const days = Array.from(doc.querySelectorAll("#cal-days button")).filter(b => b.textContent);
   check("calendar rendered days", days.length >= 28, "got " + days.length);
-  check("no day is marked closed (nothing is closed in settings)",
-    doc.querySelectorAll("#cal-days button.closed").length === 0);
-  check("the closed-days note is omitted when nothing is closed",
-    !/We are closed/.test(visible(doc)));
+  check("Sundays are marked closed in the booking calendar",
+    doc.querySelectorAll("#cal-days button.closed").length >= 4);
+  check("the closed-days note mentions Sunday",
+    /We are closed Sundays/.test(visible(doc)));
 }
 
 /* ============ menu.html ============ */
@@ -785,8 +789,8 @@ console.log("\n=== admin.html ===");
   check("overview warns publishing is not connected", /Publishing is not connected/i.test(body));
   check("overview is honest about the page being public", /Anyone who knows this address/i.test(body));
   check("overview lists details still to confirm", /Details to confirm/.test(body));
-  check("email/hours/socials flagged unconfirmed",
-    /Email address/.test(body) && /Opening hours/.test(body) && /Social media links/.test(body));
+  check("email/socials flagged unconfirmed but hours are confirmed",
+    /Email address/.test(body) && !/Opening hours/.test(body) && /Social media links/.test(body));
   check("stat tiles present", doc.querySelectorAll(".tile").length === 6);
   check("action bar says everything is published",
     /Everything is published/.test(doc.querySelector(".actionbar").textContent));

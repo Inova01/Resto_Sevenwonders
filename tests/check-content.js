@@ -186,20 +186,21 @@ check("telHref()", SW.telHref() === "tel:+19044029212", SW.telHref());
 check("formsLive() false with no key", SW.formsLive() === false);
 
 const grouped = SW.hoursGrouped();
-check("hoursGrouped() collapses equal days", grouped.length === 3,
+check("hoursGrouped() collapses equal days", grouped.length === 4,
   JSON.stringify(grouped));
 check("hoursGrouped() first range is Mon-Thu",
-  grouped[0] && grouped[0].label === "Mon – Thu" && grouped[0].value === "8 AM – 9 PM",
+  grouped[0] && grouped[0].label === "Mon – Thu" && grouped[0].value === "9 AM – 8:30 PM",
   JSON.stringify(grouped[0]));
-check("closedWeekdays() empty (nothing marked closed)", SW.closedWeekdays().length === 0);
+check("closedWeekdays() disables Sunday", JSON.stringify(SW.closedWeekdays()) === "[0]",
+  JSON.stringify(SW.closedWeekdays()));
 
 /* A closed day must map to the right JS weekday number (0=Sun) */
 const saved = JSON.parse(JSON.stringify(SW.settings.hours));
 SW.settings.hours[0].closed = true;            // Monday
-check("closedWeekdays() maps Monday to 1", JSON.stringify(SW.closedWeekdays()) === "[1]",
+check("closedWeekdays() maps Monday to 1", JSON.stringify(SW.closedWeekdays()) === "[1,0]",
   JSON.stringify(SW.closedWeekdays()));
-SW.settings.hours[6].closed = true;            // Sunday
-check("closedWeekdays() maps Sunday to 0", JSON.stringify(SW.closedWeekdays()) === "[1,0]",
+SW.settings.hours[6].closed = false;           // Sunday open again
+check("closedWeekdays() maps Sunday to 0", JSON.stringify(SW.closedWeekdays()) === "[1]",
   JSON.stringify(SW.closedWeekdays()));
 SW.settings.hours = saved;
 
