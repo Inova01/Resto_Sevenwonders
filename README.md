@@ -107,10 +107,11 @@ phone number, rather than showing a fake confirmation. Get a free key at
 [web3forms.com](https://web3forms.com) and paste it into the dashboard under
 *Info & hours → Online forms*.
 
-**Stripe secrets** — the Shop page can collect combined-cart payments when the
-site is deployed on Cloudflare Pages. Add `STRIPE_SECRET_KEY` and
-`STRIPE_WEBHOOK_SECRET` as encrypted Cloudflare Variables and Secrets. Do not
-commit Stripe secret keys. `.dev.vars.example` lists the supported variable
+**Stripe secrets** — the Shop and Menu pages can collect payments when the site
+is deployed on Cloudflare Pages. Add `STRIPE_SECRET_KEY` as an encrypted
+Cloudflare secret to turn checkout on. Then add `STRIPE_WEBHOOK_SECRET` after
+creating the Stripe webhook so completed payments are verified and logged. Do
+not commit Stripe secret keys. `.dev.vars.example` lists the supported variable
 names for local testing.
 
 Publishing from the dashboard needs a fine-grained GitHub token with

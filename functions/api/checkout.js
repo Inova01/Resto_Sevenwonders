@@ -86,10 +86,10 @@ function checkoutUrls(request, env, source) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.STRIPE_SECRET_KEY || !env.STRIPE_WEBHOOK_SECRET) {
+  if (!env.STRIPE_SECRET_KEY) {
     return json({
       error: "Stripe is not connected yet.",
-      detail: "Add STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in Cloudflare Pages Variables and Secrets."
+      detail: "Add STRIPE_SECRET_KEY in Cloudflare Pages Variables and Secrets."
     }, 503);
   }
 
@@ -194,12 +194,13 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestGet({ env }) {
-  const ready = !!(env && env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET);
+  const ready = !!(env && env.STRIPE_SECRET_KEY);
   return json({
     ok: true,
     paymentsAvailable: ready,
+    webhookAvailable: !!(env && env.STRIPE_WEBHOOK_SECRET),
     message: ready
       ? "Stripe checkout endpoint is ready."
-      : "Stripe checkout endpoint is ready. Add STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET to accept payments."
+      : "Stripe checkout endpoint is ready. Add STRIPE_SECRET_KEY to accept payments."
   });
 }

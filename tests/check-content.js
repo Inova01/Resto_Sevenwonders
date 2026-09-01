@@ -110,9 +110,8 @@ console.log("\n=== 1d. Stripe payment architecture ===");
   const menuIds = [];
   SW.eachMenuItem(item => menuIds.push(item.id));
   SW.menu.drinks.concat(SW.menu.desserts).forEach(item => menuIds.push(item.id));
-  check("Stripe checkout function exists and uses server secrets",
+  check("Stripe checkout function exists and uses a server secret",
     /STRIPE_SECRET_KEY/.test(checkout) &&
-    /STRIPE_WEBHOOK_SECRET/.test(checkout) &&
     /api\.stripe\.com\/v1\/checkout\/sessions/.test(checkout));
   check("Stripe checkout re-prices from the server catalog",
     /SHOP_CATALOG/.test(checkout) &&

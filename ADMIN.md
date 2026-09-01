@@ -242,9 +242,11 @@ stops working immediately.
 
 ## Payments with Stripe
 
-The site now includes a Stripe Checkout architecture for the Shop page:
+The site now includes a Stripe Checkout architecture for the Shop and Menu
+pages:
 
 - Guests add products to the cart in `shop.html`.
+- Guests can also build a food order from `menu.html`.
 - The cart sends only product ids and quantities to `/api/checkout`.
 - `/api/checkout` loads prices from `functions/_shared/shop-catalog.js`, creates
   a Stripe Checkout Session, and returns Stripe's hosted checkout URL.
@@ -260,12 +262,13 @@ To switch it on in Cloudflare Pages:
 2. In Cloudflare, open **Workers & Pages → your Pages project → Settings →
    Variables and Secrets**.
 3. Add an encrypted secret named `STRIPE_SECRET_KEY` with the restaurant's
-   Stripe secret key.
+   Stripe secret key. Checkout can start working after this deploys.
 4. In Stripe, add a webhook endpoint:
    `https://YOUR-DOMAIN/api/stripe-webhook`
 5. Subscribe it to `checkout.session.completed`.
 6. Copy the webhook signing secret from Stripe and add it in Cloudflare as
-   `STRIPE_WEBHOOK_SECRET`.
+   `STRIPE_WEBHOOK_SECRET`. This is still required before relying on webhook
+   logs as proof that an order was paid.
 7. Optional: add `STRIPE_TAX_RATE_ID`, `STRIPE_SUCCESS_URL`,
    `STRIPE_CANCEL_URL`, or `STRIPE_CURRENCY`.
 
