@@ -508,8 +508,8 @@ console.log("\n=== about.html ===");
   check("founder portraits have real alt text",
     founders.every(c => /Gaboyau/.test(c.querySelector("img").getAttribute("alt"))));
   const founderImgCss = firstBlockAfter(".founder-card img");
-  check("founder portraits use a tall portrait crop",
-    /aspect-ratio:\s*2\s*\/\s*3/.test(founderImgCss) &&
+  check("founder portraits use a balanced portrait crop",
+    /aspect-ratio:\s*4\s*\/\s*5/.test(founderImgCss) &&
     /object-position:\s*center top/.test(founderImgCss),
     founderImgCss);
 
