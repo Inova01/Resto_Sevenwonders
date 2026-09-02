@@ -827,8 +827,8 @@ console.log("\n=== admin.html ===");
   check("overview warns publishing is not connected", /Publishing is not connected/i.test(body));
   check("overview is honest about the page being public", /Anyone who knows this address/i.test(body));
   check("overview lists details still to confirm", /Details to confirm/.test(body));
-  check("email/socials flagged unconfirmed but hours are confirmed",
-    /Email address/.test(body) && !/Opening hours/.test(body) && /Social media links/.test(body));
+  check("only socials flagged unconfirmed while email and hours are confirmed",
+    !/Email address/.test(body) && !/Opening hours/.test(body) && /Social media links/.test(body));
   check("stat tiles present", doc.querySelectorAll(".tile").length === 6);
   check("action bar says everything is published",
     /Everything is published/.test(doc.querySelector(".actionbar").textContent));
@@ -840,6 +840,12 @@ console.log("\n=== admin.html ===");
     win.SWStore.get("github").isConfigured() === false);
   check("download publisher always works",
     win.SWStore.get("download").isConfigured() === true);
+
+  Array.from(doc.querySelectorAll("#nav .side__link"))
+    .find(l => /Gallery/.test(l.textContent))
+    .dispatchEvent(new win.Event("click", { bubbles: true }));
+  check("gallery editor can upload from the computer",
+    !!doc.querySelector("#view input[type='file'][accept*='image']"));
 
   Array.from(doc.querySelectorAll("#nav .side__link"))
     .find(l => /Shop/.test(l.textContent))

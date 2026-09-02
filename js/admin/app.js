@@ -82,6 +82,9 @@
   var state = { view: "overview" };
   var DEFAULT_ADMIN_PIN = "9212";
   var INACTIVITY_LIMIT_MS = 20 * 60 * 1000;
+  var MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+  var UPLOAD_MAX_EDGE = 1600;
+  var UPLOAD_JPEG_QUALITY = 0.84;
   var inactivityTimer = null;
   var gateBound = false;
   var inactivityBound = false;
@@ -248,11 +251,94 @@
      PHOTO PICKER MODAL
      ===================================================== */
   var pickerCb = null;
+  function uploadedAlt(file) {
+    return String((file && file.name) || "Uploaded photo")
+      .replace(/\.[^.]+$/, "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() || "Uploaded photo";
+  }
+  function resizeUpload(dataUrl, done) {
+    var img = new Image();
+    img.onload = function () {
+      var scale = Math.min(1, UPLOAD_MAX_EDGE / Math.max(img.width || 1, img.height || 1));
+      var w = Math.max(1, Math.round((img.width || 1) * scale));
+      var hgt = Math.max(1, Math.round((img.height || 1) * scale));
+      var canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = hgt;
+      var ctx = canvas.getContext && canvas.getContext("2d");
+      if (!ctx || !canvas.toDataURL) {
+        done(dataUrl);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, w, hgt);
+      done(canvas.toDataURL("image/jpeg", UPLOAD_JPEG_QUALITY));
+    };
+    img.onerror = function () {
+      alert("Could not read that image. Please choose a JPG, PNG or WebP file.");
+    };
+    img.src = dataUrl;
+  }
+  function importPhotoFromComputer(file, done) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type || "")) {
+      alert("Please choose a JPG, PNG or WebP image.");
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      alert("That photo is too large. Please choose an image under 8 MB.");
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      resizeUpload(String(reader.result || ""), function (src) {
+        done(src, uploadedAlt(file));
+      });
+    };
+    reader.onerror = function () {
+      alert("Could not read that image. Please try a different file.");
+    };
+    reader.readAsDataURL(file);
+  }
+  function addUploadedGalleryPhoto(src, alt) {
+    var photos = draft.gallery.images || (draft.gallery.images = []);
+    var existing = photos.filter(function (p) { return p.src === src; })[0];
+    if (!existing) {
+      existing = { src: src, alt: alt || "Uploaded restaurant photo", hidden: false };
+      photos.unshift(existing);
+    }
+    touch(true);
+    return existing.src;
+  }
+  function uploadButton(label, onPhoto) {
+    var input = h("input", {
+      type: "file",
+      accept: "image/jpeg,image/png,image/webp",
+      style: "display:none",
+      onchange: function (e) {
+        importPhotoFromComputer(e.target.files && e.target.files[0], function (src, alt) {
+          onPhoto(src, alt);
+          e.target.value = "";
+        });
+      }
+    });
+    return h("span", { class: "upload-control" }, [
+      input,
+      h("button", {
+        class: "btn btn--primary", type: "button",
+        onclick: function () { input.click(); }
+      }, [label || "Upload from computer"])
+    ]);
+  }
   function openPhotoPicker(current, cb) {
     pickerCb = cb;
     var grid = $("#photo-grid");
     var photos = (draft.gallery.images || []);
     fill(grid, [
+      uploadButton("Upload from computer", function (src, alt) {
+        choose(addUploadedGalleryPhoto(src, alt));
+      }),
       h("button", {
         class: "none" + (current ? "" : " sel"), type: "button", title: "No photo",
         onclick: function () { choose(""); }
@@ -764,12 +850,15 @@
 
       card("Add a photo", [
         h("p", { class: "card__hint", style: "margin-top:0" , text:
-          "A web page cannot copy an image file into the project, so put the file in the site's assets/gallery/ folder first (alongside gallery-01.jpeg and the rest), then type its filename here." }),
+          "Choose a photo from this computer, or type the filename if it is already in assets/gallery/." }),
         h("div", { style: "display:flex;gap:.6rem;flex-wrap:wrap;align-items:end" }, [
           h("div", { class: "field", style: "flex:1 1 260px" }, [
             h("label", { text: "Filename or path", for: "new-photo" }),
             h("input", { type: "text", id: "new-photo", placeholder: "gallery-54.jpeg" })
           ]),
+          uploadButton("Upload from computer", function (src, alt) {
+            addUploadedGalleryPhoto(src, alt);
+          }),
           h("button", {
             class: "btn btn--primary", type: "button",
             onclick: function () {

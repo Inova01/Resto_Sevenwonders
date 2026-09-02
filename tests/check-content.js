@@ -225,6 +225,7 @@ console.log("\n=== 3. Every referenced image exists on disk ===");
 const seen = new Set();
 function img(p, where) {
   if (!p) return;
+  if (/^data:image\//i.test(p)) return;
   if (seen.has(p + where)) return;
   seen.add(p + where);
   const abs = path.join(ROOT, p.replace(/\//g, path.sep));

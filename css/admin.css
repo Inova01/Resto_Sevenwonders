@@ -376,6 +376,16 @@ select { appearance: none; background-image: none; }
 .photo-grid button:hover, .photo-grid button.sel { border-color: var(--apricot); }
 .photo-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .photo-grid .none { display: grid; place-items: center; color: var(--muted); font-size: 0.95rem; background: var(--panel-2); }
+.upload-control { display: inline-flex; }
+.photo-grid .upload-control { display: block; aspect-ratio: 1; }
+.photo-grid .upload-control .btn {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  white-space: normal;
+}
 
 /* =========================================================
    GALLERY MANAGER
