@@ -906,8 +906,11 @@ console.log("\n=== dashboard: an edit becomes a publishable file ===");
   check("publish screen lists the change", /Menu, prices and the daily special/.test(pub));
   check("publish screen shows the file path", /content\/menu\.js/.test(pub));
   check("publish screen shows the server menu catalog path", /functions\/_shared\/menu-catalog\.js/.test(pub));
-  check("publish is blocked until a method is connected",
-    Array.from(doc.querySelectorAll("#view button")).some(b => /Publish now/.test(b.textContent) && b.disabled));
+  const setupButton = Array.from(doc.querySelectorAll("#view button")).find(b => /Set up GitHub first/.test(b.textContent));
+  check("publish screen sends the manager to GitHub setup until a token is saved", !!setupButton && setupButton.disabled === false);
+  setupButton.dispatchEvent(new win.Event("click", { bubbles: true }));
+  check("setup button opens Settings",
+    /Publishing to GitHub/.test(doc.querySelector("#view").textContent));
   check("no script errors while editing", errors.length === 0, errors.join("\n         "));
 }
 

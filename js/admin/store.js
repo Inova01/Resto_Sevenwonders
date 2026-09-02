@@ -315,7 +315,7 @@
     var API = "https://api.github.com";
 
     function cfg() {
-      return readLS(GH_KEY, { owner: "", repo: "", branch: "main", token: "" });
+      return readLS(GH_KEY, { owner: "Inova01", repo: "Resto_Sevenwonders", branch: "main", token: "" });
     }
 
     function req(path, options) {
@@ -349,7 +349,7 @@
     return {
       id: "github",
       label: "GitHub (publishes the live site)",
-      help: "Commits the changed files to your repository. GitHub Pages then rebuilds the site, usually within a minute.",
+      help: "Commits the changed files to GitHub. Cloudflare Pages then rebuilds the live website, usually within a minute.",
 
       config: cfg,
       setConfig: function (next) { writeLS(GH_KEY, next); },

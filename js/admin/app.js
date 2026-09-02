@@ -1296,8 +1296,8 @@
           ? null
           : h("div", { class: "notice notice--warn" }, [
               h("span", { class: "notice__ico", text: "·" }),
-              h("div", {}, [h("b", { text: "This method is not set up." }),
-                h("p", { text: "Open Settings to connect it, or choose “Download the files”, which always works." })])
+              h("div", {}, [h("b", { text: "GitHub publishing is not connected yet." }),
+                h("p", { text: "Open Settings once, paste a GitHub token with Contents: Read and write, then come back here and publish." })])
             ]),
         textField("Note to record with this change", publishState, "message", {
           placeholder: "e.g. New prices for the fish platters",
@@ -1305,9 +1305,17 @@
         }),
         h("div", { style: "display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.9rem" }, [
           h("button", {
-            class: "btn btn--primary", type: "button", disabled: publishState.busy || !pub.isConfigured(),
-            onclick: function () { doPublish(pub, files); }
-          }, [publishState.busy ? "Publishing…" : "Publish now"]),
+            class: "btn btn--primary", type: "button", disabled: publishState.busy,
+            onclick: function () {
+              if (!pub.isConfigured()) {
+                state.view = "settings";
+                paintNav();
+                render();
+                return;
+              }
+              doPublish(pub, files);
+            }
+          }, [publishState.busy ? "Publishing…" : (pub.isConfigured() ? "Publish now" : "Set up GitHub first")]),
           h("button", {
             class: "btn btn--danger", type: "button", disabled: publishState.busy,
             onclick: function () {
