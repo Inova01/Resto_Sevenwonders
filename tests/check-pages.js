@@ -508,9 +508,10 @@ console.log("\n=== about.html ===");
   check("founder portraits have real alt text",
     founders.every(c => /Gaboyau/.test(c.querySelector("img").getAttribute("alt"))));
   const founderImgCss = firstBlockAfter(".founder-card img");
-  check("founder portraits use a balanced portrait crop",
-    /aspect-ratio:\s*4\s*\/\s*5/.test(founderImgCss) &&
-    /object-position:\s*center top/.test(founderImgCss),
+  check("founder portraits use a wide compact crop",
+    /height:\s*clamp\(240px,\s*28vw,\s*340px\)/.test(founderImgCss) &&
+    /aspect-ratio:\s*5\s*\/\s*4/.test(founderImgCss) &&
+    /object-position:\s*center 28%/.test(founderImgCss),
     founderImgCss);
 
   const photos = Array.from(doc.querySelectorAll("[data-about-photos] img"));
