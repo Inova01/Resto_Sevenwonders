@@ -817,7 +817,7 @@ console.log("\n=== admin.html ===");
 
   const counts = Array.from(doc.querySelectorAll("#nav .count")).map(text);
   check("menu count = 28 dishes + 23 drinks = 51", counts[1] === "51", counts.join(","));
-  check("gallery count is 58", counts[3] === "58", counts.join(","));
+  check("gallery count matches content", counts[3] === String(win.SW.gallery.images.length), counts.join(","));
   check("shop count is 10", counts[2] === "10");
   check("blog count is 6", counts[4] === "6");
   check("publish badge empty when nothing has changed", counts[8] === "");
@@ -954,6 +954,35 @@ console.log("\n=== dashboard: a Stripe Payment Link becomes a publishable file =
     try { new win.Function(files[0].text); return true; } catch (e) { return false; }
   })());
   check("no script errors while editing Stripe links", errors.length === 0, errors.join("\n         "));
+}
+
+console.log("\n=== dashboard: a blog upload becomes a publishable image file ===");
+{
+  const { doc, win, errors } = loadPage("admin.html");
+  unlockAdmin(doc);
+  const draft = JSON.parse(JSON.stringify(win.SW.published));
+  const uploaded = "data:image/jpeg;base64," + Buffer.from("fake uploaded blog photo").toString("base64");
+  draft.blog.posts[0].img = uploaded;
+  draft.gallery.images.unshift({ src: uploaded, alt: "Uploaded blog photo", hidden: false });
+
+  const files = win.SWStore.Serializer.filesFor(draft, win.SW.published);
+  const paths = files.map(f => f.path);
+  const blogFile = files.find(f => f.path === "content/blog.js");
+  const galleryFile = files.find(f => f.path === "content/gallery.js");
+  const uploadFile = files.find(f => /^assets\/uploads\/dashboard-[a-z0-9]+\.jpg$/.test(f.path));
+
+  check("blog photo publish includes content/blog.js", !!blogFile, JSON.stringify(paths));
+  check("blog upload publish includes content/gallery.js", !!galleryFile, JSON.stringify(paths));
+  check("blog upload publish includes one real image file", !!uploadFile, JSON.stringify(paths));
+  check("blog content points at the uploaded image file",
+    !!(blogFile && uploadFile && blogFile.text.includes(uploadFile.path) && !blogFile.text.includes("data:image")));
+  check("gallery content points at the uploaded image file",
+    !!(galleryFile && uploadFile && galleryFile.text.includes(uploadFile.path) && !galleryFile.text.includes("data:image")));
+  check("uploaded image file is sent as base64",
+    uploadFile && uploadFile.encoding === "base64" && /ZmFrZSB1cGxvYWRlZCBibG9nIHBob3Rv/.test(uploadFile.text));
+  check("publishDataFor returns file paths, not browser data URLs",
+    win.SWStore.Serializer.publishDataFor(draft).blog.posts[0].img === uploadFile.path);
+  check("no script errors while preparing blog image uploads", errors.length === 0, errors.join("\n         "));
 }
 
 console.log("\n" + "=".repeat(52));

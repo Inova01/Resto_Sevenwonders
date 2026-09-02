@@ -2778,6 +2778,42 @@
       }
     ],
     "width": 1280
+  },
+  "assets/uploads/dashboard-1hypgyi.jpg": {
+    "bytes": 72158,
+    "height": 1004,
+    "quality": null,
+    "webp": [
+      {
+        "bytes": 13588,
+        "height": 344,
+        "quality": 72,
+        "src": "assets/variants/uploads/dashboard-1hypgyi-240.webp",
+        "width": 240
+      },
+      {
+        "bytes": 24030,
+        "height": 516,
+        "quality": 72,
+        "src": "assets/variants/uploads/dashboard-1hypgyi-360.webp",
+        "width": 360
+      },
+      {
+        "bytes": 34246,
+        "height": 688,
+        "quality": 72,
+        "src": "assets/variants/uploads/dashboard-1hypgyi-480.webp",
+        "width": 480
+      },
+      {
+        "bytes": 52942,
+        "height": 1004,
+        "quality": 72,
+        "src": "assets/variants/uploads/dashboard-1hypgyi-700.webp",
+        "width": 700
+      }
+    ],
+    "width": 700
   }
 };
 

@@ -1326,7 +1326,8 @@
 
     var LABELS = {
       settings: "Info, hours and social links", menu: "Menu, prices and the daily special",
-      shop: "Shop products", gallery: "Gallery photos", blog: "Blog posts", home: "Homepage"
+      shop: "Shop products", gallery: "Gallery photos", blog: "Blog posts", home: "Homepage",
+      uploads: "Uploaded photo file"
     };
 
     var head = [
@@ -1372,7 +1373,7 @@
             h("span", { class: "grow" }),
             h("span", { class: "file mono", text: f.path })
           ]),
-          h("pre", { text: f.text })
+          h("pre", { text: f.encoding === "base64" ? "[new image file uploaded from the dashboard]" : f.text })
         ]);
       }))),
 
@@ -1443,7 +1444,8 @@
            in memory — otherwise every section would keep showing as
            "changed" until the deploy finished and the page was reloaded.
            The draft is then cleared, so a reload starts from the files. */
-        Store.SECTIONS.forEach(function (s) { published[s] = clone(draft[s]); });
+        var publishedDraft = Serializer.publishDataFor(draft);
+        Store.SECTIONS.forEach(function (s) { published[s] = clone(publishedDraft[s]); });
         Draft.clear();
       }
       render();

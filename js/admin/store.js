@@ -69,6 +69,61 @@
     return btoa(out);
   }
 
+  function base64ToBytes(b64) {
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  function dataImageParts(value) {
+    var m = /^data:image\/(jpeg|jpg|png|webp);base64,([a-z0-9+/=]+)$/i.exec(String(value || ""));
+    if (!m) return null;
+    return {
+      ext: /^jpe?g$/i.test(m[1]) ? "jpg" : m[1].toLowerCase(),
+      base64: m[2]
+    };
+  }
+
+  function shortHash(str) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0).toString(36);
+  }
+
+  function prepareUploads(data) {
+    var uploads = [];
+    var map = {};
+
+    function walk(value) {
+      var parts = dataImageParts(value);
+      if (parts) {
+        if (!map[value]) {
+          map[value] = "assets/uploads/dashboard-" + shortHash(parts.base64) + "." + parts.ext;
+          uploads.push({
+            section: "uploads",
+            path: map[value],
+            text: parts.base64,
+            encoding: "base64"
+          });
+        }
+        return map[value];
+      }
+      if (Array.isArray(value)) return value.map(walk);
+      if (value && typeof value === "object") {
+        var out = {};
+        Object.keys(value).forEach(function (k) { out[k] = walk(value[k]); });
+        return out;
+      }
+      return value;
+    }
+
+    return { data: walk(data), uploads: uploads };
+  }
+
   /* =====================================================
      DRAFT — the working copy in this browser
      ===================================================== */
@@ -272,27 +327,34 @@
     /* Every changed section as { path, text } */
     filesFor: function (draft, published) {
       var files = [];
-      Draft.changedSections(draft, published).forEach(function (section) {
+      var prepared = prepareUploads(draft);
+      var publishDraft = prepared.data;
+      Draft.changedSections(publishDraft, published).forEach(function (section) {
         files.push({
           section: section,
           path: Serializer.path(section),
-          text: Serializer.render(section, draft[section])
+          text: Serializer.render(section, publishDraft[section])
         });
         if (section === "shop") {
           files.push({
             section: section,
             path: Serializer.shopCatalogPath(),
-            text: Serializer.renderShopCatalog(draft[section])
+            text: Serializer.renderShopCatalog(publishDraft[section])
           });
         } else if (section === "menu") {
           files.push({
             section: section,
             path: Serializer.menuCatalogPath(),
-            text: Serializer.renderMenuCatalog(draft[section])
+            text: Serializer.renderMenuCatalog(publishDraft[section])
           });
         }
       });
+      prepared.uploads.forEach(function (f) { files.push(f); });
       return files;
+    },
+
+    publishDataFor: function (draft) {
+      return prepareUploads(draft).data;
     }
   };
 
@@ -404,12 +466,12 @@
             treeSha = commit.tree.sha;
             // Upload each file's content as a blob
             return Promise.all(files.map(function (f) {
-              return req(base + "/git/blobs", {
-                method: "POST",
-                body: { content: utf8ToBase64(f.text), encoding: "base64" }
-              }).then(function (blob) {
-                return { path: f.path, mode: "100644", type: "blob", sha: blob.sha };
-              });
+            return req(base + "/git/blobs", {
+              method: "POST",
+              body: { content: f.encoding === "base64" ? f.text : utf8ToBase64(f.text), encoding: "base64" }
+            }).then(function (blob) {
+              return { path: f.path, mode: "100644", type: "blob", sha: blob.sha };
+            });
             }));
           })
           .then(function (entries) {
@@ -480,7 +542,9 @@
         files.forEach(function (f, i) {
           // Stagger slightly: some browsers drop simultaneous downloads
           setTimeout(function () {
-            var blob = new Blob([f.text], { type: "text/javascript;charset=utf-8" });
+            var blob = f.encoding === "base64"
+              ? new Blob([base64ToBytes(f.text)], { type: "image/" + f.path.split(".").pop() })
+              : new Blob([f.text], { type: "text/javascript;charset=utf-8" });
             var url = URL.createObjectURL(blob);
             var a = document.createElement("a");
             a.href = url;
