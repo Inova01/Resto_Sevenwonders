@@ -80,6 +80,12 @@
   });
 
   var state = { view: "overview" };
+  var DEFAULT_ADMIN_PIN = "9212";
+  var INACTIVITY_LIMIT_MS = 20 * 60 * 1000;
+  var inactivityTimer = null;
+  var gateBound = false;
+  var inactivityBound = false;
+  var isUnlocked = false;
 
   function changed() { return Draft.changedSections(draft, published); }
 
@@ -1423,13 +1429,13 @@
 
       card("Screen lock", [
         h("p", { class: "card__hint", style: "margin-top:0", text:
-          "An optional PIN, checked in the browser. It stops someone who stumbles onto the address from seeing the editor. " +
+          "A PIN privacy screen, checked in the browser. It stops someone who stumbles onto the address from seeing the editor. " +
           "It is not security — a determined person can get past it — and it does not protect the live site. The publish token does that. " +
-          "ADMIN.md explains how to put a real login in front of this page if you need one." }),
+          "The dashboard also locks itself after 20 minutes without activity. ADMIN.md explains how to put a real login in front of this page if you need one." }),
         h("div", { style: "display:flex;gap:.6rem;flex-wrap:wrap;align-items:end" }, [
           h("div", { class: "field", style: "flex:1 1 200px" }, [
             h("label", { text: "New PIN", for: "new-pin" }),
-            h("input", { type: "password", id: "new-pin", inputmode: "numeric", placeholder: "leave blank to remove" })
+            h("input", { type: "password", id: "new-pin", inputmode: "numeric", placeholder: "leave blank to use starter PIN" })
           ]),
           h("button", {
             class: "btn btn--primary", type: "button",
@@ -1437,7 +1443,7 @@
               var pin = ($("#new-pin").value || "").trim();
               if (!pin) {
                 Meta.set({ pinHash: null });
-                alert("PIN removed. The dashboard will open without asking.");
+                alert("Custom PIN removed. The starter PIN is now active again.");
                 $("#new-pin").value = "";
                 return;
               }
@@ -1451,7 +1457,7 @@
         ]),
         Meta.read().pinHash
           ? h("p", { class: "card__hint", text: "A PIN is currently set." })
-          : h("p", { class: "card__hint", text: "No PIN set — the dashboard opens straight away." })
+          : h("p", { class: "card__hint", text: "Starter PIN is active. Change it here before handing the dashboard to the owner." })
       ]),
 
       card("Supabase (later)", [
@@ -1500,30 +1506,69 @@
     });
   }
 
-  function startGate() {
-    var meta = Meta.read();
-    if (!meta.pinHash) return openApp();
+  function finishPinAttempt(ok) {
+    if (ok) {
+      $("#gate").hidden = true;
+      openApp();
+    } else {
+      $("#gate-msg").textContent = "That PIN does not match.";
+      $("#gate-pin").value = "";
+      $("#gate-pin").focus();
+    }
+  }
 
+  function resetInactivityTimer() {
+    if (!isUnlocked) return;
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(function () {
+      lockApp("Dashboard locked after 20 minutes without activity.");
+    }, INACTIVITY_LIMIT_MS);
+  }
+
+  function bindInactivityTimer() {
+    if (inactivityBound) return;
+    inactivityBound = true;
+    ["keydown", "mousedown", "mousemove", "touchstart", "scroll"].forEach(function (eventName) {
+      document.addEventListener(eventName, resetInactivityTimer, { passive: true });
+    });
+  }
+
+  function lockApp(message) {
+    isUnlocked = false;
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = null;
+    $("#shell").hidden = true;
+    startGate(message);
+  }
+
+  function startGate(message) {
     var gate = $("#gate");
     gate.hidden = false;
-    $("#gate-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      hashPin($("#gate-pin").value).then(function (hash) {
-        if (hash === Meta.read().pinHash) {
-          gate.hidden = true;
-          openApp();
-        } else {
-          $("#gate-msg").textContent = "That PIN does not match.";
-          $("#gate-pin").value = "";
-          $("#gate-pin").focus();
+    $("#gate-msg").textContent = message || "";
+    $("#gate-pin").value = "";
+    if (!gateBound) {
+      gateBound = true;
+      $("#gate-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var pin = $("#gate-pin").value;
+        var meta = Meta.read();
+        if (!meta.pinHash) {
+          finishPinAttempt(pin === DEFAULT_ADMIN_PIN);
+          return;
         }
+        hashPin(pin).then(function (hash) {
+          finishPinAttempt(hash === Meta.read().pinHash);
+        });
       });
-    });
+    }
     $("#gate-pin").focus();
   }
 
   function openApp() {
+    isUnlocked = true;
     $("#shell").hidden = false;
+    bindInactivityTimer();
+    resetInactivityTimer();
     paintNav();
     render();
   }

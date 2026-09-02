@@ -33,6 +33,21 @@ function loadPage(file, opts = {}) {
       });
       win.requestAnimationFrame = () => 0;
       win.cancelAnimationFrame = () => {};
+      if (opts.fakeTimers) {
+        const timers = new Map();
+        let timerId = 0;
+        win.setTimeout = (fn) => {
+          const id = ++timerId;
+          timers.set(id, fn);
+          return id;
+        };
+        win.clearTimeout = (id) => timers.delete(id);
+        win.__runAllTimers = () => {
+          const pending = Array.from(timers.values());
+          timers.clear();
+          pending.forEach(fn => fn());
+        };
+      }
       win.__canvasContextCalls = 0;
       win.HTMLCanvasElement.prototype.getContext = () => {
         win.__canvasContextCalls++;
@@ -79,6 +94,15 @@ function visible(doc) {
   c.querySelectorAll("script, style, template").forEach(n => n.remove());
   c.querySelectorAll("[hidden]").forEach(n => n.remove());
   return c.textContent.replace(/\s+/g, " ").trim();
+}
+
+function unlockAdmin(doc, pin = "9212") {
+  const gatePin = doc.querySelector("#gate-pin");
+  const gateForm = doc.querySelector("#gate-form");
+  if (!gatePin || !gateForm) return false;
+  gatePin.value = pin;
+  gateForm.dispatchEvent(new doc.defaultView.Event("submit", { bubbles: true, cancelable: true }));
+  return doc.querySelector("#shell").hidden === false;
 }
 
 function checkRenderedImages(file) {
@@ -763,7 +787,7 @@ console.log("\n=== keyboard accessibility ===");
 console.log("\n=== admin.html ===");
 {
   const adminHtml = fs.readFileSync(path.join(ROOT, "admin.html"), "utf8");
-  const { doc, win, errors } = loadPage("admin.html");
+  const { doc, win, errors } = loadPage("admin.html", { fakeTimers: true });
   check("no script errors", errors.length === 0, errors.join("\n         "));
   check("dashboard uses the bumped readable stylesheet",
     /css\/admin\.css\?v=dashboard-readable/.test(adminHtml));
@@ -774,8 +798,15 @@ console.log("\n=== admin.html ===");
     /font-size:\s*clamp\(17px/.test(ADMIN_CSS_TEXT));
   check("dashboard sidebar is wider",
     /--sidebar:\s*clamp\(280px,\s*18vw,\s*340px\)/.test(ADMIN_CSS_TEXT));
-  check("dashboard shell is visible (no PIN set)", doc.querySelector("#shell").hidden === false);
-  check("gate stays hidden", doc.querySelector("#gate").hidden === true);
+  check("dashboard starts locked even when no custom PIN is set", doc.querySelector("#shell").hidden === true);
+  check("PIN gate is visible on every fresh visit", doc.querySelector("#gate").hidden === false);
+  unlockAdmin(doc, "1111");
+  check("wrong starter PIN keeps the dashboard locked", doc.querySelector("#shell").hidden === true);
+  check("starter PIN opens the dashboard", unlockAdmin(doc));
+  if (typeof win.__runAllTimers === "function") win.__runAllTimers();
+  check("dashboard locks again after 20 minutes of inactivity",
+    doc.querySelector("#shell").hidden === true && doc.querySelector("#gate").hidden === false);
+  check("starter PIN reopens after inactivity lock", unlockAdmin(doc));
 
   const nav = Array.from(doc.querySelectorAll("#nav .side__link span:first-child")).map(text);
   check("all 10 sections in the sidebar", nav.length === 10, nav.join(", "));
@@ -821,6 +852,7 @@ console.log("\n=== admin.html ===");
 console.log("\n=== dashboard: every screen renders ===");
 {
   const { doc, win, errors } = loadPage("admin.html");
+  unlockAdmin(doc);
   const links = Array.from(doc.querySelectorAll("#nav .side__link"));
   links.forEach((link) => {
     const name = text(link.querySelector("span"));
@@ -837,6 +869,7 @@ console.log("\n=== dashboard: every screen renders ===");
 console.log("\n=== dashboard: an edit becomes a publishable file ===");
 {
   const { doc, win, errors } = loadPage("admin.html");
+  unlockAdmin(doc);
   // Go to Menu & prices
   Array.from(doc.querySelectorAll("#nav .side__link"))
     .find(l => /Menu & prices/.test(l.textContent))
@@ -881,6 +914,7 @@ console.log("\n=== dashboard: an edit becomes a publishable file ===");
 console.log("\n=== dashboard: a Stripe Payment Link becomes a publishable file ===");
 {
   const { doc, win, errors } = loadPage("admin.html");
+  unlockAdmin(doc);
   Array.from(doc.querySelectorAll("#nav .side__link"))
     .find(l => /Shop/.test(l.textContent))
     .dispatchEvent(new win.Event("click", { bubbles: true }));
